@@ -89,7 +89,6 @@ def create_event():
     message = ''
     if request.method == "POST" and form.validate_on_submit():
         try:
-            print('creating')
             api.create_event(form.name.data, current_user.login, form.date_time.data)
             message = f'{form.name.data} was created'
             form.name.data = ''

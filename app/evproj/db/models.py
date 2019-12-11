@@ -40,9 +40,8 @@ class Event(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    #creator = Column(Integer, ForeignKey('users.id'), nullable=False)
-    creator = Column(String, nullable=False)
+    creator = Column(Integer, ForeignKey('users.id'), nullable=False)
     created = Column(DateTime, default=datetime.utcnow, nullable=False)
-    date_time = Column(String, nullable=False)
+    date_time = Column(DateTime, nullable=False)
     event_status = Column(Event_status, default='unconfirmed', nullable=False)
     registration_status = Column(Boolean, default=True, nullable=False)

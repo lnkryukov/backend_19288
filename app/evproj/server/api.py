@@ -49,8 +49,15 @@ def get_events():
 
 
 def create_event(name, creator, date_time):
+    timedate = date_time.split('-')
+    time_date = datetime(int(timedate[0]), int(timedate[1]), int(timedate[2]),
+                         int(timedate[3]), int(timedate[4]), 0, 0)
     with get_session() as s:
-        event = Event(name=name, creator=creator, date_time=date_time)
+        user_id = s.query(User).filter(
+                User.login == creator,
+        ).one_or_none().id
+
+        event = Event(name=name, creator=user_id, date_time=time_date)
         s.add(event)
         logging.info('Creating new event [{}]'.format(name))
 
@@ -62,6 +69,7 @@ def get_event_info(id):
         ).one_or_none()
 
         return event
+
 
 def confirm_user(confirmation_link):
     with get_session() as s:
