@@ -23,7 +23,7 @@ def get_session():
         session.close()
 
 
-def create_tables():
+def create_tables(password):
     logging.info('Dropping existing tables')
     for tbl in reversed(Base.metadata.sorted_tables):
         try:
@@ -36,8 +36,8 @@ def create_tables():
     with get_session() as s:
         root = User(
             login='root_admin',
-            password='root_admin123456789',
-            mail='root_admin',
+            password=password,
+            mail='root_admin_mail',
             name='Name',
             surname='Surname',
             lvl=0,
@@ -48,7 +48,7 @@ def create_tables():
     logging.info('Default user [root_admin] was created')
 
 
-def upgrade_schema():
-    logging.info('Upgrading tables schema')
-    from .models import Tokens as tb
-    tb.__table__.create(_engine)
+#def upgrade_schema():
+    #logging.info('Upgrading tables schema')
+    #from .models import Tokens as tb
+    #tb.__table__.create(_engine)

@@ -10,8 +10,12 @@ class AuthForm(FlaskForm):
 
 class RegisterForm(FlaskForm):
     login = StringField('Login', [validators.DataRequired()])
-    mail = PasswordField('Email', [validators.DataRequired()])
+    mail = StringField('Email', [validators.DataRequired()])
     name = StringField('Name', [validators.DataRequired()])
     surname = StringField('Surname', [validators.DataRequired()])
     password = PasswordField('Password', [validators.DataRequired()])
     password_repeat = PasswordField('Password', [validators.DataRequired()])
+
+class CreateEvent(FlaskForm):
+    name = StringField('Name', [validators.DataRequired()])
+    date_time = StringField('Date_time', [validators.DataRequired()])

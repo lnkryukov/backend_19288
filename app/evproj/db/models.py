@@ -17,7 +17,7 @@ Event_status = ENUM('unconfirmed', 'future', 'past', name='event_status')
 
 
 class User(Base, UserMixin):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     login = Column(String, unique=True, nullable=False)
@@ -28,20 +28,11 @@ class User(Base, UserMixin):
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
                        unique=True, nullable=False)
     lvl = Column(Integer, default=2, nullable=False)
-    status = Column(User_status, default='unconfirmed', nullable=False)
+    status = Column(User_status, default='active', nullable=False)
     confirmation_link = Column(String, nullable=False)
 
     def get_id(self):
         return self.cookie_id
-
-
-class Token(Base):
-    __tablename__ = 'token'
-
-    id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
-    issued = Column(DateTime, default=datetime.utcnow, nullable=False)
-    status = Column(Status, default='active', nullable=False)
 
 
 class Event(Base):
@@ -49,7 +40,9 @@ class Event(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    creator = Column(Integer, ForeignKey('user.id'), nullable=False)
+    #creator = Column(Integer, ForeignKey('users.id'), nullable=False)
+    creator = Column(String, nullable=False)
     created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    date_time = Column(String, nullable=False)
     event_status = Column(Event_status, default='unconfirmed', nullable=False)
     registration_status = Column(Boolean, default=True, nullable=False)

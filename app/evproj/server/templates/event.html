@@ -1,0 +1,21 @@
+{% extends "blank.html" %}
+{% block title %}
+<title>{{event.get('name', '')}}</title>
+{% endblock %}
+
+{% block head %}
+EVENT - {{event.get('name', '')}}
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-6">
+	<div class="card mb-4">
+        <div class="card-header"><a class="btn btn-link" href="/event/{{event.get('id', '')}}" role="button"> {{event.get('name', '')}} </a></div>
+        <div class="card-body">{{event.get('creator', '')}} - {{event.get('date', '')}}</div>
+	</div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+{% endblock %}

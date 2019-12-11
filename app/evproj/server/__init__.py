@@ -31,7 +31,6 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 login_manager.user_loader(auth.user_loader)
-login_manager.header_loader(auth.header_loader)
 login_manager.blueprint_login_views = {
     'general': '/login',
     'api': '/api/unauthorized',

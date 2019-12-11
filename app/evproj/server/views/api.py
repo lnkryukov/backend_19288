@@ -24,24 +24,6 @@ def make_ok(description=None):
     return jsonify(body)
 
 
-@mod.route('/issue_token', methods=['GET'])
-@login_required
-def issue_token():
-    if current_user.admin:
-        return jsonify(token=auth.issue_token(current_user))
-    else:
-        return make_400('You dont have administrator rights')
-
-
-
-@mod.route('/token', methods=['GET'])
-@login_required
-def token():
-    if current_user.admin:
-        return jsonify(token=auth.get_token(current_user))
-    else:
-        return make_400('You dont have administrator rights')
-
 # test routes for something)
 
 @mod.route('/test_route', methods=['GET'])

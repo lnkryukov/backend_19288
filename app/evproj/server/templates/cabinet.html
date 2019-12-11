@@ -1,0 +1,28 @@
+{% extends "blank.html" %}
+{% block title %}
+<title>Cabinet</title>
+{% endblock %}
+
+{% block head %}
+CABINET
+{% endblock %}
+
+{% block content %}
+<div class="col-lg-6">
+	<div class="card mb-4">
+        <div class="card-header">{{user.surname}} {{user.name}}</div>
+        <div class="card-body">{{user.mail}} - {{user.lvl}}</div>
+	</div>
+</div>
+
+<a href="/create_event" class="btn btn-primary btn-icon-split">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-flag"></i>
+                    </span>
+                    <span class="text">Create event</span>
+                  </a>
+{% endblock %}
+
+
+{% block extra_js %}
+{% endblock %}

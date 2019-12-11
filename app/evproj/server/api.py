@@ -25,13 +25,43 @@ def register_user(login, mail, name, surname, password, lvl=2):
             user.status = 'unconfirmed'
             user.lvl = lvl
         else:
-            confirmation_link = random_string_digits(25)
+            confirmation_link = util.random_string_digits(25)
             user = User(login=login, mail=mail, name=name,
                         surname=surname, password=password,
                         lvl=lvl, confirmation_link=confirmation_link)
             s.add(user)
         logging.info('Registering new user [{}]'.format(login))
 
+
+def get_events():
+    result = {}
+    with get_session() as s:
+        events = s.query(Event).all()
+
+        for event in events:
+            result[event.id] = {
+                'id': event.id,
+                'name': event.name,
+                'creator': event.creator,
+                'date': event.date_time,
+            }
+    return result
+
+
+def create_event(name, creator, date_time):
+    with get_session() as s:
+        event = Event(name=name, creator=creator, date_time=date_time)
+        s.add(event)
+        logging.info('Creating new event [{}]'.format(name))
+
+
+def get_event_info(id):
+    with get_session() as s:
+        event = s.query(Event).filter(
+                Event.id == id,
+        ).one_or_none()
+
+        return event
 
 def confirm_user(confirmation_link):
     with get_session() as s:
