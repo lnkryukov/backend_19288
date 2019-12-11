@@ -1,9 +1,7 @@
 #!/bin/bash
 
-export PGUSER=""
-export PGHOST=""
-export PGPORT=""
-export PGDATABASE=""
-export PGPASSWORD=""
-
-
+export PGUSER="evpr"
+export PGHOST="localhost"
+export PGPORT="5432"
+export PGDATABASE="evpr"
+export PGPASSWORD="evrp123456789"
