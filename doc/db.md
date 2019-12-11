@@ -10,6 +10,7 @@
 
 ## Как поставить PostgreSQL 
 1) Ставим пакет:
+	
 	Ubuntu:
 
 		```sudo apt install -y postgresql```
