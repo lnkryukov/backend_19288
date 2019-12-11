@@ -111,22 +111,6 @@ def eventе(id):
     )
 
 
-@mod.route('/confirmation/<string:name>')
-def event(name):
-    if current_user.is_authenticated:
-        pass
-    else:
-        return render_template(
-            'event.html',
-            name=name,
-        )
-
-
-@mod.route('/blank')
-def blank():
-    return render_template('blank.html')
-
-
 def page_not_found(e):
     if current_user.is_authenticated:
         return render_template(
