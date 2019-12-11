@@ -10,9 +10,12 @@
 
 ## Как поставить PostgreSQL 
 1) Ставим пакет:
-	Ubintu:
+	Ubuntu:
+
 		```sudo apt install -y postgresql```
+	
 	CentOS 7:
+
 		```sudo yum install postgresql-server postgresql-contrib```
 		```sudo postgresql-setup initdb```
 		```sudo systemctl start postgresql```
