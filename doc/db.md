@@ -8,10 +8,14 @@
 
 Но в то же время проигрывает MySQL по скорости работы.
 
-## Как поставить PostgreSQL (Ubuntu)
+## Как поставить PostgreSQL 
 1) Ставим пакет:
-
-		sudo apt install -y postgresql
+	Ubintu:
+		```sudo apt install -y postgresql```
+	CentOS 7:
+		```sudo yum install postgresql-server postgresql-contrib```
+		```sudo postgresql-setup initdb```
+		```sudo systemctl start postgresql```
 
 2) Переходим в суперюзера бд:
 
@@ -30,4 +34,11 @@
 		psql %dbname% 
 		GRANT ALL ON DATABASE %dbname% to %username%;
 
+6) CENTOS ONLY! Отредактировать конфиг-файл:
+
+		cd /var/lib/pgsql/data/
+		sudo nano/vim ph_hba.conf
+		заменить METHOD на md5 у local, ipv4, ipv6 connections (3 записи).
+
 После этого можно подключиться к БД задав нужные переменные окружения из `setup.sh` и набрав в консоли `psql`.
+
