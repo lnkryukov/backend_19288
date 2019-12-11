@@ -47,6 +47,7 @@
     -   Так же можно поднять PostgreSQL в облаке (например [Heroku](https://www.heroku.com/))
 
 *   При первом запуске необходимо:
-	-	указать опцию `--create-tables CREATE_TABLES`, чтобы в БД создались нужные табличкии
+	-	указать опцию `--create-tables password`, чтобы в БД создались нужные табличкии
+	-	password - от root_admin
 
 *   Запуск происходит через `python3 main.py`

@@ -106,7 +106,6 @@ def create_event():
 @mod.route('/event/<string:id>')
 def eventе(id):
     event = api.get_event_info(id)
-    print(event)
     return render_template(
         '/event.html',
         event=event,
