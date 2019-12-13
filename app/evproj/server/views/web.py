@@ -19,7 +19,7 @@ def login():
     form = forms.AuthForm(request.form)
     message = ''
     if request.method == "POST" and form.validate_on_submit():
-        user = auth.check_user(form.login.data)
+        user = auth.check_user(form.mail.data)
         if user:
             if sha256_crypt.verify(form.password.data, user.password):
                 login_user(user)
@@ -39,13 +39,11 @@ def register():
     message = ''
     if request.method == "POST" and form.validate_on_submit():
         try:
-            api.register_user(form.login.data,
-                                form.mail.data,
+            api.register_user(form.mail.data,
                                 form.name.data,
                                 form.surname.data,
                                 sha256_crypt.encrypt(str(form.password.data)))
             message = f'{form.login.data} was registered'
-            form.login.data = ''
             form.mail.data = ''
             form.name.data = ''
             form.surname.data = ''
@@ -53,6 +51,7 @@ def register():
             form.password_repeat.data = ''
         except Exception as e:
             message = 'Failed to register user, probably one already exists.\n{}'.format(str(e))
+        return redirect(url_for('general.login'))
     return render_template('register.html', form=form, message=message)
 
 
@@ -89,12 +88,23 @@ def create_event():
     message = ''
     if request.method == "POST" and form.validate_on_submit():
         try:
-            api.create_event(form.name.data, current_user.login, form.date_time.data)
+            last_id = api.create_event(form.name.data,
+                                        form.sm_description.data,
+                                        form.description.data,
+                                        form.date_time.data,
+                                        form.phone.data,
+                                        form.mail.data)
+            api.create_event_creator(current_user.id, last_id)
             message = f'{form.name.data} was created'
             form.name.data = ''
+            form.sm_description.data = ''
+            form.description.data = ''
             form.date_time.data = ''
+            form.phone.data = ''
+            form.mail.data = ''
         except Exception as e:
             message = 'Failed to create event.\n{}'.format(str(e))
+        return redirect(url_for('general.home'))
     return render_template(
         '/create_event.html',
         form=form,
@@ -103,19 +113,43 @@ def create_event():
 
 
 @mod.route('/event/<string:id>')
-def eventе(id):
-    event = api.get_event_info(id)
-    return render_template(
-        '/event.html',
-        event=event,
-    )
+def event(id):
+    if api.event_exist(id):
+        event = api.get_event_info(id)
+        users = api.get_participators(id)
+        if current_user.is_authenticated:
+            entering = api.check_participation(current_user.id, id)
+            return render_template(
+                '/event_page.html',
+                event=event,
+                users=users,
+                entering=entering,
+            )
+        else:
+            return render_template(
+                '/event_page.html',
+                event=event,
+                users=users,
+                entering=False,
+            )
+    else:
+        abort(404)
+
+
+@mod.route('/join/<string:id>', methods=['GET', 'POST'])
+@login_required
+def join(id):
+    if api.event_exist(id):
+        pass
+    else:
+        abort(404)
 
 
 def page_not_found(e):
     if current_user.is_authenticated:
         return render_template(
             '404.html',
-            login=current_user.login
+            login=current_user.mail
         ), 404
     else:
         return render_template(

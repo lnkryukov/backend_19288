@@ -4,12 +4,11 @@ from wtforms import (BooleanField, StringField, PasswordField, validators,
 
 
 class AuthForm(FlaskForm):
-    login = StringField('Login', [validators.DataRequired()])
+    mail = StringField('Mail', [validators.DataRequired()])
     password = PasswordField('Password', [validators.DataRequired()])
 
 
 class RegisterForm(FlaskForm):
-    login = StringField('Login', [validators.DataRequired()])
     mail = StringField('Email', [validators.DataRequired()])
     name = StringField('Name', [validators.DataRequired()])
     surname = StringField('Surname', [validators.DataRequired()])
@@ -18,4 +17,8 @@ class RegisterForm(FlaskForm):
 
 class CreateEvent(FlaskForm):
     name = StringField('Name', [validators.DataRequired()])
+    sm_description = StringField('Sm_description', [validators.DataRequired()])
+    description = StringField('Description', [validators.DataRequired()])
     date_time = StringField('Date_time', [validators.DataRequired()])
+    phone = StringField('Phone', [validators.DataRequired()])
+    mail = StringField('mail', [validators.DataRequired()])

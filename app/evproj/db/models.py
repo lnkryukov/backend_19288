@@ -14,13 +14,13 @@ Base = declarative_base()
 Status = ENUM('active', 'deleted', name='status')
 User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned', name='user_status')
 Event_status = ENUM('unconfirmed', 'future', 'past', name='event_status')
+Participation_level = ENUM('creator', 'presenter', 'guest', name='participation_level')
 
 
 class User(Base, UserMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
-    login = Column(String, unique=True, nullable=False)
     mail = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
@@ -36,12 +36,24 @@ class User(Base, UserMixin):
 
 
 class Event(Base):
-    __tablename__ = 'event'
+    __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    creator = Column(Integer, ForeignKey('users.id'), nullable=False)
+    sm_description = Column(String, nullable=False)
+    description = Column(String, nullable=False)
     created = Column(DateTime, default=datetime.utcnow, nullable=False)
     date_time = Column(DateTime, nullable=False)
-    event_status = Column(Event_status, default='unconfirmed', nullable=False)
-    registration_status = Column(Boolean, default=True, nullable=False)
+    #lulz
+    phone = Column(String, nullable=False)
+    mail = Column(String, nullable=False)
+
+
+class Participation(Base):
+    __tablename__ = 'participations'
+
+    id = Column(Integer, primary_key=True)
+    event = Column(Integer, ForeignKey('events.id'), nullable=False)
+    participant = Column(Integer, ForeignKey('users.id'), nullable=False)
+    participation_level = Column(Participation_level, default='guest', nullable=False)
+    participation_confirm = Column(Boolean, default=False, nullable=False)

@@ -11,7 +11,14 @@ EVENT - {{event.name}}
 <div class="col-lg-6">
 	<div class="card mb-4">
         <div class="card-header">{{event.name}}</div>
-        <div class="card-body">{{event.creator}} - {{event.created}}</div>
+        <div class="card-body">
+        	<p>
+        		{{event.description}}
+        	</p>
+        	<p>
+        		{{event.date_time}}
+        	</p>
+        </div>
 	</div>
 </div>
 {% endblock %}

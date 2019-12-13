@@ -11,26 +11,22 @@ import logging
 import os
 
 
-def register_user(login, mail, name, surname, password, lvl=2):
+def register_user(mail, name, surname, password, lvl=2):
     with get_session() as s:
-        user_login = s.query(User).filter(
-                User.login == login,
-                User.status == 'deleted',
-        ).one_or_none()
-        user_mail = s.query(User).filter(
+        user = s.query(User).filter(
                 User.mail == mail,
                 User.status == 'deleted',
         ).one_or_none()
-        if user_login or user_mail:
+        if user:
             user.status = 'unconfirmed'
             user.lvl = lvl
         else:
             confirmation_link = util.random_string_digits(25)
-            user = User(login=login, mail=mail, name=name,
+            user = User(mail=mail, name=name,
                         surname=surname, password=password,
                         lvl=lvl, confirmation_link=confirmation_link)
             s.add(user)
-        logging.info('Registering new user [{}]'.format(login))
+        logging.info('Registering new user [{}]'.format(mail))
 
 
 def get_events():
@@ -42,24 +38,34 @@ def get_events():
             result[event.id] = {
                 'id': event.id,
                 'name': event.name,
-                'creator': event.creator,
+                'sm_description': event.sm_description,
                 'date': event.date_time,
             }
     return result
 
 
-def create_event(name, creator, date_time):
+def create_event(name, sm_description, description, date_time, phone, mail):
     timedate = date_time.split('-')
     time_date = datetime(int(timedate[0]), int(timedate[1]), int(timedate[2]),
                          int(timedate[3]), int(timedate[4]), 0, 0)
     with get_session() as s:
-        user_id = s.query(User).filter(
-                User.login == creator,
-        ).one_or_none().id
-
-        event = Event(name=name, creator=user_id, date_time=time_date)
+        last_event = s.query(Event).order_by(Event.id.desc()).first()
+        event = Event(name=name, sm_description=sm_description, description=description,
+                        date_time=time_date, phone=phone, mail=mail)
         s.add(event)
         logging.info('Creating new event [{}]'.format(name))
+        if last_event:
+            return last_event.id + 1
+        else:
+            return 1
+
+
+def create_event_creator(creator, last_id):
+    with get_session() as s:
+        participation = Participation(event=last_id, participant=creator,
+                                        participation_level='creator', participation_confirm=True)
+        s.add(participation)
+        logging.info('Added creator [{}] to event id [{}]'.format(creator, last_id))
 
 
 def get_event_info(id):
@@ -69,6 +75,64 @@ def get_event_info(id):
         ).one_or_none()
 
         return event
+
+
+def check_participation(user_id, event_id):
+    with get_session() as s:
+        participation = s.query(Participation).filter(
+                Participation.event == event_id,
+                Participation.participant == user_id
+        ).one_or_none()
+        if participation:
+            return True
+        else:
+            return False
+
+
+def get_participators(id):
+    result = {}
+    with get_session() as s:
+        users = s.query(User, Event, Participation).filter(
+                User.id == Participation.participant,
+                Event.id == Participation.event,
+                Event.id == id
+        ).all()
+
+        for user, _, participant in users:
+            if participant.participation_level is not 'guest':
+                result[user.id] = {
+                    'name': user.name,
+                    'surname': user.surname,
+                    'participation_level': participant.participation_level,
+                }
+
+    return result
+
+
+def guest_join(user_id, event_id):
+    with get_session() as s:
+        participation = Participation(event=event_id, participant=user_id,
+                                        participation_level='guest', participation_confirm=False)
+        s.add(participation)
+
+
+def guest_confirm(user_id, event_id):
+    with get_session() as s:
+        part = s.query(Participation).filter(
+            Participation.event == event_id,
+            Participation.participant == user_id,
+            Participation.participation_confirm == False
+        ).first()
+        setattr(part, 'participation_confirm', True)
+        s.commit()
+
+
+def event_exist(event_id):
+    with get_session() as s:
+        exists = s.query(Event).filter(
+                Event.id == event_id
+        ).count()
+    return True if exists > 0 else False
 
 
 def confirm_user(confirmation_link):

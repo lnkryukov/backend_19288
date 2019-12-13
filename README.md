@@ -22,7 +22,7 @@
 *	СУБД - [PostgreSQL](https://www.postgresql.org/)
 *	Связь с БД - [SQLAlchemy](https://www.sqlalchemy.org/)
 *	Web-framework - [Flask](http://flask.pocoo.org/)
-*	Web-интерфейс - Временно(а может быть и нет `¯\_(ツ)_/¯`) [Bootstrap](https://getbootstrap.com/) 
+*	Web-интерфейс - Временно (а может быть и нет `¯\_(ツ)_/¯`) [Bootstrap](https://getbootstrap.com/) 
 
 ## Установка:	
 *	В первую очередь ставим нужные пакеты (Ubuntu):

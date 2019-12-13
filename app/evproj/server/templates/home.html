@@ -8,14 +8,21 @@ HOME
 {% endblock %}
 
 {% block content %}
-<div class="col-lg-6">
+
+<div class="card-deck">
 {% for event in events.values() %}
-	<div class="card mb-4">
-        <div class="card-header"><a class="btn btn-link" href="/event/{{event.get('id', '')}}" role="button"> {{event.get('name', '')}} </a></div>
-        <div class="card-body">{{event.get('creator', '')}} - {{event.get('date', '')}}</div>
-	</div>
+<div class="col-lg-3">
+  <div class="card mb-4">
+    <div class="card-header"><a class="btn btn-link" href="/event/{{event.get('id', '')}}" role="button"> {{event.get('name', '')}} </a></div>
+    <div class="card-body">
+      <h5 class="card-title">{{event.get('sm_description', '')}}</h5>
+      <p class="card-text">{{event.get('date', '')}}</p>
+    </div>
+  </div>
+</div>
 {% endfor %}
 </div>
+
 {% endblock %}
 
 

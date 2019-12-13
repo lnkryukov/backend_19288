@@ -25,19 +25,18 @@ def get_session():
 
 def create_tables(password):
     logging.info('Dropping existing tables')
-    for tbl in reversed(Base.metadata.sorted_tables):
-        try:
-            tbl.drop(_engine)
-        except:
-            pass
+    try:
+        Base.metadata.reflect(_engine)
+        Base.metadata.drop_all(_engine)
+    except Exception as e:
+        logging.info('Failed to drop tables.\n{}'.format(str(e)))
     logging.info('Creating tables')
     Base.metadata.create_all(_engine)
     logging.info('Tables was created')
     with get_session() as s:
         root = User(
-            login='root_admin',
+            mail='root_mail',
             password=password,
-            mail='root_admin_mail',
             name='Name',
             surname='Surname',
             lvl=0,
@@ -45,4 +44,4 @@ def create_tables(password):
             confirmation_link='none',
         )
         s.add(root)
-    logging.info('Default user [root_admin] was created')
+    logging.info('Default user with mail [root_mail] was created')

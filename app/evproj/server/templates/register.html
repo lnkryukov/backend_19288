@@ -38,13 +38,8 @@
                             <form role="form" action="register" method="POST" name="register" enctype="multipart/form-data" oninput='password_repeat.setCustomValidity(password_repeat.value != password.value ? "Passwords do not match." : "")'>
                                 <fieldset>
                                     {{form.hidden_tag()}}
-                                    <div class="form-group row">
-                                        <div class="col-sm-6 mb-3 mb-sm-0">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="login" aria-describedby="loginHelp" name="login" required type="text" value="" placeholder="Enter login...">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="mail" aria-describedby="emailHelp" name="mail" required type="text" value="" placeholder="Enter Email Address...">
-                                        </div>
+                                    <div class="col-sm-6">
+                                        <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="mail" aria-describedby="emailHelp" name="mail" required type="text" value="" placeholder="Enter Email Address...">
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 mb-3 mb-sm-0">
