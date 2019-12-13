@@ -124,15 +124,21 @@
   </section>
 
   
-  {% if not entering %}
+  
   <!-- Call to Action Section -->
   <section class="page-section bg-dark text-white">
     <div class="container text-center">
-      <h2 class="mb-4">Хочешь принять участие?</h2>
-      <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+      {% if entering == 'monitoring' %}
+        <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
+        <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
+      {% elif entering == 'guest' %}
+        <h2 class="mb-4">Спасибо за подачу заявки!</h2>
+      {% else %}
+        <h2 class="mb-4">Хочешь принять участие?</h2>
+        <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+      {% endif %}
     </div>
   </section>
-  {% endif %}
 
   <!-- Contact Section -->
   <section class="page-section" id="contact" style="height: 100vh;">

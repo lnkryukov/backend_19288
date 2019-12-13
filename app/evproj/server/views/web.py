@@ -119,6 +119,16 @@ def event(id):
         users = api.get_participators(id)
         if current_user.is_authenticated:
             entering = api.check_participation(current_user.id, id)
+            if (entering == 'monitoring'):
+                conf, unconf = api.get_stat(id)
+                return render_template(
+                    '/event_page.html',
+                    event=event,
+                    users=users,
+                    entering=entering,
+                    conf=conf,
+                    unconf=unconf,
+                )
             return render_template(
                 '/event_page.html',
                 event=event,
@@ -130,7 +140,7 @@ def event(id):
                 '/event_page.html',
                 event=event,
                 users=users,
-                entering=False,
+                entering='not joined',
             )
     else:
         abort(404)
@@ -140,7 +150,8 @@ def event(id):
 @login_required
 def join(id):
     if api.event_exist(id):
-        pass
+        api.guest_join(current_user.id, id)
+        return redirect(url_for('general.event', id=id))
     else:
         abort(404)
 

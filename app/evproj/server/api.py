@@ -84,9 +84,12 @@ def check_participation(user_id, event_id):
                 Participation.participant == user_id
         ).one_or_none()
         if participation:
-            return True
+            if participation.participation_level != 'guest':
+                return 'monitoring'
+            else:
+                return 'guest'
         else:
-            return False
+            return 'not joined'
 
 
 def get_participators(id):
@@ -107,6 +110,23 @@ def get_participators(id):
                 }
 
     return result
+
+
+def get_stat(event_id):
+    with get_session() as s:
+        confirmed_users = s.query(Participation).filter(
+                Participation.event == event_id,
+                Participation.participation_level == 'guest',
+                Participation.participation_confirm == True
+        ).count()
+
+        unconfirmed_users = s.query(Participation).filter(
+                Participation.event == event_id,
+                Participation.participation_level == 'guest',
+                Participation.participation_confirm == False
+        ).count()
+
+        return confirmed_users, unconfirmed_users
 
 
 def guest_join(user_id, event_id):
