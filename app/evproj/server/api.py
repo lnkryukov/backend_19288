@@ -139,6 +139,7 @@ def get_user_stat(user_id):
 
         for participant, event in as_creator:
             result_creator[event.id] = {
+                'id': event.id,
                 'name': event.name,
                 'date': event.date_time,
             }
@@ -151,6 +152,7 @@ def get_user_stat(user_id):
 
         for participant, event in as_presenter:
             result_presenter[event.id] = {
+                'id': event.id,
                 'name': event.name,
                 'date': event.date_time,
             }
@@ -164,6 +166,7 @@ def get_user_stat(user_id):
 
         for participant, event in as_guest:
             result_guest[event.id] = {
+                'id': event.id,
                 'name': event.name,
                 'date': event.date_time,
             }
