@@ -75,9 +75,13 @@ def home():
 @mod.route('/cabinet')
 @login_required
 def cabinet():
+    as_creator, as_presenter, as_guest = api.get_user_stat(current_user.id)
     return render_template(
         '/cabinet.html',
         user=current_user,
+        as_creator=as_creator,
+        as_presenter=as_presenter,
+        as_guest=as_guest,
     )
 
 

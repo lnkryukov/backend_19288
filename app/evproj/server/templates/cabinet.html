@@ -14,6 +14,47 @@ CABINET
         <div class="card-body">{{user.mail}} - {{user.lvl}}</div>
 	</div>
 </div>
+
+<div class="card-deck">
+{% for user in as_creator.values() %}
+<div class="col-lg-3">
+  <div class="card mb-4">
+    <div class="card-header">{{user.get('name', '')}}</div>
+    <div class="card-body">
+      <h5 class="card-title">{{user.get('date', '')}}</h5>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<div class="card-deck">
+{% for user in as_presenter.values() %}
+<div class="col-lg-3">
+  <div class="card mb-4">
+    <div class="card-header">{{user.get('name', '')}}</div>
+    <div class="card-body">
+      <h5 class="card-title">{{user.get('date', '')}}</h5>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<div class="card-deck">
+{% for user in as_guest.values() %}
+<div class="col-lg-3">
+  <div class="card mb-4">
+    <div class="card-header">{{user.get('name', '')}}</div>
+    <div class="card-body">
+      <h5 class="card-title">{{user.get('date', '')}}</h5>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+
+
 {% endblock %}
 
 

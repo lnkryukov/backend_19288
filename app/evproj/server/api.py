@@ -126,6 +126,53 @@ def get_stat(event_id):
         return confirmed_users, unconfirmed_users
 
 
+def get_user_stat(user_id):
+    result_creator = {}
+    result_presenter = {}
+    result_guest = {}
+    with get_session() as s:
+        as_creator = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'creator'
+        ).all()
+
+        for participant, event in as_creator:
+            result_creator[event.id] = {
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+        as_presenter = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'presenter'
+        ).all()
+
+        for participant, event in as_presenter:
+            result_creator[event.id] = {
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+        as_guest = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'guest',
+                Participation.participation_status == 'confirmed'
+        ).all()
+
+        for participant, event in as_guest:
+            result_creator[event.id] = {
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+    return result_creator, result_presenter, result_guest
+
+
+
+
 def guest_join(user_id, event_id):
     with get_session() as s:
         participation = Participation(event=event_id, participant=user_id,
