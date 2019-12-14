@@ -133,7 +133,7 @@ def guest_join(user_id, event_id):
         s.add(participation)
 
 
-def guest_confirm(user_id, event_id, action):
+def guest_action(user_id, event_id, action):
     with get_session() as s:
         part = s.query(Participation).filter(
             Participation.event == event_id,

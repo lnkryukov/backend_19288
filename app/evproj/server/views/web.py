@@ -168,6 +168,21 @@ def join(id):
         abort(404)
 
 
+@mod.route('/guest_action', methods=['GET', 'POST'])
+@login_required
+def guest_action():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        api.guest_action(int(args['user']), int(args['event']), args['action'])
+        return redirect(url_for('general.event', id=int(args['event'])))
+    except KeyError:
+        return make_400()
+    except NoData:
+        return make_400('no data')
+
+
 def page_not_found(e):
     if current_user.is_authenticated:
         return render_template(
