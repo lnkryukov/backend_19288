@@ -150,7 +150,7 @@ def get_user_stat(user_id):
         ).all()
 
         for participant, event in as_presenter:
-            result_creator[event.id] = {
+            result_presenter[event.id] = {
                 'name': event.name,
                 'date': event.date_time,
             }
@@ -163,7 +163,7 @@ def get_user_stat(user_id):
         ).all()
 
         for participant, event in as_guest:
-            result_creator[event.id] = {
+            result_guest[event.id] = {
                 'name': event.name,
                 'date': event.date_time,
             }
