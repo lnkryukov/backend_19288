@@ -15,6 +15,61 @@ CABINET
 	</div>
 </div>
 
+<h5>as creator</h5>
+<table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in as_creator.values() %}
+            <tr>
+              <td>{{user.get('name', '')}}</td>
+              <td>{{user.get('date', '')}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+<h5>as guest</h5>
+<table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in as_presenter.values() %}
+            <tr>
+              <td>{{user.get('name', '')}}</td>
+              <td>{{user.get('date', '')}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+<h5>as guest</h5>
+<table class="table table-dark">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in as_guest.values() %}
+            <tr>
+              <td>{{user.get('name', '')}}</td>
+              <td>{{user.get('date', '')}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+
+<div class="row">
+	<h5>as creator</h5>
 <div class="card-deck">
 {% for user in as_creator.values() %}
 <div class="col-lg-3">
@@ -27,7 +82,9 @@ CABINET
 </div>
 {% endfor %}
 </div>
-
+</div>
+<div class="row">
+	<h5>as presenter</h5>
 <div class="card-deck">
 {% for user in as_presenter.values() %}
 <div class="col-lg-3">
@@ -40,7 +97,9 @@ CABINET
 </div>
 {% endfor %}
 </div>
-
+</div>
+<div class="row">
+	<h5>as guest</h5>
 <div class="card-deck">
 {% for user in as_guest.values() %}
 <div class="col-lg-3">
@@ -53,7 +112,7 @@ CABINET
 </div>
 {% endfor %}
 </div>
-
+</div>
 
 {% endblock %}
 
