@@ -164,6 +164,9 @@
           </tbody>
         </table>
 
+      {% elif entering == 'presenter' %}
+        <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
+        <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
       {% elif entering == 'guest' %}
         <h2 class="mb-4">Спасибо за подачу заявки!</h2>
       {% else %}
