@@ -15,6 +15,7 @@ Status = ENUM('active', 'deleted', name='status')
 User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned', name='user_status')
 Event_status = ENUM('unconfirmed', 'future', 'past', name='event_status')
 Participation_level = ENUM('creator', 'presenter', 'guest', name='participation_level')
+Participation_status = ENUM('unknown', 'confirmed', 'declined', name='participation_status')
 
 
 class User(Base, UserMixin):
@@ -56,4 +57,4 @@ class Participation(Base):
     event = Column(Integer, ForeignKey('events.id'), nullable=False)
     participant = Column(Integer, ForeignKey('users.id'), nullable=False)
     participation_level = Column(Participation_level, default='guest', nullable=False)
-    participation_confirm = Column(Boolean, default=False, nullable=False)
+    participation_status = Column(Participation_status, default='unknown', nullable=False)

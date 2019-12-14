@@ -63,7 +63,7 @@ def create_event(name, sm_description, description, date_time, phone, mail):
 def create_event_creator(creator, last_id):
     with get_session() as s:
         participation = Participation(event=last_id, participant=creator,
-                                        participation_level='creator', participation_confirm=True)
+                                        participation_level='creator', participation_status='confirmed')
         s.add(participation)
         logging.info('Added creator [{}] to event id [{}]'.format(creator, last_id))
 
@@ -84,10 +84,7 @@ def check_participation(user_id, event_id):
                 Participation.participant == user_id
         ).one_or_none()
         if participation:
-            if participation.participation_level != 'guest':
-                return 'monitoring'
-            else:
-                return 'guest'
+            return participation.participation_level
         else:
             return 'not joined'
 
@@ -117,13 +114,13 @@ def get_stat(event_id):
         confirmed_users = s.query(Participation).filter(
                 Participation.event == event_id,
                 Participation.participation_level == 'guest',
-                Participation.participation_confirm == True
+                Participation.participation_status == 'confirmed'
         ).count()
 
         unconfirmed_users = s.query(Participation).filter(
                 Participation.event == event_id,
                 Participation.participation_level == 'guest',
-                Participation.participation_confirm == False
+                Participation.participation_status == 'declined'
         ).count()
 
         return confirmed_users, unconfirmed_users
@@ -132,19 +129,38 @@ def get_stat(event_id):
 def guest_join(user_id, event_id):
     with get_session() as s:
         participation = Participation(event=event_id, participant=user_id,
-                                        participation_level='guest', participation_confirm=False)
+                                        participation_level='guest', participation_status='unknown')
         s.add(participation)
 
 
-def guest_confirm(user_id, event_id):
+def guest_confirm(user_id, event_id, action):
     with get_session() as s:
         part = s.query(Participation).filter(
             Participation.event == event_id,
             Participation.participant == user_id,
-            Participation.participation_confirm == False
+            Participation.participation_status == 'unknown'
         ).first()
-        setattr(part, 'participation_confirm', True)
+        setattr(part, 'participation_status', action)
         s.commit()
+
+
+def get_uncorfimed_users(event_id):
+    result = {}
+    with get_session() as s:
+        users = s.query(User, Participation).filter(
+                User.id == Participation.participant,
+                Participation.event == event_id,
+                Participation.participation_status == 'unknown'
+        ).all()
+
+        for user, _ in users:
+            result[user.id] = {
+                'id': user.id,
+                'name': user.name,
+                'surname': user.surname,
+            }
+
+    return result
 
 
 def event_exist(event_id):

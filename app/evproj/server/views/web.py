@@ -119,7 +119,19 @@ def event(id):
         users = api.get_participators(id)
         if current_user.is_authenticated:
             entering = api.check_participation(current_user.id, id)
-            if (entering == 'monitoring'):
+            if (entering == 'creator'):
+                conf, unconf = api.get_stat(id)
+                unc_users = api.get_uncorfimed_users(id)
+                return render_template(
+                    '/event_page.html',
+                    event=event,
+                    users=users,
+                    entering=entering,
+                    conf=conf,
+                    unconf=unconf,
+                    unc_users=unc_users,
+                )
+            if (entering == 'presenter'):
                 conf, unconf = api.get_stat(id)
                 return render_template(
                     '/event_page.html',
