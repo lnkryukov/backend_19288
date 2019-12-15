@@ -44,26 +44,35 @@
             <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
           </li>
 
-          <li class="nav-item dropdown no-arrow border-left" >
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="ml-auto my-2 my-lg-0 mr-2 d-none d-lg-inline">Valerie Luna</span>
-                                <!--  <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60"> -->
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="/cabinet">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 ml-auto my-2 my-lg-0"></i> Profile
+          {% if current_user.is_authenticated %}
+                            <div class="topbar-divider d-none d-sm-block"></div>
+
+                            <!-- Nav Item - User Information -->
+                            <li class="nav-item dropdown no-arrow">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.mail}}</span>
+                                    <!-- <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60"> -->
                                 </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/create_event">
-                                    <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 ml-auto my-2 my-lg-0"></i> Create event
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/logout" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2"></i> Logout
-                                </a>
-                            </div>
-                        </li>
+                                <!-- Dropdown - User Information -->
+                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                    <a class="dropdown-item" href="/cabinet">
+                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/create_event">
+                                        <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 ml-auto my-2 my-lg-0"></i> Create event
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/logout" data-toggle="modal" data-target="#logoutModal">
+                                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                                    </a>
+                                </div>
+                            </li>
+                        {% else %}
+                            <a class="navbar-brand" href="/login">LOGIN</a>
+                            <div class="topbar-divider d-none d-sm-block"></div>
+                            <a class="navbar-brand" href="/register">REGISTER</a>
+                        {% endif %}
 
         </ul>
       </div>

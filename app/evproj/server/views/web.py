@@ -69,6 +69,7 @@ def home():
     return render_template(
         'home.html',
         events=events,
+        current_user=current_user,
     )
 
 
@@ -134,6 +135,7 @@ def event(id):
                     conf=conf,
                     unconf=unconf,
                     unc_users=unc_users,
+                    current_user=current_user,
                 )
             if (entering == 'presenter'):
                 conf, unconf = api.get_stat(id)
@@ -144,12 +146,14 @@ def event(id):
                     entering=entering,
                     conf=conf,
                     unconf=unconf,
+                    current_user=current_user,
                 )
             return render_template(
                 '/event_page.html',
                 event=event,
                 users=users,
                 entering=entering,
+                current_user=current_user,
             )
         else:
             return render_template(
@@ -157,6 +161,7 @@ def event(id):
                 event=event,
                 users=users,
                 entering='not joined',
+                current_user=current_user,
             )
     else:
         abort(404)
