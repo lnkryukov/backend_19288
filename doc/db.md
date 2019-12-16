@@ -25,11 +25,11 @@
 
 		sudo su - postgres
 
-3) Заводим новую роль:
+3) Создаём новую роль:
 
 		createuser %usename% --pwprompt
 
-4) Заводим саму БД:
+4) Создаём саму БД:
 
 		createdb -O %username% %dbname%
 
@@ -43,6 +43,3 @@
 		cd /var/lib/pgsql/data/
 		sudo nano/vim ph_hba.conf
 		заменить METHOD на md5 у local, ipv4, ipv6 connections (3 записи).
-
-После этого можно подключиться к БД задав нужные переменные окружения из `setup.sh` и набрав в консоли `psql`.
-
