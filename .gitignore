@@ -112,3 +112,7 @@ dmypy.json
 
 # setup.sh
 setup.sh
+
+# local logs, git ext and more
+service.log
+git-aacp
