@@ -43,15 +43,15 @@ def register():
                                 form.name.data,
                                 form.surname.data,
                                 sha256_crypt.encrypt(str(form.password.data)))
-            message = f'{form.login.data} was registered'
+            message = f'{form.mail.data} was registered'
             form.mail.data = ''
             form.name.data = ''
             form.surname.data = ''
             form.password.data = ''
             form.password_repeat.data = ''
+            return redirect(url_for('general.login'))
         except Exception as e:
             message = 'Failed to register user, probably one already exists.\n{}'.format(str(e))
-        return redirect(url_for('general.login'))
     return render_template('register.html', form=form, message=message)
 
 
@@ -60,6 +60,15 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('general.home'))
+
+
+@mod.route('/confirm/<string:link>')
+def confirm(link):
+    message = api.confirm_user(link)
+    return render_template(
+        'conf.html',
+        message=message
+    )
 
 
 @mod.route('/')
@@ -122,47 +131,22 @@ def event(id):
     if api.event_exist(id):
         event = api.get_event_info(id)
         users = api.get_participators(id)
+        entering = 'not joined'
         if current_user.is_authenticated:
             entering = api.check_participation(current_user.id, id)
-            if (entering == 'creator'):
-                conf, unconf = api.get_stat(id)
-                unc_users = api.get_uncorfimed_users(id)
-                return render_template(
-                    '/event_page.html',
-                    event=event,
-                    users=users,
-                    entering=entering,
-                    conf=conf,
-                    unconf=unconf,
-                    unc_users=unc_users,
-                    current_user=current_user,
-                )
-            if (entering == 'presenter'):
-                conf, unconf = api.get_stat(id)
-                return render_template(
-                    '/event_page.html',
-                    event=event,
-                    users=users,
-                    entering=entering,
-                    conf=conf,
-                    unconf=unconf,
-                    current_user=current_user,
-                )
-            return render_template(
-                '/event_page.html',
-                event=event,
-                users=users,
-                entering=entering,
-                current_user=current_user,
-            )
-        else:
-            return render_template(
-                '/event_page.html',
-                event=event,
-                users=users,
-                entering='not joined',
-                current_user=current_user,
-            )
+        conf, unconf = api.get_stat(id)
+        unc_users = api.get_uncorfimed_users(id)
+
+        return render_template(
+            '/event_page.html',
+            event=event,
+            users=users,
+            entering=entering,
+            conf=conf,
+            unconf=unconf,
+            unc_users=unc_users,
+            current_user=current_user,
+        )
     else:
         abort(404)
 
@@ -182,15 +166,10 @@ def join(id):
 def guest_action():
     try:
         args = request.get_json()
-        if not args:
-            return make_400('Expected json')
         api.guest_action(int(args['user']), int(args['event']), args['action'])
-        return redirect(url_for('general.event', id=int(args['event'])))
-    except KeyError:
-        return make_400()
-    except NoData:
-        return make_400('no data')
-
+        return redirect(url_for('general.event', id=args['event']))
+    except:
+        print('problems')
 
 def page_not_found(e):
     if current_user.is_authenticated:

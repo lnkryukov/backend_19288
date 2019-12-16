@@ -20,3 +20,8 @@ cfg.PORT = int(os.getenv('PORT', '8080'))
 cfg.DB_CONNECTION_STRING = _get_db_connection_string() 
 cfg.RUNTIME_FOLDER = os.path.dirname(os.path.abspath(__file__))
 cfg.SCPITS_FOLDER = os.getenv('SCRIPT_FOLDER', '{}/evproj/scripts'.format(cfg.RUNTIME_FOLDER))
+
+cfg.SMTP_HOST = os.getenv('SMTP_HOST')
+cfg.MAIL_LOGIN = os.getenv('MAIL_LOGIN')
+cfg.MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+cfg.SITE_ADDR = os.getenv('SITE_ADDR')

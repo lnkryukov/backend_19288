@@ -132,12 +132,12 @@
     </div>
   </section>
 
-  
-  
+
   <!-- Call to Action Section -->
   <section class="page-section bg-dark text-white">
     <div class="container text-center">
-      {% if entering == 'creator' %}
+      {% if current_user.is_authenticated %}
+        {% if entering == 'creator' %}
         <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
         <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
 
@@ -173,14 +173,18 @@
           </tbody>
         </table>
 
-      {% elif entering == 'presenter' %}
-        <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
-        <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
-      {% elif entering == 'guest' %}
-        <h2 class="mb-4">Спасибо за подачу заявки!</h2>
+        {% elif entering == 'presenter' %}
+          <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
+          <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
+        {% elif entering == 'guest' %}
+          <h2 class="mb-4">Спасибо за подачу заявки!</h2>
+        {% else %}
+          <h2 class="mb-4">Хочешь принять участие?</h2>
+          <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+        {% endif %}
       {% else %}
-        <h2 class="mb-4">Хочешь принять участие?</h2>
-        <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+          <h2 class="mb-4">Хочешь принять участие?</h2>
+          <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
       {% endif %}
     </div>
   </section>

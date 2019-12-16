@@ -17,16 +17,39 @@ def register_user(mail, name, surname, password, lvl=2):
                 User.mail == mail,
                 User.status == 'deleted',
         ).one_or_none()
+        # checking unique link
+        confirmation_link = ''
+        while True:
+            confirmation_link = util.random_string_digits(50)
+            exists = s.query(User).filter(User.confirmation_link == confirmation_link).one_or_none()
+            if not exists:
+                break
+
         if user:
             user.status = 'unconfirmed'
+            user.confirmation_link = confirmation_link
             user.lvl = lvl
         else:
-            confirmation_link = util.random_string_digits(25)
             user = User(mail=mail, name=name,
                         surname=surname, password=password,
                         lvl=lvl, confirmation_link=confirmation_link)
             s.add(user)
+        util.send_email(mail, confirmation_link)
         logging.info('Registering new user [{}]'.format(mail))
+
+
+
+def confirm_user(confirmation_link):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.confirmation_link == confirmation_link,
+                User.status == 'unconfirmed',
+        ).one_or_none()
+        if user:
+            user.status = 'active'
+            return 'user confirmed'
+        else:
+            return 'user is currently confirmed by this link'
 
 
 def get_events():
@@ -178,9 +201,15 @@ def get_user_stat(user_id):
 
 def guest_join(user_id, event_id):
     with get_session() as s:
-        participation = Participation(event=event_id, participant=user_id,
+        is_consists = s.query(Participation).filter(
+                Participation.participant == user_id,
+                Participation.event == event_id
+        ).one_or_none()
+
+        if not is_consists:
+            participation = Participation(event=event_id, participant=user_id,
                                         participation_level='guest', participation_status='unknown')
-        s.add(participation)
+            s.add(participation)
 
 
 def guest_action(user_id, event_id, action):
@@ -219,13 +248,3 @@ def event_exist(event_id):
                 Event.id == event_id
         ).count()
     return True if exists > 0 else False
-
-
-def confirm_user(confirmation_link):
-    with get_session() as s:
-        user = s.query(User).filter(
-                User.confirmation_link == confirmation_link,
-                User.status == 'unconfirmed',
-        ).one_or_none()
-        if user:
-            user.status = 'active'

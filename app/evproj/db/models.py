@@ -29,7 +29,7 @@ class User(Base, UserMixin):
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
                        unique=True, nullable=False)
     lvl = Column(Integer, default=2, nullable=False)
-    status = Column(User_status, default='active', nullable=False)
+    status = Column(User_status, default='unconfirmed', nullable=False)
     confirmation_link = Column(String, nullable=False)
 
     def get_id(self):
@@ -45,7 +45,7 @@ class Event(Base):
     description = Column(String, nullable=False)
     created = Column(DateTime, default=datetime.utcnow, nullable=False)
     date_time = Column(DateTime, nullable=False)
-    #lulz
+    #questionable
     phone = Column(String, nullable=False)
     mail = Column(String, nullable=False)
 
