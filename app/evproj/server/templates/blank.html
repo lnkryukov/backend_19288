@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-
     {% block title%}
     <title>Blank</title>
     {% endblock %}
@@ -46,37 +45,33 @@
                     <ul class="navbar-nav ml-auto">
 
                         {% if current_user.is_authenticated %}
-                            <div class="topbar-divider d-none d-sm-block"></div>
+                        <div class="topbar-divider d-none d-sm-block"></div>
 
-                            <!-- Nav Item - User Information -->
-                            <li class="nav-item dropdown no-arrow">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.mail}}</span>
-                                    <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{current_user.mail}}</span>
+                                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="/cabinet">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
                                 </a>
-                                <!-- Dropdown - User Information -->
-                                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                    <a class="dropdown-item" href="/cabinet">
-                                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/create_event">
-                                        <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 ml-auto my-2 my-lg-0"></i> Create event
-                                    </a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="/logout" data-toggle="modal" data-target="#logoutModal">
-                                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
-                                    </a>
-                                </div>
-                            </li>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/create_event">
+                                    <i class="fas fa-calendar-plus fa-sm fa-fw mr-2 ml-auto my-2 my-lg-0"></i> Create event
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/logout" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i> Logout
+                                </a>
+                            </div>
+                        </li>
                         {% else %}
-                            <a class="navbar-brand" href="/login">LOGIN</a>
-                            <div class="topbar-divider d-none d-sm-block"></div>
-                            <a class="navbar-brand" href="/register">REGISTER</a>
-                        {% endif %}
-
-
-                        
+                        <a class="navbar-brand" href="/login">LOGIN</a>
+                        <div class="topbar-divider d-none d-sm-block"></div>
+                        <a class="navbar-brand" href="/register">REGISTER</a> {% endif %}
 
                     </ul>
 
@@ -87,9 +82,7 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    {% block content%}
-                    BLAAAANK
-                    {% endblock %}
+                    {% block content%} BLAAAANK {% endblock %}
 
                 </div>
                 <!-- /.container-fluid -->
