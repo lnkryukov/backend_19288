@@ -14,10 +14,10 @@ HOME
     {% for event in events.values() %}
     <div class="col-lg-3">
         <div class="card mb-4">
-            <div class="card-header"><a class="btn btn-link" href="/event/{{event.get('id', '')}}" role="button"> {{event.get('name', '')}} </a></div>
+            <div class="card-header text-center"><a class="btn btn-link" href="/event/{{event.get('id', '')}}" role="button"> {{event.get('name', '')}} </a></div>
             <div class="card-body">
-                <h5 class="card-title">{{event.get('sm_description', '')}}</h5>
-                <p class="card-text">{{event.get('date', '')}}</p>
+                <h5 class="card-title text-center">{{event.get('sm_description', '')}}</h5>
+                <p class="card-text text-center">{{event.get('date', '')}}</p>
             </div>
         </div>
     </div>

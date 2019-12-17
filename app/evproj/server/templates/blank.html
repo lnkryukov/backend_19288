@@ -45,8 +45,6 @@
                     <ul class="navbar-nav ml-auto">
 
                         {% if current_user.is_authenticated %}
-                        <div class="topbar-divider d-none d-sm-block"></div>
-
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -69,13 +67,10 @@
                         </li>
                         {% else %}
                         <li class="nav-item">
-                            <a href="/login">LOGIN</a>
-                        </li>
-                        <li class="nav-item" style="padding-right: 5px; padding-left: 5px;">
-                            |
+                            <a class="nav-link text-primary" href="/login">LOGIN</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/register">REGISTER</a>
+                            <a class="nav-link text-primary" href="/register">REGISTER</a>
                         </li>
                         {% endif %}
 
