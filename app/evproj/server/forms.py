@@ -15,6 +15,7 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', [validators.DataRequired()])
     password_repeat = PasswordField('Password', [validators.DataRequired()])
 
+
 class CreateEvent(FlaskForm):
     name = StringField('Name', [validators.DataRequired()])
     sm_description = StringField('Sm_description', [validators.DataRequired()])

@@ -11,7 +11,6 @@ def random_string_digits(str_len=8):
     return ''.join(random.SystemRandom().choice(letters_and_digits) for i in range(str_len))
 
 
-
 def send_email(mail, link):
     server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
     server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)

@@ -50,7 +50,7 @@ class Event(Base):
     description = Column(String, nullable=False)
     created = Column(DateTime, default=datetime.utcnow, nullable=False)
     date_time = Column(DateTime, nullable=False)
-    #questionable
+    # questionable
     phone = Column(String, nullable=False)
     mail = Column(String, nullable=False)
 

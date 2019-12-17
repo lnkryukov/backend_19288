@@ -10,7 +10,6 @@ from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
-
 mod = Blueprint('api', __name__, url_prefix='/api')
 
 
@@ -35,15 +34,15 @@ def register_user():
     try:
         args = request.get_json()
         if not args:
-        	return make_400('Expected json')
+            return make_400('Expected json')
 
         api.register_user(args['mail'], args['name'], args['surname'],
-        				  sha256_crypt.encrypt(str(args['password'])))
+                          sha256_crypt.encrypt(str(args['password'])))
         return make_ok('User was registered')
     except KeyError:
-    	return make_400()
+        return make_400()
     except IntegrityError:
-    	return make_400('User with this login already exists')
+        return make_400('User with this login already exists')
 
 
 @mod.route('/event_create', methods=['POST'])
@@ -107,4 +106,3 @@ def test_api_route():
         return make_ok()
     except:
         return make_400()
-

@@ -17,7 +17,7 @@ cfg.CSRF_ENABLED = False if os.getenv('DISABLE_CSRF') else True
 cfg.SECRET_KEY = os.getenv('SECRET_KEY', 'Top Secret Key, do not use in production!!!')
 cfg.HOST = os.getenv('HOST_ADDR', '0.0.0.0')
 cfg.PORT = int(os.getenv('PORT', '8080'))
-cfg.DB_CONNECTION_STRING = _get_db_connection_string() 
+cfg.DB_CONNECTION_STRING = _get_db_connection_string()
 cfg.RUNTIME_FOLDER = os.path.dirname(os.path.abspath(__file__))
 cfg.SCPITS_FOLDER = os.getenv('SCRIPT_FOLDER', '{}/evproj/scripts'.format(cfg.RUNTIME_FOLDER))
 

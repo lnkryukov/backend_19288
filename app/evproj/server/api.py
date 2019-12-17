@@ -40,7 +40,6 @@ def register_user(mail, name, surname, password, lvl=2):
         logging.info('Registering new user [{}]'.format(mail))
 
 
-
 def confirm_user(confirmation_link):
     with get_session() as s:
         user = s.query(User).filter(

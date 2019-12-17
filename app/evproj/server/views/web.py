@@ -83,7 +83,6 @@ def cabinet():
     )
 
 
-
 @mod.route('/create_event')
 @login_required
 def create_event():
