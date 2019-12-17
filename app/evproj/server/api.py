@@ -21,7 +21,9 @@ def register_user(mail, name, surname, password, lvl=2):
         confirmation_link = ''
         while True:
             confirmation_link = util.random_string_digits(50)
-            exists = s.query(User).filter(User.confirmation_link == confirmation_link).one_or_none()
+            exists = s.query(User).filter(
+                    User.confirmation_link == confirmation_link
+            ).one_or_none()
             if not exists:
                 break
 
@@ -74,10 +76,11 @@ def create_event(name, sm_description, description, date_time, phone, mail):
                          int(timedate[3]), int(timedate[4]), 0, 0)
     with get_session() as s:
         last_event = s.query(Event).order_by(Event.id.desc()).first()
-        event = Event(name=name, sm_description=sm_description, description=description,
-                        date_time=time_date, phone=phone, mail=mail)
+        event = Event(name=name, sm_description=sm_description,
+                      description=description, date_time=time_date,
+                      phone=phone, mail=mail)
         s.add(event)
-        logging.info('Creating new event [{}] ({})'.format(name, sm_description))
+        logging.info('Creating event [{}] [{}]'.format(name, sm_description))
         if last_event:
             return last_event.id + 1
         else:
@@ -87,7 +90,8 @@ def create_event(name, sm_description, description, date_time, phone, mail):
 def create_event_creator(creator, last_id):
     with get_session() as s:
         participation = Participation(event=last_id, participant=creator,
-                                        participation_level='creator', participation_status='confirmed')
+                                      participation_level='creator',
+                                      participation_status='confirmed')
         s.add(participation)
 
 
@@ -97,7 +101,8 @@ def create_event_presenters(presenters, last_id):
         for user in users:
             us = s.query(User).filter(User.mail == user).first().id
             participation = Participation(event=last_id, participant=us,
-                                        participation_level='presenter', participation_status='confirmed')
+                                          participation_level='presenter',
+                                          participation_status='confirmed')
             s.add(participation)
 
 
@@ -216,9 +221,11 @@ def guest_join(user_id, event_id):
 
         if not is_consists:
             participation = Participation(event=event_id, participant=user_id,
-                                        participation_level='guest', participation_status='unknown')
+                                          participation_level='guest',
+                                          participation_status='unknown')
             s.add(participation)
-        logging.info('User with id [{}] joined event with id [{}]'.format(user_id, event_id))
+        logging.info('User [id {}] joined event [id {}]'.format(user_id,
+                                                                event_id))
 
 
 def guest_action(user_id, event_id, action):
@@ -230,7 +237,9 @@ def guest_action(user_id, event_id, action):
         ).first()
         setattr(part, 'participation_status', action)
         s.commit()
-        logging.info('Event (id [{}]) creator set [{}] to joined user with id [{}]'.format(event_id, action, user_id))
+        logging.info('User [id {}] is [{}] in event [id {}]'.format(user_id,
+                                                                    action,
+                                                                    event_id))
 
 
 def get_uncorfimed_users(event_id):

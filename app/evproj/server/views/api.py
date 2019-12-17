@@ -53,8 +53,9 @@ def event_create():
         if not args:
             return make_400('Expected json')
 
-        last_id = api.create_event(args['name'], args['sm_description'], args['description'],
-                                    args['date_time'], args['phone'], args['mail'])
+        last_id = api.create_event(args['name'], args['sm_description'],
+                                   args['description'], args['date_time'],
+                                   args['phone'], args['mail'])
         api.create_event_creator(current_user.id, last_id)
         if args['presenters'] != '':
             api.create_event_presenters(args['presenters'], last_id)

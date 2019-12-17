@@ -11,11 +11,16 @@ import uuid
 Base = declarative_base()
 
 
-Status = ENUM('active', 'deleted', name='status')
-User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned', name='user_status')
-Event_status = ENUM('unconfirmed', 'future', 'past', name='event_status')
-Participation_level = ENUM('creator', 'presenter', 'guest', name='participation_level')
-Participation_status = ENUM('unknown', 'confirmed', 'declined', name='participation_status')
+Status = ENUM('active', 'deleted',
+              name='status')
+User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
+                   name='user_status')
+Event_status = ENUM('unconfirmed', 'future', 'past',
+                    name='event_status')
+Participation_level = ENUM('creator', 'presenter', 'guest',
+                           name='participation_level')
+Participation_status = ENUM('unknown', 'confirmed', 'declined',
+                            name='participation_status')
 
 
 class User(Base, UserMixin):
