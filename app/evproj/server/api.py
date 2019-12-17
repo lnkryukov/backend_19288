@@ -47,6 +47,7 @@ def confirm_user(confirmation_link):
         ).one_or_none()
         if user:
             user.status = 'active'
+            logging.info('User [{}] is confirmed'.format(user.mail))
             return 'user confirmed'
         else:
             return 'user is currently confirmed by this link'
@@ -76,7 +77,7 @@ def create_event(name, sm_description, description, date_time, phone, mail):
         event = Event(name=name, sm_description=sm_description, description=description,
                         date_time=time_date, phone=phone, mail=mail)
         s.add(event)
-        logging.info('Creating new event [{}]'.format(name))
+        logging.info('Creating new event [{}] ({})'.format(name, sm_description))
         if last_event:
             return last_event.id + 1
         else:
@@ -88,7 +89,6 @@ def create_event_creator(creator, last_id):
         participation = Participation(event=last_id, participant=creator,
                                         participation_level='creator', participation_status='confirmed')
         s.add(participation)
-        logging.info('Added creator [{}] to event id [{}]'.format(creator, last_id))
 
 
 def create_event_presenters(presenters, last_id):
@@ -99,7 +99,6 @@ def create_event_presenters(presenters, last_id):
             participation = Participation(event=last_id, participant=us,
                                         participation_level='presenter', participation_status='confirmed')
             s.add(participation)
-            logging.info('Added presenter [{}] to event id [{}]'.format(user, last_id))
 
 
 def get_event_info(id):
@@ -219,6 +218,7 @@ def guest_join(user_id, event_id):
             participation = Participation(event=event_id, participant=user_id,
                                         participation_level='guest', participation_status='unknown')
             s.add(participation)
+        logging.info('User with id [{}] joined event with id [{}]'.format(user_id, event_id))
 
 
 def guest_action(user_id, event_id, action):
@@ -230,6 +230,7 @@ def guest_action(user_id, event_id, action):
         ).first()
         setattr(part, 'participation_status', action)
         s.commit()
+        logging.info('Event (id [{}]) creator set [{}] to joined user with id [{}]'.format(event_id, action, user_id))
 
 
 def get_uncorfimed_users(event_id):
