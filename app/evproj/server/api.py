@@ -129,19 +129,28 @@ def check_participation(user_id, event_id):
 def get_participators(id):
     result = {}
     with get_session() as s:
-        users = s.query(User, Event, Participation).filter(
+        users = s.query(User, Participation).filter(
                 User.id == Participation.participant,
-                Event.id == Participation.event,
-                Event.id == id
+                Participation.event == id
         ).all()
 
-        for user, _, participant in users:
-            if participant.participation_level is not 'guest':
-                result[user.id] = {
+        i = 1
+        for user, participant in users:
+            if participant.participation_level == 'creator':
+                result[i] = {
                     'name': user.name,
                     'surname': user.surname,
                     'participation_level': participant.participation_level,
                 }
+                i += 1
+        for user, participant in users:
+            if participant.participation_level == 'presenter':
+                result[i] = {
+                    'name': user.name,
+                    'surname': user.surname,
+                    'participation_level': participant.participation_level,
+                }
+                i += 1
 
     return result
 

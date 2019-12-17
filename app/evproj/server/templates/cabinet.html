@@ -5,17 +5,10 @@
 {% endblock %}
 
 {% block head %}
-CABINET
+{{user.surname}} {{user.name}}
 {% endblock %}
 
 {% block content %}
-<div class="col-lg-6">
-    <div class="card mb-4">
-        <div class="card-header">{{user.surname}} {{user.name}}</div>
-        <div class="card-body">{{user.mail}} - {{user.lvl}}</div>
-    </div>
-</div>
-
 <h5>as creator</h5>
 <table class="table table-sm table-dark">
     <thead>
