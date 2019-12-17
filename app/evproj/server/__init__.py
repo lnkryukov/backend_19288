@@ -1,6 +1,6 @@
 from .. import cfg
 from . import auth
-from .views import web as web_views
+from .views import web as web_view, api as api_view
 
 from flask import Flask
 from flask_login import LoginManager
@@ -19,8 +19,9 @@ app.config.update(
 )
 
 
-app.register_blueprint(web_views.mod)
-app.register_error_handler(404, web_views.page_not_found)
+app.register_blueprint(web_view.mod)
+app.register_blueprint(api_view.mod)
+app.register_error_handler(404, web_view.page_not_found)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)

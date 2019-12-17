@@ -34,13 +34,13 @@
             <div id="content">
 
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <nav class="navbar navbar-expand-lg navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <a class="navbar-brand" href="/home">HOME</a>
 
                     <div class="topbar-divider d-none d-sm-block"></div>
 
-                    <form class="c_title d-none d-sm-inline-block form-inline mr-auto h3 text-gray-800">{% block head%}{% endblock %}</form>
+                    <a class="navbar-brand">{% block head%}{% endblock %}</a>
 
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
@@ -146,6 +146,10 @@
 
     <!-- Custom scripts for all pages-->
     <script src="/static/sbadmin/js/sb-admin-2.min.js"></script>
+
+    {% block extra_js%}
+    <title>Blank</title>
+    {% endblock %}
 
 </body>
 

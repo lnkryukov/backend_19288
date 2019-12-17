@@ -138,8 +138,8 @@
     <div class="container text-center">
       {% if current_user.is_authenticated %}
         {% if entering == 'creator' %}
-        <h2 class="mb-4">Подтвержденных = {{conf}}</h2>
-        <h2 class="mb-4">Неподтвержденных = {{unconf}}</h2>
+        <h2 class="mb-4" id="join_conf">Подтвержденных = {{conf}}</h2>
+        <h2 class="mb-4" id="join_unconf">Неподтвержденных = {{unconf}}</h2>
 
         <table class="table table-dark">
           <thead>
@@ -179,12 +179,12 @@
         {% elif entering == 'guest' %}
           <h2 class="mb-4">Спасибо за подачу заявки!</h2>
         {% else %}
-          <h2 class="mb-4">Хочешь принять участие?</h2>
-          <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+          <h2 class="mb-4" id="text_join">Хочешь принять участие?</h2>
+          <a class="btn btn-light btn-xl b_join" id="{{event.id}}">ДА!</a>
         {% endif %}
       {% else %}
-          <h2 class="mb-4">Хочешь принять участие?</h2>
-          <a class="btn btn-light btn-xl" href="/join/{{event.id}}">ДА!</a>
+          <h2 class="mb-4" id="text_join">Хочешь принять участие?</h2>
+          <a class="btn btn-light btn-xl b_join" id="{{event.id}}">ДА!</a>
       {% endif %}
     </div>
   </section>
@@ -251,6 +251,8 @@
   <script src="/static/creative/js/creative.min.js"></script>
 
   <script src="/static/guests_moves.js"></script>
+
+  <script src="/static/join.js"></script>
 
 </body>
 

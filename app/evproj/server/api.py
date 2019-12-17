@@ -91,6 +91,17 @@ def create_event_creator(creator, last_id):
         logging.info('Added creator [{}] to event id [{}]'.format(creator, last_id))
 
 
+def create_event_presenters(presenters, last_id):
+    users = presenters.replace(" ", "").split(',')
+    with get_session() as s:
+        for user in users:
+            us = s.query(User).filter(User.mail == user).first().id
+            participation = Participation(event=last_id, participant=us,
+                                        participation_level='presenter', participation_status='confirmed')
+            s.add(participation)
+            logging.info('Added presenter [{}] to event id [{}]'.format(user, last_id))
+
+
 def get_event_info(id):
     with get_session() as s:
         event = s.query(Event).filter(
@@ -195,8 +206,6 @@ def get_user_stat(user_id):
             }
 
     return result_creator, result_presenter, result_guest
-
-
 
 
 def guest_join(user_id, event_id):

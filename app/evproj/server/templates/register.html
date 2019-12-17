@@ -35,32 +35,32 @@
                                 <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
                             </div>
                             {% from "_formhelpers.html" import render_field %}
-                            <form role="form" action="register" method="POST" name="register" enctype="multipart/form-data" oninput='password_repeat.setCustomValidity(password_repeat.value != password.value ? "Passwords do not match." : "")'>
+                            <form role="form" id="f_register" action="" method="POST" enctype="multipart/form-data" oninput='password_repeat.setCustomValidity(password_repeat.value != password.value ? "Passwords do not match." : "")'>
                                 <fieldset>
                                     {{form.hidden_tag()}}
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="mail" aria-describedby="emailHelp" name="mail" required type="text" value="" placeholder="Enter Email Address...">
+                                            <input class="text-primary form-control form-control-user register_user_mail" style="border-radius: 10rem;" id="mail" aria-describedby="emailHelp" name="mail" required type="text" value="" placeholder="Enter Email Address...">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 mb-3 mb-sm-0">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="name" name="name" required type="text" value="" placeholder="Enter name">
+                                            <input class="text-primary form-control form-control-user register_user_name" style="border-radius: 10rem;" id="name" name="name" required type="text" value="" placeholder="Enter name">
                                         </div>
                                         <div class="col-sm-6">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="surname" name="surname" required type="text" value="" placeholder="Enter surname">
+                                            <input class="text-primary form-control form-control-user register_user_surname" style="border-radius: 10rem;" id="surname" name="surname" required type="text" value="" placeholder="Enter surname">
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 mb-3 mb-sm-0">
-                                            <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="password" name="password" required type="password" value="" placeholder="Password">
+                                            <input class="text-primary form-control form-control-user register_user_password" style="border-radius: 10rem;" id="password" name="password" required type="password" value="" placeholder="Password">
                                         </div>
                                         <div class="col-sm-6">
                                             <input class="text-primary form-control form-control-user" style="border-radius: 10rem;" id="password_repeat" name="password_repeat" required type="password" value="" placeholder="Repeat password">
                                         </div>
                                     </div>
-                                    <p>{{message}}</p>
-                                    <input class="btn btn-primary btn-user btn-block" style="border-radius: 10rem;" type="submit" value="Register">
+                                    <p id="message"></p>
+                                    <button type="submit" class="btn btn-primary" style="border-radius: 10rem;">Register</button>
                                 </fieldset>
                                 <hr>
                                 <a class="btn btn-google btn-user btn-block">
@@ -79,14 +79,16 @@
     </div>
 
     <!-- Bootstrap core JavaScript-->
-    <script src="static/sbadmin/vendor/jquery/jquery.min.js"></script>
-    <script src="static/sbadmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/sbadmin/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/sbadmin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
-    <script src="static/sbadmin/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/static/sbadmin/vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="static/sbadmin/js/sb-admin-2.min.js"></script>
+    <script src="/static/sbadmin/js/sb-admin-2.min.js"></script>
+
+    <script src="/static/register.js"></script>
 
 </body>
 

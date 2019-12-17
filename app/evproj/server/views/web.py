@@ -2,10 +2,13 @@ from flask import (Blueprint, request, redirect, url_for,
                    render_template, jsonify, abort)
 from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user)
+
 from passlib.hash import sha256_crypt
+
 from .. import auth
 from .. import forms
 from .. import api
+
 import logging
 
 
@@ -31,27 +34,12 @@ def login():
     return render_template('login.html', form=form, message=message)
 
 
-@mod.route('/register', methods=['GET', 'POST'])
+@mod.route('/register')
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('general.home'))
     form = forms.RegisterForm(request.form)
     message = ''
-    if request.method == "POST" and form.validate_on_submit():
-        try:
-            api.register_user(form.mail.data,
-                                form.name.data,
-                                form.surname.data,
-                                sha256_crypt.encrypt(str(form.password.data)))
-            message = f'{form.mail.data} was registered'
-            form.mail.data = ''
-            form.name.data = ''
-            form.surname.data = ''
-            form.password.data = ''
-            form.password_repeat.data = ''
-            return redirect(url_for('general.login'))
-        except Exception as e:
-            message = 'Failed to register user, probably one already exists.\n{}'.format(str(e))
     return render_template('register.html', form=form, message=message)
 
 
@@ -95,30 +83,12 @@ def cabinet():
     )
 
 
-@mod.route('/create_event', methods=['GET', 'POST'])
+
+@mod.route('/create_event')
 @login_required
 def create_event():
     form = forms.CreateEvent(request.form)
     message = ''
-    if request.method == "POST" and form.validate_on_submit():
-        try:
-            last_id = api.create_event(form.name.data,
-                                        form.sm_description.data,
-                                        form.description.data,
-                                        form.date_time.data,
-                                        form.phone.data,
-                                        form.mail.data)
-            api.create_event_creator(current_user.id, last_id)
-            message = f'{form.name.data} was created'
-            form.name.data = ''
-            form.sm_description.data = ''
-            form.description.data = ''
-            form.date_time.data = ''
-            form.phone.data = ''
-            form.mail.data = ''
-        except Exception as e:
-            message = 'Failed to create event.\n{}'.format(str(e))
-        return redirect(url_for('general.home'))
     return render_template(
         '/create_event.html',
         form=form,
@@ -150,26 +120,6 @@ def event(id):
     else:
         abort(404)
 
-
-@mod.route('/join/<string:id>', methods=['GET', 'POST'])
-@login_required
-def join(id):
-    if api.event_exist(id):
-        api.guest_join(current_user.id, id)
-        return redirect(url_for('general.event', id=id))
-    else:
-        abort(404)
-
-
-@mod.route('/guest_action', methods=['GET', 'POST'])
-@login_required
-def guest_action():
-    try:
-        args = request.get_json()
-        api.guest_action(int(args['user']), int(args['event']), args['action'])
-        return redirect(url_for('general.event', id=args['event']))
-    except:
-        print('problems')
 
 def page_not_found(e):
     if current_user.is_authenticated:

@@ -16,29 +16,32 @@ CREATE EVENT
                     <div class="card-body p-3">
                         <div class="p-3">
                         	{% from "_formhelpers.html" import render_field %}
-                        	<form role="form" action="create_event" method="POST" name="" enctype="multipart/form-data">
+                        	<form role="form" id="f_create_event" action="" method="POST" enctype="multipart/form-data">
 			                    <fieldset>
 			                        {{form.hidden_tag()}}
 			                        <div class="form-group">
-			                            {{ render_field(form.name, class="form-control", placeholder="enter name") }}
+			                            {{ render_field(form.name, class="form-control create_event_name", placeholder="enter name") }}
 			                        </div>
 			                        <div class="form-group">
-			                            {{ render_field(form.sm_description, class="form-control", placeholder="enter small description") }}
+			                            {{ render_field(form.sm_description, class="form-control create_event_sm_description", placeholder="enter small description") }}
 			                        </div>
 			                        <div class="form-group">
-			                            {{ render_field(form.description, class="form-control", placeholder="enter description") }}
+			                            {{ render_field(form.description, class="form-control create_event_description", placeholder="enter description") }}
 			                        </div>
 			                        <div class="form-group">
-			                            {{ render_field(form.date_time, class="form-control", placeholder="enter date y-m-d-h-m") }}
+			                            {{ render_field(form.date_time, class="form-control create_event_date_time", placeholder="enter date y-m-d-h-m") }}
 			                        </div>
 			                        <div class="form-group">
-			                            {{ render_field(form.phone, class="form-control", placeholder="enter phone") }}
+			                            {{ render_field(form.phone, class="form-control create_event_phone", placeholder="enter phone") }}
 			                        </div>
 			                        <div class="form-group">
-			                            {{ render_field(form.mail, class="form-control", placeholder="enter mail") }}
+			                            {{ render_field(form.mail, class="form-control create_event_mail", placeholder="enter mail") }}
 			                        </div>
-			                        <p>{{message}}</p>
-			                        <button type="submit" class="btn btn-primary">Create</button>
+			                        <div class="form-group">
+			                            {{ render_field(form.presenters, class="form-control create_event_presenters", placeholder="enter presenters") }}
+			                        </div>
+			                        <p id="message"></p>
+                                    <button type="submit" class="btn btn-primary" style="border-radius: 10rem;">Create</button>
 			                    </fieldset>
 			                </form>
 						</div>
@@ -50,4 +53,5 @@ CREATE EVENT
 
 
 {% block extra_js %}
+<script src="/static/create_event.js"></script>
 {% endblock %}

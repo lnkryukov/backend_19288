@@ -21,4 +21,5 @@ class CreateEvent(FlaskForm):
     description = StringField('Description', [validators.DataRequired()])
     date_time = StringField('Date_time', [validators.DataRequired()])
     phone = StringField('Phone', [validators.DataRequired()])
-    mail = StringField('mail', [validators.DataRequired()])
+    mail = StringField('Mail', [validators.DataRequired()])
+    presenters = StringField('Presenters')
