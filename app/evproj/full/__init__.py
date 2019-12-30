@@ -1,6 +1,6 @@
 from .. import cfg
-from . import auth
-from .views import web as web_view, api as api_view
+from ..core import auth
+from . import web as web_view, api as api_view
 
 from flask import Flask
 from flask_login import LoginManager

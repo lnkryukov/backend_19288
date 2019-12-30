@@ -5,9 +5,9 @@ from flask_login import (login_required, login_user, logout_user,
 
 from passlib.hash import sha256_crypt
 
-from .. import auth
-from .. import forms
-from .. import api
+from ..core import auth
+from . import forms
+from ..core import api
 
 import logging
 

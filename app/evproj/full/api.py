@@ -3,10 +3,10 @@ from flask_login import login_required, current_user
 
 from passlib.hash import sha256_crypt
 
-from .. import auth
-from .. import api
+from ..core import auth
+from ..core import api
 
-from ..exceptions import NotJsonError, NoData
+from ..core.exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
@@ -46,6 +46,7 @@ def register_user():
 
 
 @mod.route('/event_create', methods=['POST'])
+@login_required
 def event_create():
     try:
         args = request.get_json()
@@ -62,8 +63,8 @@ def event_create():
         return make_ok('Event was created', str(last_id))
     except KeyError:
         return make_400()
-    except IntegrityError:
-        return make_400('Something went wrong')
+    except IntegrityError as e:
+        return make_400('Something went wrong - \n{}'.format(str(e)))
 
 
 @mod.route('/join', methods=['POST'])
@@ -93,16 +94,3 @@ def guest_action():
         return make_400()
     except IntegrityError:
         return make_400('Something went wrong')
-
-
-@mod.route('/test_api_route', methods=['POST'])
-@login_required
-def test_api_route():
-    try:
-        args = request.get_json()
-        if not args:
-            return make_400('Expected json')
-        print(args)
-        return make_ok()
-    except:
-        return make_400()

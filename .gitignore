@@ -116,3 +116,4 @@ setup.sh
 # local logs, git ext and more
 service.log
 git-aacp
+git-ak
