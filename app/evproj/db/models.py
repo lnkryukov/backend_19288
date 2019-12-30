@@ -7,6 +7,8 @@ from flask_login import UserMixin
 from datetime import datetime
 import uuid
 
+from .. import cfg
+
 
 Base = declarative_base()
 
@@ -34,7 +36,7 @@ class User(Base, UserMixin):
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
                        unique=True, nullable=False)
     lvl = Column(Integer, default=2, nullable=False)
-    status = Column(User_status, default='unconfirmed', nullable=False)
+    status = Column(User_status, default=cfg.DEFAULT_USER_STATUS, nullable=False)
     confirmation_link = Column(String, nullable=False)
 
     def get_id(self):

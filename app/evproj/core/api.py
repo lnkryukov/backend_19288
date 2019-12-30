@@ -17,6 +17,7 @@ def register_user(mail, name, surname, password, lvl=2):
                 User.mail == mail,
                 User.status == 'deleted',
         ).one_or_none()
+
         # checking unique link
         confirmation_link = ''
         while True:
@@ -28,7 +29,7 @@ def register_user(mail, name, surname, password, lvl=2):
                 break
 
         if user:
-            user.status = 'unconfirmed'
+            user.status = cfg.DEFAULT_USER_STATUS
             user.confirmation_link = confirmation_link
             user.lvl = lvl
         else:
@@ -36,7 +37,8 @@ def register_user(mail, name, surname, password, lvl=2):
                         surname=surname, password=password,
                         lvl=lvl, confirmation_link=confirmation_link)
             s.add(user)
-        util.send_email(mail, confirmation_link)
+        if cfg.DEFAULT_USER_STATUS == 'unconfirmed':
+            util.send_email(mail, confirmation_link)
         logging.info('Registering new user [{}]'.format(mail))
 
 
