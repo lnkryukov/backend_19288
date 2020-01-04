@@ -71,6 +71,19 @@ def get_events():
     return result
 
 
+def get_id_by_mail(mail):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.mail == mail,
+                User.status == 'active'
+        ).first()
+
+        if user:
+            return user.id
+        else:
+            return -1
+
+
 def create_event(name, sm_description, description, date_time, phone, mail):
     timedate = date_time.split('-')
     time_date = datetime(int(timedate[0]), int(timedate[1]), int(timedate[2]),
