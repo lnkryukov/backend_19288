@@ -32,7 +32,7 @@
 
 *   `/event_create`, [POST]:
     *   Создание мероприятия
-    *    принимает:
+    *   Принимает:
         *    `mail` [string] - почта создателя мероприятия
         *    `name` [string] - название мероприятия
         *    `sm_description` [string] - мелкое описание мероприятия (превью)
@@ -40,7 +40,7 @@
         *    `date` [string y-m-d-h-m] - дата проведения мероприятия
         *    `phone` [string] - телефон связи по мероприятию
         *    `presenters` [optional] [string, separator ','] - перечисление почт докладчиков
-    *   успех:
+    *   Успех:
         *    200 с:
              *    `status` - `"ok"`
              *    `description` - `"Event was created!"`
