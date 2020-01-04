@@ -95,7 +95,7 @@ def join():
         return make_400('Problem.\n{}'.format(str(e)))
 
 
-@mod.route('/event/<string:id>')
+@mod.route('/event/<int:id>')
 def event(id):
     try:
         if api.event_exist(id):
