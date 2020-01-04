@@ -99,9 +99,8 @@ def join():
 def event(id):
     try:
         if api.event_exist(id):
-            print (api.event_info(id))
-            #return jsonify(api.event_info(id))
-            return make_ok()
+            print(api.event_info(id))
+            return jsonify(api.event_info(id))
         else:
             return make_400('No such event')
     except Exception as e:

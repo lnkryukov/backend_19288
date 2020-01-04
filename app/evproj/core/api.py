@@ -9,6 +9,7 @@ from datetime import datetime
 import requests
 import logging
 import os
+from types import SimpleNamespace
 
 
 def register_user(mail, name, surname, password, lvl=2):
@@ -301,4 +302,14 @@ def event_info(id):
                 Participation.participation_level == 'creator'
         ).one_or_none()
         
-        return event
+        info = SimpleNamespace()
+
+        for us, ev, pa in event:
+            info.mail = us.mail
+            info.name = ev.name
+            info.sm_description = ev.sm_description
+            info.description = ev.description
+            info.date_time = ev.date_time
+            info.phone = ev.phone
+
+        return info
