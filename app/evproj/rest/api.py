@@ -27,8 +27,8 @@ def make_ok(description=None, params=None):
     return jsonify(body)
 
 
-@mod.route('/register_user', methods=['POST'])
-def register_user():
+@mod.route('/register', methods=['POST'])
+def register():
     try:
         args = request.get_json()
         if not args:
@@ -43,8 +43,8 @@ def register_user():
         return make_400('User with this login already exists')
 
 
-@mod.route('/event_create', methods=['POST'])
-def event_create():
+@mod.route('/create_event', methods=['POST'])
+def create_event():
     try:
         args = request.get_json()
         if not args:
@@ -74,3 +74,40 @@ def get_all_machines():
         return jsonify(api.get_events())
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
+
+
+@mod.route('/join', methods=['POST'])
+def join():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        user_id = api.get_id_by_mail(args['mail'])
+        if api.event_exist(int(args['event_id'])):
+            if user_id is not -1:
+                api.guest_join(user_id, int(args['event_id']))
+                return make_ok('Guest joined event')
+            else:
+                return make_400('no such user')
+        else:
+            return make_400('no such event')
+    except Exception as e:
+        return make_400('Problem.\n{}'.format(str(e)))
+
+
+# доделать
+@mod.route('/guest_action', methods=['POST'])
+def guest_action():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        user_id = api.get_id_by_mail(args['mail'])
+        api.event_exist(int(args['event_id']))
+
+        api.guest_action(int(args['user']), int(args['event']), args['action'])
+        return make_ok()
+    except KeyError as e:
+        return make_400('KeyError - \n{}'.format(str(e)))
+    except IntegrityError as e:
+        return make_400('IntegrityError - \n{}'.format(str(e)))
