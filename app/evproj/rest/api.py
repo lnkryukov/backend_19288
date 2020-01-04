@@ -101,6 +101,7 @@ def event(id):
         if api.event_exist(id):
             print (api.event_info(id))
             #return jsonify(api.event_info(id))
+            return make_ok()
         else:
             return make_400('No such event')
     except Exception as e:
