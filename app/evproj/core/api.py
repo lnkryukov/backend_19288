@@ -300,9 +300,17 @@ def event_info(id):
                 Participation.event == Event.id,
                 Participation.participant == User.id,
                 Participation.participation_level == 'creator'
-        ).one_or_none()
+        ).first()
 
-        for us, ev, pa in event:
+        for ev, pa, us in event:
+            print({
+                "creator": us.mail,
+                "name": ev.name,
+                "sm_description": ev.sm_description,
+                "description": ev.description,
+                "date_time": ev.date_time,
+                "phone": ev.phone
+            })
             return {
                 "creator": us.mail,
                 "name": ev.name,

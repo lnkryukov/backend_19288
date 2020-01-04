@@ -104,7 +104,7 @@ def event(id):
         else:
             return make_400('No such event')
     except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
+        return make_400('Problem. {}'.format(str(e)))
 
 
 # доделать
