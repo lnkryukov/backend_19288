@@ -303,7 +303,7 @@ def event_info(id):
         ).first()
 
         for ev, pa, us in event:
-            print({
+            logging.info({
                 "creator": us.mail,
                 "name": ev.name,
                 "sm_description": ev.sm_description,
