@@ -301,15 +301,13 @@ def event_info(id):
                 Participation.participant == User.id,
                 Participation.participation_level == 'creator'
         ).one_or_none()
-        
-        info = SimpleNamespace()
 
         for us, ev, pa in event:
-            info.mail = us.mail
-            info.name = ev.name
-            info.sm_description = ev.sm_description
-            info.description = ev.description
-            info.date_time = ev.date_time
-            info.phone = ev.phone
-
-        return info
+            return {
+                "creator": us.mail,
+                "name": ev.name,
+                "sm_description": ev.sm_description,
+                "description": ev.description,
+                "date_time": ev.date_time,
+                "phone": ev.phone
+            }
