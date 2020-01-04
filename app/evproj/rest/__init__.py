@@ -5,6 +5,7 @@ from . import api as restful_api
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
+from flask_cors import CORS
 
 import logging
 
@@ -21,6 +22,8 @@ app.register_blueprint(restful_api.mod)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)
+
+CORS(app)
 
 def run():
     monkey.patch_all(ssl=False)

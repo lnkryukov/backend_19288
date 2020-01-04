@@ -7,6 +7,7 @@ chardet
 Click
 cryptography
 Flask
+flask-cors
 Flask-Login
 Flask-WTF
 gevent
