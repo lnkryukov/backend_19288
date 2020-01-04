@@ -301,9 +301,9 @@ def event_info(id):
                 Participation.participant == User.id,
                 Participation.participation_level == 'creator'
         ).first()
-
+        print(event)
         for ev, pa, us in event:
-            print({
+            logging.info({
                 "creator": us.mail,
                 "name": ev.name,
                 "sm_description": ev.sm_description,
