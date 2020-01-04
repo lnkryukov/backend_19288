@@ -39,7 +39,7 @@
         *    `description` [string] - полное описание мероприятия
         *    `date` [string y-m-d-h-m] - дата проведения мероприятия
         *    `phone` [string] - телефон связи по мероприятию
-        *    `presenters` [optional] [string, separator ','] - перечисление почт докладчиков
+        *    `presenters` [string, separator ',' или пустая строка] - перечисление почт докладчиков
     *   Успех:
         *    200 с:
              *    `status` - `"ok"`
