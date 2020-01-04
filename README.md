@@ -34,7 +34,7 @@
 		sudo apt install git python python3 python3-pip
 		pip3 install virtualenv
 
-*	Клонинуем репозиторий и настраиваем виртуальное окружение (bash/zsh):
+*	Клонинуем репозиторий и настраиваем виртуальное (опционально для продакшн-сервера) окружение (bash/zsh):
 
 		git clone git@github.com:EventsExpertsMIEM/EventsProj.git
 		cd app
