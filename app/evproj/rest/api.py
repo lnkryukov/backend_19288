@@ -88,9 +88,21 @@ def join():
                 api.guest_join(user_id, int(args['event_id']))
                 return make_ok('Guest joined event')
             else:
-                return make_400('no such user')
+                return make_400('No such user')
         else:
-            return make_400('no such event')
+            return make_400('No such event')
+    except Exception as e:
+        return make_400('Problem.\n{}'.format(str(e)))
+
+
+@mod.route('/event/<string:id>')
+def event(id):
+    try:
+        if api.event_exist(id):
+            print api.event_info(id)
+            return jsonify(api.event_info(id))
+        else:
+            return make_400('No such event')
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
 

@@ -290,3 +290,15 @@ def event_exist(event_id):
                 Event.id == event_id
         ).count()
     return True if exists > 0 else False
+
+
+def event_info(id):
+    with get_session() as s:
+        event = s.query(Event, Participation, User).filter(
+                Event.id == id,
+                Participation.event == Event.id,
+                Participation.participant == User.id,
+                Participation.participation_level == 'creator'
+        ).one_or_none()
+        
+        return event
