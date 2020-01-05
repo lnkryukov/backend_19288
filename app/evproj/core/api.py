@@ -67,7 +67,7 @@ def get_events():
                 'id': event.id,
                 'name': event.name,
                 'sm_description': event.sm_description,
-                'date': event.date_time,
+                'date_time': event.date_time,
             }
     return result
 
@@ -301,21 +301,14 @@ def event_info(id):
                 Participation.participant == User.id,
                 Participation.participation_level == 'creator'
         ).first()
-        print(event)
-        for ev, pa, us in event:
-            logging.info({
-                "creator": us.mail,
-                "name": ev.name,
-                "sm_description": ev.sm_description,
-                "description": ev.description,
-                "date_time": ev.date_time,
-                "phone": ev.phone
-            })
-            return {
-                "creator": us.mail,
-                "name": ev.name,
-                "sm_description": ev.sm_description,
-                "description": ev.description,
-                "date_time": ev.date_time,
-                "phone": ev.phone
-            }
+
+        return {
+            "creator_mail": event.User.mail,
+            "creator_name": event.User.name,
+            "creator_surname": event.User.surname,
+            "name": event.Event.name,
+            "sm_description": event.Event.sm_description,
+            "description": event.Event.description,
+            "date_time": event.Event.date_time,
+            "phone": event.Event.phone
+        }    

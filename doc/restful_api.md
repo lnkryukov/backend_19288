@@ -55,14 +55,30 @@
              *    `id` [unsigned int] - id мероприятия
              *    `name` [string] - название мероприятия
              *    `sm_description` [string] - мелкое описание мероприятия (превью)
-             *    `date` [string y-m-d-h-m] - дата проведения мероприятия
+             *    `date_time` [string y-m-d-h-m] - дата проведения мероприятия
+    *   в случе проблем:
+        *    400 с `error: DESCRIPTION`
 
 *   `/join`  [POST]:
     *    регистрация пользователя на мероприятие
     *    принимает:
          *    `mail` [string] - почта пользователя
          *    `event_id` [string] - id мероприятия
-    *   успех:
+    *    успех:
          *    200 с `status: "ok"` и `description: "Guest joined event"`
     *    неудача:
          *    400 с `error: DESCRIPTION`
+
+*   `/event/<int:id>`  [GET]:
+    *   Получение информации о мероприятии
+    *   отдаёт:
+        *    `creator_mail` [string] - почта создателя мероприятия
+        *    `creator_name` [string] - имя создателя мероприятия
+        *    `creator_surname` [string] - фамилия создателя мероприятия
+        *    `name` [string] - название мероприятия
+        *    `sm_description` [string] - мелкое описание мероприятия (превью)
+        *    `description` [string] - полное описание мероприятия
+        *    `date_time` [string y-m-d-h-m] - дата проведения мероприятия
+        *    `phone` [string] - контактный телефон
+    *   в случе проблем:
+        *    400 с `error: DESCRIPTION`
