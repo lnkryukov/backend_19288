@@ -27,6 +27,10 @@ def make_ok(description=None, params=None):
     return jsonify(body)
 
 
+def route_not_found(e):
+    return jsonify(error="Unknown route!"), 404
+
+
 @mod.route('/register', methods=['POST'])
 def register():
     try:
@@ -66,6 +70,8 @@ def create_event():
         return make_400('KeyError - \n{}'.format(str(e)))
     except IntegrityError as e:
         return make_400('IntegrityError - \n{}'.format(str(e)))
+    except Exception as e:
+        return make_400('Problem - \n{}'.format(str(e)))
 
 
 @mod.route('/events', methods=['GET'])
@@ -95,7 +101,7 @@ def join():
         return make_400('Problem.\n{}'.format(str(e)))
 
 
-@mod.route('/event/<int:id>')
+@mod.route('/event/<int:id>', methods=['GET'])
 def event(id):
     try:
         if api.event_exist(id):
@@ -106,7 +112,22 @@ def event(id):
         return make_400('Problem. {}'.format(str(e)))
 
 
-# доделать
+# TODO
+
+@mod.route('/profile/<string:mail>')
+def profile(mail):
+    try:
+        user_id = api.get_id_by_mail(mail)
+        if user_id != -1:
+            as_creator, as_presenter, as_guest = api.get_user_stat(user_id)
+            return jsonify(creator=as_creator, presenter=as_presenter,
+                           guest=as_presenter)
+        else:
+            return make_400('No such user')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
 @mod.route('/guest_action', methods=['POST'])
 def guest_action():
     try:
@@ -122,3 +143,5 @@ def guest_action():
         return make_400('KeyError - \n{}'.format(str(e)))
     except IntegrityError as e:
         return make_400('IntegrityError - \n{}'.format(str(e)))
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))

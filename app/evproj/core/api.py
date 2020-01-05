@@ -293,6 +293,8 @@ def event_exist(event_id):
     return True if exists > 0 else False
 
 
+# restapi
+
 def event_info(id):
     with get_session() as s:
         event = s.query(Event, Participation, User).filter(
@@ -312,3 +314,51 @@ def event_info(id):
             "date_time": event.Event.date_time,
             "phone": event.Event.phone
         }    
+
+
+def get_user_info(id):
+    result_creator = {}
+    result_presenter = {}
+    result_guest = {}
+    with get_session() as s:
+        as_creator = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'creator'
+        ).all()
+
+        for participant, event in as_creator:
+            result_creator[event.id] = {
+                'id': event.id,
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+        as_presenter = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'presenter'
+        ).all()
+
+        for participant, event in as_presenter:
+            result_presenter[event.id] = {
+                'id': event.id,
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+        as_guest = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_level == 'guest',
+                Participation.participation_status == 'confirmed'
+        ).all()
+
+        for participant, event in as_guest:
+            result_guest[event.id] = {
+                'id': event.id,
+                'name': event.name,
+                'date': event.date_time,
+            }
+
+    return result_creator, result_presenter, result_guest

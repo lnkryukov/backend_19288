@@ -19,6 +19,7 @@ app.config.update(
 )
 
 app.register_blueprint(restful_api.mod)
+app.register_error_handler(404, restful_api.route_not_found)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)
