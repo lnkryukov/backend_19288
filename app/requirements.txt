@@ -9,12 +9,10 @@ cryptography
 Flask
 flask-cors
 Flask-Login
-Flask-WTF
 gevent
 greenlet
 idna
 itsdangerous
-Jinja2
 MarkupSafe
 more-itertools
 passlib
@@ -32,4 +30,3 @@ testing.common.database
 testing.postgresql
 urllib3
 Werkzeug
-WTForms
