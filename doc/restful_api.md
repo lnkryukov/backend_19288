@@ -14,6 +14,13 @@
     *    неудача:
          *    400 с `error: DESCRIPTION`
 
+*   `/logout`  [GET/POST]:
+    *    Логаут пользователя из системы
+    *    успех:
+         *    200 с `status: "ok"` и `description: "User was logouted"`
+    *    неудача:
+         *    400 с `error: DESCRIPTION`
+
 *   `/register`  [POST]:
     *    регистрация пользователя в системе
     *    принимает:

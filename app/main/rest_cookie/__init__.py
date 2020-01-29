@@ -18,7 +18,7 @@ app.config.update(
     SECRET_KEY=cfg.SECRET_KEY,
 )
 
-app.register_blueprint(api.mod)
+app.register_blueprint(api.bp)
 app.register_error_handler(401, api.unauthorized)
 app.register_error_handler(404, api.route_not_found)
 app.register_error_handler(405, api.method_not_allowed)

@@ -12,7 +12,7 @@ from ..core.exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
-mod = Blueprint('api', __name__)
+bp = Blueprint('api', __name__)
 
 
 def make_400(text='Invalid reqeust'):
@@ -43,7 +43,7 @@ def method_not_allowed(e):
     return jsonify(error="Wrong route method!"), 405
 
 
-@mod.route('/login', methods=['POST'])
+@bp.route('/login', methods=['POST'])
 def login():
     try:
         if current_user.is_authenticated:
@@ -65,7 +65,7 @@ def login():
         return make_400('Problem - \n{}'.format(str(e)))
 
 
-@mod.route('/logout', methods=['GET', 'POST'])
+@bp.route('/logout', methods=['GET', 'POST'])
 @login_required
 def logout():
     try:
@@ -75,7 +75,7 @@ def logout():
         return make_400('Problem - \n{}'.format(str(e)))
 
 
-@mod.route('/register', methods=['POST'])
+@bp.route('/register', methods=['POST'])
 def register():
     try:
         if current_user.is_authenticated:
@@ -94,7 +94,7 @@ def register():
         return make_400('User with this login already exists')
 
 
-@mod.route('/create_event', methods=['POST'])
+@bp.route('/create_event', methods=['POST'])
 @login_required
 def create_event():
     try:
@@ -117,7 +117,7 @@ def create_event():
         return make_400('Problem - \n{}'.format(str(e)))
 
 
-@mod.route('/events', methods=['GET'])
+@bp.route('/events', methods=['GET'])
 def events():
     try:
         return jsonify(bl_events.get_events())
@@ -125,7 +125,7 @@ def events():
         return make_400('Problem.\n{}'.format(str(e)))
 
 
-@mod.route('/event/<int:id>', methods=['GET'])
+@bp.route('/event/<int:id>', methods=['GET'])
 def event(id):
     try:
         if bl_events.event_exist(id):
@@ -136,7 +136,7 @@ def event(id):
         return make_400('Problem. {}'.format(str(e)))
 
 
-@mod.route('/profile', methods=['GET'])
+@bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
     try:
@@ -147,7 +147,7 @@ def profile():
         return make_400('Problem. {}'.format(str(e)))
 
 
-@mod.route('/join', methods=['POST'])
+@bp.route('/join', methods=['POST'])
 @login_required
 def join():
     try:

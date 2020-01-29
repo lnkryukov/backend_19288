@@ -1,6 +1,6 @@
 from .. import cfg
 from ..core import auth
-from . import api as restful_api
+from . import api
 
 from flask import Flask
 from flask_login import LoginManager
@@ -19,9 +19,10 @@ app.config.update(
     AUTH_HEADER_NAME=cfg.AUTH_HEADER_NAME,
 )
 
-app.register_blueprint(restful_api.mod)
-app.register_error_handler(404, restful_api.route_not_found)
-app.register_error_handler(405, restful_api.method_not_allowed)
+app.register_blueprint(api.bp)
+app.register_error_handler(401, api.unauthorized)
+app.register_error_handler(404, api.route_not_found)
+app.register_error_handler(405, api.method_not_allowed)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)
