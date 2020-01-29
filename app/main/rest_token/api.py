@@ -4,8 +4,8 @@ from flask_login import login_required, current_user
 from passlib.hash import sha256_crypt
 
 from ..core import auth
-from ..core import blusers
-from ..core import blevents
+from ..core import bl_users
+from ..core import bl_events
 
 from ..core.exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
@@ -59,7 +59,7 @@ def register():
             if not args:
                 return make_400('Expected json')
 
-            blusers.register_user(args['mail'], args['name'], args['surname'],
+            bl_users.register_user(args['mail'], args['name'], args['surname'],
                               sha256_crypt.encrypt(str(args['password'])))
             return make_ok('User was registered')
     except KeyError as e:

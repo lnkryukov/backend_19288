@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, make_response
-from flask_login import login_required, current_user
+from flask_login import (login_required, login_user, logout_user,
+                         login_fresh, current_user)
 
 from passlib.hash import sha256_crypt
 
@@ -30,6 +31,10 @@ def make_ok(description=None, params=None):
     return jsonify(body)
 
 
+def unauthorized(e):
+    return jsonify(error="Unauthorized"), 401
+
+
 def route_not_found(e):
     return jsonify(error="Unknown route!"), 404
 
@@ -47,7 +52,7 @@ def login():
             args = request.get_json()
             if not args:
                 return make_400('Expected json')
-            user = bl_users.check_user(args['mail'])
+            user = auth.check_user(args['mail'])
             if user:
                 if sha256_crypt.verify(args['password'], user.password):
                     login_user(user)
@@ -56,6 +61,16 @@ def login():
                     return make_400('Invalid password')
             else:
                 return make_400('Invalid user')
+    except Exception as e:
+        return make_400('Problem - \n{}'.format(str(e)))
+
+
+@mod.route('/logout', methods=['GET', 'POST'])
+@login_required
+def logout():
+    try:
+        logout_user()
+        return make_ok('User was logouted')
     except Exception as e:
         return make_400('Problem - \n{}'.format(str(e)))
 
@@ -70,7 +85,7 @@ def register():
             if not args:
                 return make_400('Expected json')
 
-            blusers.register_user(args['mail'], args['name'], args['surname'],
+            bl_users.register_user(args['mail'], args['name'], args['surname'],
                               sha256_crypt.encrypt(str(args['password'])))
             return make_ok('User was registered')
     except KeyError as e:

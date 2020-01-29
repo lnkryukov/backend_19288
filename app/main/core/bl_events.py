@@ -102,7 +102,6 @@ def join_event(user_id, event_id, role):
                                                                     role))
 
 
-participation_status
 def event_exist(event_id):
     with get_session() as s:
         exists = s.query(Event).filter(

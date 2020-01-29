@@ -3,9 +3,10 @@ from ..core import auth
 from . import api
 
 from flask import Flask
+from flask_login import LoginManager
+from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
-from flask_cors import CORS
 
 import logging
 
@@ -15,10 +16,10 @@ app.config.update(
     DEBUG=cfg.DEBUG,
     CSRF_ENABLED=cfg.CSRF_ENABLED,
     SECRET_KEY=cfg.SECRET_KEY,
-    TEMPLATES_AUTO_RELOAD=True,
 )
 
 app.register_blueprint(api.mod)
+app.register_error_handler(401, api.unauthorized)
 app.register_error_handler(404, api.route_not_found)
 app.register_error_handler(405, api.method_not_allowed)
 

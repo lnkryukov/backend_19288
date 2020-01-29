@@ -15,6 +15,7 @@ idna
 itsdangerous
 MarkupSafe
 more-itertools
+nanoid
 passlib
 pg8000
 pluggy

@@ -3,9 +3,10 @@ from ..core import auth
 from . import api as restful_api
 
 from flask import Flask
+from flask_login import LoginManager
+from flask_cors import CORS
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
-from flask_cors import CORS
 
 import logging
 
