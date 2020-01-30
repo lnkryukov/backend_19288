@@ -1,4 +1,4 @@
-# EventsProj Database
+# 19288 Evetns Project Database
 
 ## Почему PostgreSQL
 * Хорошая докумантция и большое сообщество.

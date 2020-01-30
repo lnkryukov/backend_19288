@@ -3,11 +3,9 @@ from flask_login import login_required, current_user
 
 from passlib.hash import sha256_crypt
 
-from ..core import auth
-from ..core import bl_users
-from ..core import bl_events
+from .. import auth, users, events
 
-from ..core.exceptions import NotJsonError, NoData
+from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
@@ -73,7 +71,7 @@ def register():
             if not args:
                 return make_400('Expected json')
 
-            bl_users.register_user(args['mail'], args['name'], args['surname'],
+            users.register_user(args['mail'], args['name'], args['surname'],
                               sha256_crypt.encrypt(str(args['password'])))
             return make_ok('User was registered')
     except KeyError as e:
@@ -90,11 +88,11 @@ def create_event():
         if not args:
             return make_400('Expected json')
 
-        last_id = bl_events.create_event(args['name'],
+        last_id = events.create_event(args['name'],
                                          args['sm_description'],
                                          args['description'],
                                          args['date_time'])
-        bl_events.create_event_creator(current_user.id, last_id)
+        events.create_event_creator(current_user.id, last_id)
 
         return make_ok('Event was created', str(last_id))
     except KeyError as e:
@@ -108,7 +106,7 @@ def create_event():
 @bp.route('/events', methods=['GET'])
 def events():
     try:
-        return jsonify(bl_events.get_events())
+        return jsonify(events.get_events())
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
 
@@ -116,8 +114,8 @@ def events():
 @bp.route('/event/<int:id>', methods=['GET'])
 def event(id):
     try:
-        if bl_events.event_exist(id):
-            return jsonify(bl_events.event_info(id))
+        if events.event_exist(id):
+            return jsonify(events.event_info(id))
         else:
             return make_400('No such event')
     except Exception as e:
@@ -128,7 +126,7 @@ def event(id):
 @login_required
 def profile():
     try:
-        as_creator, as_presenter, as_participant = bl_events.get_user_stat(current_user.id)
+        as_creator, as_presenter, as_participant = events.get_user_stat(current_user.id)
         return jsonify(creator=as_creator, presenter=as_presenter,
                        participant=as_participant)
     except Exception as e:
@@ -143,8 +141,8 @@ def join():
         if not args:
             return make_400('Expected json')
 
-        if bl_events.event_exist(int(args['event_id'])):
-            bl_events.join_event(current_user.id, int(args['event_id']), args['role'])
+        if events.event_exist(int(args['event_id'])):
+            events.join_event(current_user.id, int(args['event_id']), args['role'])
             return make_ok('Guest joined event')
         else:
             return make_400('No such event')

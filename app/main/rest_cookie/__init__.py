@@ -1,5 +1,4 @@
-from .. import cfg
-from ..core import auth
+from .. import cfg, auth
 from . import api
 
 from flask import Flask

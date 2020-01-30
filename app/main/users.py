@@ -1,5 +1,5 @@
-from .. import cfg
-from ..db import *
+from . import cfg
+from .db import *
 from . import util
 
 from .exceptions import NotJsonError, NoData

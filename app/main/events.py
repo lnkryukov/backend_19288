@@ -1,5 +1,5 @@
-from .. import cfg
-from ..db import *
+from . import cfg
+from .db import *
 from . import util
 from .exceptions import NotJsonError, NoData
 
@@ -97,10 +97,12 @@ def join_event(user_id, event_id, role):
             participation = Participation(event=event_id, participant=user_id,
                                           participation_role=role)
             s.add(participation)
-        logging.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
+            logging.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
                                                                     event_id,
                                                                     role))
-
+            return 0
+        else:
+            return 'User is already joined this event'
 
 def event_exist(event_id):
     with get_session() as s:

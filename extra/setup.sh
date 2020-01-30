@@ -11,6 +11,9 @@ export PGDATABASE=""
 # пароль пользователя postgresql
 export PGPASSWORD=""
 
+# порт приложения
+export PORT=""
+
 # подтверждение регистрации по электронной почте
 # 'active' для отключения подтверждения
 # 'unconfirmed' для включения

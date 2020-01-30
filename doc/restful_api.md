@@ -1,4 +1,4 @@
-# EventsProj RESTful API
+# 19288 Evetns Project RESTful API
 
 ## Информация:
 *   Принимает и отдаёт JSON
@@ -30,6 +30,15 @@
          *    `password` [string] - пароль пользователя
     *   успех:
          *    200 с `status: "ok"`
+    *    неудача:
+         *    400 с `error: DESCRIPTION`
+
+*   `/register`  [POST]:
+    *    регистрация пользователя в системе
+    *    принимает:
+         *    `link` [string] - ссылка подтверждения пользователя
+    *    успех:
+         *    200 с `status: "ok"` и `description: "User was confirmed"`
     *    неудача:
          *    400 с `error: DESCRIPTION`
 

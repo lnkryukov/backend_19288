@@ -2,7 +2,7 @@ import random
 import string
 import smtplib
 from email.message import EmailMessage
-from .. import cfg
+from . import cfg
 
 
 def random_string_digits(str_len=8):
