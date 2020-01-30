@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import logging
 from main import db, rest_cookie, rest_token
 import urllib3
-from passlib.hash import sha256_crypt
+import bcrypt
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     args = parser.parse_args()
     
     if args.password:
-        db.create_tables(sha256_crypt.encrypt(args.password))
+        db.create_tables(bcrypt.hashpw(args.password, bcrypt.gensalt()))
 
     if args.role == 'rest_cookie':
         logging.info('Starting restful api backend server with cookies auth')

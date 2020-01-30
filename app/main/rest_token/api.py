@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, make_response
-from flask_login import login_required, current_user
+from flask_login import (login_required, login_user, logout_user,
+                         login_fresh, current_user)
 
-from passlib.hash import sha256_crypt
+import bcrypt
 
 from .. import auth, users, events
 
@@ -72,12 +73,24 @@ def register():
                 return make_400('Expected json')
 
             users.register_user(args['mail'], args['name'], args['surname'],
-                              sha256_crypt.encrypt(str(args['password'])))
+                        bcrypt.hashpw(str(args['password']), bcrypt.gensalt()))
             return make_ok('User was registered')
     except KeyError as e:
         return make_400('KeyError - \n{}'.format(str(e)))
     except IntegrityError:
         return make_400('User with this login already exists')
+
+
+@bp.route('/confirm', methods=['POST'])
+def confirm():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        users.confirm_user(args['link'])
+        return make_ok('User was confirmed')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
 
 
 @bp.route('/create_event', methods=['POST'])
@@ -142,12 +155,24 @@ def join():
             return make_400('Expected json')
 
         if events.event_exist(int(args['event_id'])):
-            events.join_event(current_user.id, int(args['event_id']), args['role'])
+            join = events.join_event(current_user.id,
+                                        int(args['event_id']), args['role'])
+            if join:
+                return make_400(join)
             return make_ok('Guest joined event')
         else:
             return make_400('No such event')
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
+
+
+@bp.route('/update_event', methods=['POST'])
+@login_required
+def update_event():
+    try:
+        pass
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
 
 
 # OLD CODE

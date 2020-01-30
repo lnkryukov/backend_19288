@@ -1,7 +1,7 @@
 from . import cfg
 from .db import User, get_session
 
-from passlib.hash import sha256_crypt
+import bcrypt
 import jwt
 import time
 

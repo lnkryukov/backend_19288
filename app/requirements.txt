@@ -1,11 +1,11 @@
 asn1crypto
 atomicwrites
 attrs
+bcrypt
 certifi
 cffi
 chardet
 Click
-cryptography
 Flask
 flask-cors
 Flask-Login

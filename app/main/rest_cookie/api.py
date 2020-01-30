@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, make_response
 from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user)
 
-from passlib.hash import sha256_crypt
+import bcrypt
 
 from .. import auth, users, events
 
@@ -52,7 +52,7 @@ def login():
                 return make_400('Expected json')
             user = auth.check_user(args['mail'])
             if user:
-                if sha256_crypt.verify(args['password'], user.password):
+                if bcrypt.checkpw(args['password'], user.password):
                     login_user(user)
                     return make_ok('User was logined')
                 else:
@@ -84,7 +84,7 @@ def register():
                 return make_400('Expected json')
 
             users.register_user(args['mail'], args['name'], args['surname'],
-                              sha256_crypt.encrypt(str(args['password'])))
+                        bcrypt.hashpw(str(args['password']), bcrypt.gensalt()))
             return make_ok('User was registered')
     except KeyError as e:
         return make_400('KeyError - \n{}'.format(str(e)))
