@@ -4,7 +4,7 @@ from flask_login import (login_required, login_user, logout_user,
 
 import bcrypt
 
-from .. import auth, users, events
+from .. import auth, users_logic, events_logic
 
 from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
@@ -83,7 +83,7 @@ def register():
             if not args:
                 return make_400('Expected json')
 
-            users.register_user(args['mail'], args['name'], args['surname'],
+            users_logic.register_user(args['mail'], args['name'], args['surname'],
                         bcrypt.hashpw(str(args['password']).encode('utf-8'), bcrypt.gensalt()))
             return make_ok('User was registered')
     except KeyError as e:
@@ -98,7 +98,7 @@ def confirm():
         args = request.get_json()
         if not args:
             return make_400('Expected json')
-        users.confirm_user(args['link'])
+        users_logic.confirm_user(args['link'])
         return make_ok('User was confirmed')
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))
@@ -112,11 +112,11 @@ def create_event():
         if not args:
             return make_400('Expected json')
 
-        last_id = events.create_event(args['name'],
+        last_id = events_logic.create_event(args['name'],
                                          args['sm_description'],
                                          args['description'],
                                          args['date_time'])
-        events.create_event_creator(current_user.id, last_id)
+        events_logic.create_event_creator(current_user.id, last_id)
 
         return make_ok('Event was created', str(last_id))
     except KeyError as e:
@@ -130,7 +130,7 @@ def create_event():
 @bp.route('/events', methods=['GET'])
 def events():
     try:
-        return jsonify(events.get_events())
+        return jsonify(events_logic.get_events())
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
 
@@ -138,8 +138,8 @@ def events():
 @bp.route('/event/<int:id>', methods=['GET'])
 def event(id):
     try:
-        if events.event_exist(id):
-            return jsonify(events.event_info(id))
+        if events_logic.event_exist(id):
+            return jsonify(events_logic.event_info(id))
         else:
             return make_400('No such event')
     except Exception as e:
@@ -150,7 +150,7 @@ def event(id):
 @login_required
 def profile():
     try:
-        as_creator, as_presenter, as_participant = events.get_user_stat(current_user.id)
+        as_creator, as_presenter, as_participant = events_logic.get_user_stat(current_user.id)
         return jsonify(creator=as_creator, presenter=as_presenter,
                        participant=as_participant)
     except Exception as e:
@@ -165,8 +165,8 @@ def join():
         if not args:
             return make_400('Expected json')
 
-        if events.event_exist(int(args['event_id'])):
-            join = events.join_event(current_user.id,
+        if events_logic.event_exist(int(args['event_id'])):
+            join = events_logic.join_event(current_user.id,
                                         int(args['event_id']), args['role'])
             if join:
                 return make_400(join)
