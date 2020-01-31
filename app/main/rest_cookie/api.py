@@ -52,7 +52,7 @@ def login():
                 return make_400('Expected json')
             user = auth.check_user(args['mail'])
             if user:
-                if bcrypt.checkpw(args['password'], user.password):
+                if bcrypt.checkpw(args['password'].encode('utf-8'), user.password):
                     login_user(user)
                     return make_ok('User was logined')
                 else:
@@ -84,7 +84,7 @@ def register():
                 return make_400('Expected json')
 
             users.register_user(args['mail'], args['name'], args['surname'],
-                        bcrypt.hashpw(str(args['password']), bcrypt.gensalt()))
+                        bcrypt.hashpw(str(args['password']).encode('utf-8'), bcrypt.gensalt()))
             return make_ok('User was registered')
     except KeyError as e:
         return make_400('KeyError - \n{}'.format(str(e)))

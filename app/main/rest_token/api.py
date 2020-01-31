@@ -73,7 +73,7 @@ def register():
                 return make_400('Expected json')
 
             users.register_user(args['mail'], args['name'], args['surname'],
-                        bcrypt.hashpw(str(args['password']), bcrypt.gensalt()))
+                        bcrypt.hashpw(str(args['password']).encode('utf-8'), bcrypt.gensalt()))
             return make_ok('User was registered')
     except KeyError as e:
         return make_400('KeyError - \n{}'.format(str(e)))
