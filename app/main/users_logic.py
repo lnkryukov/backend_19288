@@ -1,8 +1,8 @@
 from . import cfg
 from .db import *
 from . import util
-
 from .exceptions import NotJsonError, NoData
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
 

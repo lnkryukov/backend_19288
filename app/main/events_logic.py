@@ -129,3 +129,46 @@ def event_info(id):
             "description": event.Event.description,
             "date_time": event.Event.date_time
         }    
+
+
+
+
+
+
+
+# TODO TODO
+
+
+
+
+def update_event(user_id, event_id, params):
+    with get_session() as s:
+        event = s.query(Participation, Event).filter(
+                Event.id == id,
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_role.in_(['creator', 'manager'])
+        ).one_or_none()
+
+        if event is None:
+            return "You have no rights to edit this event"
+        else:
+            ev = event.Event
+
+            try:
+                print(ev['name'])
+            except Exception as e:
+                print(e)
+
+            return "Updated successfully"
+
+
+def test(user_id, params):
+    with get_session() as s:
+        user = s.query(User).filter(
+            User.id == user_id
+        ).one_or_none()
+        if 'name' in params.keys():
+            event.name = params['name']
+        if 'surname' in params.keys():
+            print(user.surname)

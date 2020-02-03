@@ -17,7 +17,8 @@ def main():
     args = parser.parse_args()
     
     if args.password:
-        db.create_tables(bcrypt.hashpw(args.password.encode('utf-8'), bcrypt.gensalt()))
+        pw = bcrypt.hashpw(str(args.password).encode('utf-8'), bcrypt.gensalt())
+        db.create_tables(pw.decode('utf-8'))
 
     if args.role == 'rest_cookie':
         logging.info('Starting restful api backend server with cookies auth')

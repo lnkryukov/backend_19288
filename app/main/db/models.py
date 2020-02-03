@@ -1,7 +1,7 @@
 from sqlalchemy import (Column, Integer, String, ForeignKey,
                         DateTime, Boolean, UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.dialects.postgresql import ENUM, UUID
+from sqlalchemy.dialects.postgresql import ENUM, UUID, TEXT
 from flask_login import UserMixin
 
 from datetime import datetime
@@ -17,9 +17,7 @@ Status = ENUM('active', 'deleted',
               name='status')
 User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
                    name='user_status')
-Event_status = ENUM('unconfirmed', 'future', 'past',
-                    name='event_status')
-participation_role = ENUM('creator', 'presenter', 'participant',
+Participation_role = ENUM('creator', 'manager', 'presenter', 'participant',
                            name='participation_role')
 
 
@@ -30,7 +28,7 @@ class User(Base, UserMixin):
     mail = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
-    password = Column(String, nullable=False)
+    password = Column(TEXT, nullable=False)
     phone = Column(String, nullable=True)
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
                        unique=True, nullable=False)
@@ -67,4 +65,4 @@ class Participation(Base):
     id = Column(Integer, primary_key=True)
     event = Column(Integer, ForeignKey('events.id'), nullable=False)
     participant = Column(Integer, ForeignKey('users.id'), nullable=False)
-    participation_role = Column(participation_role, default='participant', nullable=False)
+    participation_role = Column(Participation_role, default='participant', nullable=False)

@@ -52,7 +52,9 @@ def login():
                 return make_400('Expected json')
             user = auth.check_user(args['mail'])
             if user:
-                if bcrypt.checkpw(args['password'].encode('utf-8'), user.password):
+                pw = str(args['password']).encode('utf-8')
+                upw = str(user.password).encode('utf-8')
+                if bcrypt.checkpw(pw, upw):
                     login_user(user)
                     return make_ok('User was logined')
                 else:
@@ -83,8 +85,10 @@ def register():
             if not args:
                 return make_400('Expected json')
 
-            users_logic.register_user(args['mail'], args['name'], args['surname'],
-                        bcrypt.hashpw(str(args['password']).encode('utf-8'), bcrypt.gensalt()))
+            pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
+                               bcrypt.gensalt())
+            users_logic.register_user(args['mail'], args['name'],
+                                      args['surname'], pw.decode('utf-8'))
             return make_ok('User was registered')
     except KeyError as e:
         return make_400('KeyError - \n{}'.format(str(e)))
@@ -182,5 +186,18 @@ def join():
 def update_event():
     try:
         pass
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
+@bp.route('/test', methods=['POST'])
+def test():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        
+        events_logic.test(int(args['user_id']), args)
+        return make_ok()
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))
