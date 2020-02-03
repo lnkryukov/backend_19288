@@ -3,6 +3,7 @@ from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user)
 
 import bcrypt
+import logging
 
 from .. import auth, users_logic, events_logic
 
@@ -14,6 +15,7 @@ bp = Blueprint('api', __name__)
 
 
 def make_400(text='Invalid reqeust'):
+    logging.exception('400 - [{}]'.format(text))
     body = jsonify(error=text)
     return make_response(body, 400)
 
@@ -30,14 +32,17 @@ def make_ok(description=None, params=None):
 
 
 def unauthorized(e):
+    logging.warning('401 - [{}]'.format(e))
     return jsonify(error="Unauthorized"), 401
 
 
 def route_not_found(e):
+    logging.warning('404 - [{}]'.format(e))
     return jsonify(error="Unknown route!"), 404
 
 
 def method_not_allowed(e):
+    logging.warning('405 - [{}]'.format(e))
     return jsonify(error="Wrong route method!"), 405
 
 
