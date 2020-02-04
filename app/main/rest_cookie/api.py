@@ -186,23 +186,45 @@ def join():
         return make_400('Problem.\n{}'.format(str(e)))
 
 
+#-------------------------- CHECK --------------------------
+
+@bp.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+
+        users_logic.update_profile(current_user.id, args)
+        return make_ok('Profile info successfully updated.')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
+@bp.route('/update_password', methods=['POST'])
+@login_required
+def update_password():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+
+        if current_user.change_password(args['old_password'],
+                                        args['new_password']):
+            return make_ok('Password changed successfully.')
+        else:
+            return make_400('Incorrect old password!')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
+#-------------------------- TODO --------------------------
+
 @bp.route('/update_event', methods=['POST'])
 @login_required
 def update_event():
     try:
         pass
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
-
-
-@bp.route('/test', methods=['POST'])
-def test():
-    try:
-        args = request.get_json()
-        if not args:
-            return make_400('Expected json')
-        
-        events_logic.test(int(args['user_id']), args)
-        return make_ok()
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))

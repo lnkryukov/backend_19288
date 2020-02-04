@@ -161,14 +161,3 @@ def update_event(user_id, event_id, params):
                 print(e)
 
             return "Updated successfully"
-
-
-def test(user_id, params):
-    with get_session() as s:
-        user = s.query(User).filter(
-            User.id == user_id
-        ).one_or_none()
-        if 'name' in params.keys():
-            event.name = params['name']
-        if 'surname' in params.keys():
-            print(user.surname)

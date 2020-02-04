@@ -22,6 +22,8 @@ app.register_error_handler(401, api.unauthorized)
 app.register_error_handler(404, api.route_not_found)
 app.register_error_handler(405, api.method_not_allowed)
 
+CORS(app)
+
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)
 
@@ -30,8 +32,6 @@ login_manager.init_app(app)
 
 login_manager.user_loader(auth.user_loader)
 login_manager.blueprint_login_views = {'restful': '/login'}
-
-CORS(app)
 
 
 def run():

@@ -39,7 +39,7 @@ def create_tables(password):
             password=password,
             name='Name',
             surname='Surname',
-            lvl=0,
+            service_status='admin',
             status='active',
             confirmation_link='none',
         )

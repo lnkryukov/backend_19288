@@ -13,7 +13,7 @@ import os
 import nanoid
 
 
-def register_user(mail, name, surname, password, lvl=2):
+def register_user(mail, name, surname, password, service_status='user'):
     with get_session() as s:
         user = s.query(User).filter(
                 User.mail == mail,
@@ -33,11 +33,12 @@ def register_user(mail, name, surname, password, lvl=2):
         if user:
             user.status = cfg.DEFAULT_USER_STATUS
             user.confirmation_link = confirmation_link
-            user.lvl = lvl
+            user.service_status = service_status
         else:
             user = User(mail=mail, name=name,
                         surname=surname, password=password,
-                        lvl=lvl, confirmation_link=confirmation_link)
+                        service_status=service_status,
+                        confirmation_link=confirmation_link)
             s.add(user)
         if cfg.DEFAULT_USER_STATUS == 'unconfirmed':
             util.send_email(mail, confirmation_link)
@@ -56,6 +57,40 @@ def confirm_user(confirmation_link):
             return 'user confirmed'
         else:
             return 'user is currently confirmed by this link'
+
+
+def get_users():
+    result = {}
+    with get_session() as s:
+        users = s.query(User).all()
+        for user in users:
+            result[user.id] = {
+                'mail': user.mail,
+                'name': user.name,
+                'surname': user.surname,
+            }
+    return result
+
+
+def update_profile(id, args):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == id,
+                User.status == 'active',
+        ).one_or_none()
+
+        if 'name' in args.keys():
+            user.name = args['name']
+        if 'surname' in args.keys():
+            user.surname = args['surname']
+        if 'phone' in args.keys():
+            user.phone = args['phone']
+        if 'organization' in args.keys():
+            user.organization = args['organization']
+        if 'position' in args.keys():
+            user.position = args['position']
+        if 'country' in args.keys():
+            user.country = args['country']
 
 
 def get_user_stat(user_id):
