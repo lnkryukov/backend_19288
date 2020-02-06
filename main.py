@@ -3,8 +3,8 @@ import logging
 import urllib3
 import bcrypt
 
-import evapp
-from evapp import db
+import app
+from app import db
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
         db.create_tables(pw.decode('utf-8'))
 
     logging.info('Starting restful api backend server')
-    evapp.run()
+    app.run()
 
 
 if __name__ == '__main__':
