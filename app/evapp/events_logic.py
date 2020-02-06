@@ -1,4 +1,4 @@
-from . import cfg
+from .config import cfg
 from .db import *
 from . import util
 from .exceptions import NotJsonError, NoData
@@ -102,7 +102,8 @@ def join_event(user_id, event_id, role):
                                                                     role))
             return 0
         else:
-            return 'User is already joined this event'
+            return 'User has already joined this event'
+
 
 def event_exist(event_id):
     with get_session() as s:

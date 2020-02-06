@@ -1,4 +1,4 @@
-from . import cfg
+from .config import cfg
 from .db import *
 from . import util
 from .exceptions import NotJsonError, NoData
@@ -17,7 +17,7 @@ def register_user(mail, name, surname, password, service_status='user'):
     with get_session() as s:
         user = s.query(User).filter(
                 User.mail == mail,
-                User.status == 'deleted',
+                User.account_status == 'deleted',
         ).one_or_none()
 
         # checking unique link
@@ -31,7 +31,7 @@ def register_user(mail, name, surname, password, service_status='user'):
                 break
 
         if user:
-            user.status = cfg.DEFAULT_USER_STATUS
+            user.account_status = cfg.DEFAULT_USER_STATUS
             user.confirmation_link = confirmation_link
             user.service_status = service_status
         else:

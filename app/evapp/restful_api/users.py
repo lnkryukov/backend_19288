@@ -3,47 +3,15 @@ from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user)
 
 import bcrypt
-import logging
 
+from . import *
 from .. import auth, users_logic, events_logic
 
 from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
-bp = Blueprint('api', __name__)
-
-
-def make_400(text='Invalid reqeust'):
-    logging.exception('400 - [{}]'.format(text))
-    body = jsonify(error=text)
-    return make_response(body, 400)
-
-
-def make_ok(description=None, params=None):
-    body = {
-        'status': 'ok',
-    }
-    if description:
-        body['description'] = description
-    if params:
-        body['params'] = params
-    return jsonify(body)
-
-
-def unauthorized(e):
-    logging.warning('401 - [{}]'.format(e))
-    return jsonify(error="Unauthorized"), 401
-
-
-def route_not_found(e):
-    logging.warning('404 - [{}]'.format(e))
-    return jsonify(error="Unknown route!"), 404
-
-
-def method_not_allowed(e):
-    logging.warning('405 - [{}]'.format(e))
-    return jsonify(error="Wrong route method!"), 405
+bp = Blueprint('users', __name__)
 
 
 @bp.route('/login', methods=['POST'])
@@ -113,48 +81,6 @@ def confirm():
         return make_400('Problem. {}'.format(str(e)))
 
 
-@bp.route('/create_event', methods=['POST'])
-@login_required
-def create_event():
-    try:
-        args = request.get_json()
-        if not args:
-            return make_400('Expected json')
-
-        last_id = events_logic.create_event(args['name'],
-                                         args['sm_description'],
-                                         args['description'],
-                                         args['date_time'])
-        events_logic.create_event_creator(current_user.id, last_id)
-
-        return make_ok('Event was created', str(last_id))
-    except KeyError as e:
-        return make_400('KeyError - \n{}'.format(str(e)))
-    except IntegrityError as e:
-        return make_400('IntegrityError - \n{}'.format(str(e)))
-    except Exception as e:
-        return make_400('Problem - \n{}'.format(str(e)))
-
-
-@bp.route('/events', methods=['GET'])
-def events():
-    try:
-        return jsonify(events_logic.get_events())
-    except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
-
-
-@bp.route('/event/<int:id>', methods=['GET'])
-def event(id):
-    try:
-        if events_logic.event_exist(id):
-            return jsonify(events_logic.event_info(id))
-        else:
-            return make_400('No such event')
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
-
-
 @bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
@@ -215,16 +141,5 @@ def update_password():
             return make_ok('Password changed successfully.')
         else:
             return make_400('Incorrect old password!')
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
-
-
-#-------------------------- TODO --------------------------
-
-@bp.route('/update_event', methods=['POST'])
-@login_required
-def update_event():
-    try:
-        pass
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))

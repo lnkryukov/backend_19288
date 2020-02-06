@@ -1,4 +1,4 @@
-from . import cfg
+from .config import cfg
 from .db import User, get_session
 
 import bcrypt

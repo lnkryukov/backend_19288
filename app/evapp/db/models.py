@@ -7,7 +7,7 @@ from flask_login import UserMixin
 from datetime import datetime
 import uuid
 
-from .. import cfg
+from ..config import cfg
 
 
 Base = declarative_base()
@@ -26,7 +26,7 @@ class User(Base, UserMixin):
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
-    accoutn_status = Column(User_status, default=cfg.DEFAULT_USER_STATUS,
+    account_status = Column(User_status, default=cfg.DEFAULT_USER_STATUS,
                             nullable=False)
     confirmation_link = Column(String, nullable=False)
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
@@ -42,6 +42,11 @@ class User(Base, UserMixin):
     organization = Column(String, nullable=True)
     position = Column(String, nullable=True)
     country = Column(String, nullable=True)
+
+    # Foreign key to table University and table specialization
+    # тип диплома и год выпуска
+    # bio = Column(TEXT, nullable=True)
+    # био можно отредактировать при регистрации в качестве спикера
 
     def get_id(self):
         return self.cookie_id
@@ -75,6 +80,12 @@ class Event(Base):
     sm_description = Column(String, nullable=False)
     description = Column(String, nullable=False)
     date_time = Column(DateTime, nullable=False)
+
+    # start_date, end_date, start_time fields
+
+    # место проведения
+    # link to site
+    # additional info
 
 
 class Participation(Base):

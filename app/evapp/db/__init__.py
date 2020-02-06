@@ -1,4 +1,4 @@
-from .. import cfg
+from ..config import cfg
 from .models import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -40,7 +40,7 @@ def create_tables(password):
             name='Name',
             surname='Surname',
             service_status='admin',
-            status='active',
+            account_status='active',
             confirmation_link='none',
         )
         s.add(root)

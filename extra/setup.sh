@@ -14,6 +14,9 @@ export PGPASSWORD=""
 # порт приложения
 export PORT=""
 
+# метод авторизации - 'cookies' или 'tokens'
+export AUTH_METHOD=""
+
 # подтверждение регистрации по электронной почте
 # 'active' для отключения подтверждения
 # 'unconfirmed' для включения
