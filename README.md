@@ -1,1 +1,1 @@
-My gh-pages branch
+This is gh-pages branch with information about repository.
