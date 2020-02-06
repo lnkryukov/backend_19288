@@ -43,10 +43,8 @@ class User(Base, UserMixin):
     position = Column(String, nullable=True)
     country = Column(String, nullable=True)
 
-    # Foreign key to table University and table specialization
-    # тип диплома и год выпуска
-    # bio = Column(TEXT, nullable=True)
     # био можно отредактировать при регистрации в качестве спикера
+    bio = Column(TEXT, nullable=True)
 
     def get_id(self):
         return self.cookie_id
@@ -81,11 +79,13 @@ class Event(Base):
     description = Column(String, nullable=False)
     date_time = Column(DateTime, nullable=False)
 
-    # start_date, end_date, start_time fields
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=True)
+    start_time = Column(DateTime, nullable=True)
 
-    # место проведения
-    # link to site
-    # additional info
+    location = Column(String, nullable=False)
+    site_link = Column(String, nullable=False)
+    additional_info = Column(TEXT, nullable=False)
 
 
 class Participation(Base):

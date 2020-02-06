@@ -22,10 +22,7 @@ def create_event():
         if not args:
             return make_400('Expected json')
 
-        last_id = events_logic.create_event(args['name'],
-                                         args['sm_description'],
-                                         args['description'],
-                                         args['date_time'])
+        last_id = events_logic.create_event(args)
         events_logic.create_event_creator(current_user.id, last_id)
         # create_event_manager if exists
 

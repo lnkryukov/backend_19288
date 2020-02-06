@@ -1,6 +1,6 @@
 from . import auth
 from .config import cfg
-from .restful_api import users, events
+from .restful_api import auth_cookies, auth_tokens, users, events
 from .restful_api import *
 
 from flask import Flask
@@ -20,13 +20,14 @@ app.config.update(
 )
 
 if cfg.AUTH_METHOD == 'cookies':
-	app.register_blueprint(users.bp)
+	app.register_blueprint(auth_cookies.bp)
 else:
 	app.config.update(
     	AUTH_HEADER_NAME=cfg.AUTH_HEADER_NAME,
 	)
-	app.register_blueprint(users_tokens.bp)
+	app.register_blueprint(auth_tokens.bp)
 
+app.register_blueprint(users.bp)
 app.register_blueprint(events.bp)
 app.register_error_handler(401, restful_api.unauthorized)
 app.register_error_handler(404, restful_api.route_not_found)

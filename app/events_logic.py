@@ -6,7 +6,7 @@ from .exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
 
-from datetime import datetime
+from datetime import date, time
 import requests
 import logging
 import os
@@ -23,23 +23,40 @@ def get_events():
                 'id': event.id,
                 'name': event.name,
                 'sm_description': event.sm_description,
-                'date_time': event.date_time,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'start_time': event.start_time,
+                'location': event.location,
+                'site_link': event.site_link
             }
     return result
 
 
-def create_event(name, sm_description, description, date_time):
-    timedate = date_time.split('T')
-    c_date = timedate[0].split('-')
-    c_time = timedate[1].split(':')
-    time_date = datetime(int(c_date[0]), int(c_date[1]), int(c_date[2]),
-                         int(c_time[0]), int(c_time[1]), 0, 0)
+def create_event(args):
+    start_date = args['start_date'].split('-')
+    date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
+
+    date_end = None
+    start_time = None
+    if 'end_date' in args.keys():
+        end_date = args['end_date'].split('-')
+        date_end = date(int(end_date[0]), int(end_date[1]), int(end_date[2]))
+    if 'start_time' in args.keys():
+        start_time = args['start_time'].split(':')
+        time_start = time(int(start_time[0]), int(start_time[1]), 0, 0)
+    
     with get_session() as s:
         last_event = s.query(Event).order_by(Event.id.desc()).first()
-        event = Event(name=name, sm_description=sm_description,
-                      description=description, date_time=time_date)
+        event = Event(name=args['name'], sm_description=args['sm_description'],
+                      description=args['description'], start_date=date_start,
+                      end_date=date_end, start_time=time_start,
+                      location=args['location'], site_link=args['site_link'],
+                      additional_info=args['additional_info'])
         s.add(event)
-        logging.info('Creating event [{}] [{}]'.format(name, time_date))
+        logging.info('Creating event [{}] [{}] [{}] [{}]'.format(name,
+                                                                 date_start,
+                                                                 date_end,
+                                                                 start_time))
         if last_event:
             return last_event.id + 1
         else:
@@ -128,10 +145,13 @@ def event_info(id):
             "name": event.Event.name,
             "sm_description": event.Event.sm_description,
             "description": event.Event.description,
-            "date_time": event.Event.date_time
+            "start_date": event.Event.start_date,
+            "end_date": event.Event.end_date,
+            "start_time": event.Event.start_time,
+            "location": event.Event.location,
+            "site_link": event.Event.site_link,
+            "additional_info": event.Event.additional_info
         }    
-
-
 
 
 

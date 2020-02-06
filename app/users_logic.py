@@ -91,6 +91,8 @@ def update_profile(id, args):
             user.position = args['position']
         if 'country' in args.keys():
             user.country = args['country']
+        if 'bio' in args.keys():
+            user.bio = args['bio']
 
 
 def get_user_stat(user_id):
@@ -108,7 +110,9 @@ def get_user_stat(user_id):
             result_creator[event.id] = {
                 'id': event.id,
                 'name': event.name,
-                'date': event.date_time,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'start_time': event.start_time
             }
 
         as_presenter = s.query(Participation, Event).filter(
@@ -121,7 +125,9 @@ def get_user_stat(user_id):
             result_presenter[event.id] = {
                 'id': event.id,
                 'name': event.name,
-                'date': event.date_time,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'start_time': event.start_time
             }
 
         as_participant = s.query(Participation, Event).filter(
@@ -134,7 +140,9 @@ def get_user_stat(user_id):
             result_participant[event.id] = {
                 'id': event.id,
                 'name': event.name,
-                'date': event.date_time,
+                'start_date': event.start_date,
+                'end_date': event.end_date,
+                'start_time': event.start_time
             }
 
     return result_creator, result_presenter, result_participant

@@ -1,0 +1,10 @@
+asn1crypto
+atomicwrites
+attrs
+more-itertools
+passlib
+pluggy
+py
+pytest
+testing.common.database
+testing.postgresql
