@@ -29,7 +29,7 @@ def login():
                 upw = str(user.password).encode('utf-8')
                 if bcrypt.checkpw(pw, upw):
                     login_user(user)
-                    return make_ok('User was logined')
+                    return make_ok('User was logined', current_user.service_status)
                 else:
                     return make_400('Invalid password')
             else:

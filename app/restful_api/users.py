@@ -78,6 +78,14 @@ def join():
         return make_400('Problem.\n{}'.format(str(e)))
 
 
+@bp.route('/users', methods=['GET'])
+def users():
+    try:
+        return jsonify(users_logic.get_users())
+    except Exception as e:
+        return make_400('Problem.\n{}'.format(str(e)))
+
+
 #-------------------------- CHECK --------------------------
 
 @bp.route('/update_profile', methods=['POST'])

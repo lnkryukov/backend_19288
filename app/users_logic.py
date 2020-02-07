@@ -65,9 +65,12 @@ def get_users():
         users = s.query(User).all()
         for user in users:
             result[user.id] = {
+                'id': user.id,
                 'mail': user.mail,
                 'name': user.name,
                 'surname': user.surname,
+                'service_status': user.service_status,
+                'account_status': user.account_status
             }
     return result
 
