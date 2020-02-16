@@ -14,39 +14,6 @@ from sqlalchemy.exc import IntegrityError
 bp = Blueprint('users', __name__)
 
 
-@bp.route('/register', methods=['POST'])
-def register():
-    try:
-        if current_user.is_authenticated:
-            return make_400('User is currently authenticated')
-        else:
-            args = request.get_json()
-            if not args:
-                return make_400('Expected json')
-
-            pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
-                               bcrypt.gensalt())
-            users_logic.register_user(args['mail'], args['name'],
-                                      args['surname'], pw.decode('utf-8'))
-            return make_ok('User was registered')
-    except KeyError as e:
-        return make_400('KeyError - \n{}'.format(str(e)))
-    except IntegrityError:
-        return make_400('User with this login already exists')
-
-
-@bp.route('/confirm', methods=['POST'])
-def confirm():
-    try:
-        args = request.get_json()
-        if not args:
-            return make_400('Expected json')
-        users_logic.confirm_user(args['link'])
-        return make_ok('User was confirmed')
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
-
-
 @bp.route('/profile', methods=['GET'])
 @login_required
 def profile():

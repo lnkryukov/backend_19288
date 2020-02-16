@@ -1,7 +1,7 @@
 from . import auth
 from .config import cfg
-from .restful_api import accounts, users, events
-from .restful_api import *
+from .rest_api import accounts, users, events
+from .rest_api import *
 
 from flask import Flask
 from flask_login import LoginManager
@@ -23,8 +23,10 @@ app.register_blueprint(accounts.bp)
 app.register_blueprint(users.bp)
 app.register_blueprint(events.bp)
 app.register_error_handler(401, restful_api.unauthorized)
+app.register_error_handler(403, restful_api.no_access)
 app.register_error_handler(404, restful_api.route_not_found)
 app.register_error_handler(405, restful_api.method_not_allowed)
+app.register_error_handler(415, restful_api.wrong_request_type)
 
 CORS(app)
 

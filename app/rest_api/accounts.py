@@ -5,7 +5,7 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import auth
+from .. import auth, users_logic
 
 from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
@@ -46,3 +46,36 @@ def logout():
         return make_200('User was logouted')
     except Exception as e:
         return make_400('Problem - \n{}'.format(str(e)))
+
+
+@bp.route('/register', methods=['POST'])
+def register():
+    try:
+        if current_user.is_authenticated:
+            return make_400('User is currently authenticated')
+        else:
+            args = request.get_json()
+            if not args:
+                return make_400('Expected json')
+
+            pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
+                               bcrypt.gensalt())
+            users_logic.register_user(args['mail'], args['name'],
+                                      args['surname'], pw.decode('utf-8'))
+            return make_200('User was registered')
+    except KeyError as e:
+        return make_400('KeyError - \n{}'.format(str(e)))
+    except IntegrityError:
+        return make_400('User with this login already exists')
+
+
+@bp.route('/confirm', methods=['POST'])
+def confirm():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+        users_logic.confirm_user(args['link'])
+        return make_ok('User was confirmed')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
