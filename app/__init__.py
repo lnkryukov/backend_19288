@@ -1,6 +1,6 @@
 from . import auth
 from .config import cfg
-from .restful_api import auth_cookies, auth_tokens, users, events
+from .restful_api import accounts, users, events
 from .restful_api import *
 
 from flask import Flask
@@ -19,14 +19,7 @@ app.config.update(
     SECRET_KEY=cfg.SECRET_KEY,
 )
 
-if cfg.AUTH_METHOD == 'cookies':
-	app.register_blueprint(auth_cookies.bp)
-else:
-	app.config.update(
-    	AUTH_HEADER_NAME=cfg.AUTH_HEADER_NAME,
-	)
-	app.register_blueprint(auth_tokens.bp)
-
+app.register_blueprint(accounts.bp)
 app.register_blueprint(users.bp)
 app.register_blueprint(events.bp)
 app.register_error_handler(401, restful_api.unauthorized)
@@ -40,11 +33,7 @@ logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-if cfg.AUTH_METHOD == 'cookies':
-	login_manager.user_loader(auth.user_loader)
-else:
-	login_manager.header_loader(auth.header_loader)
+login_manager.user_loader(auth.user_loader)
 login_manager.blueprint_login_views = {'restfulapi': '/login'}
 
 

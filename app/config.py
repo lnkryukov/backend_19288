@@ -22,8 +22,6 @@ cfg.DB_CONNECTION_STRING = _get_db_connection_string()
 cfg.RUNTIME_FOLDER = os.path.dirname(os.path.abspath(__file__))
 cfg.SCPITS_FOLDER = os.getenv('SCRIPT_FOLDER', '{}/evapp/scripts'.format(cfg.RUNTIME_FOLDER))
 
-cfg.AUTH_METHOD = os.getenv('AUTH_METHOD', 'cookies')
-
 cfg.DEFAULT_USER_STATUS = os.getenv('DEFAULT_USER_STATUS')
 cfg.SMTP_HOST = os.getenv('SMTP_HOST')
 cfg.MAIL_LOGIN = os.getenv('MAIL_LOGIN')

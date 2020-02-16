@@ -61,15 +61,6 @@ class User(Base, UserMixin):
             return 0
 
 
-class Token(Base):
-    __tablename__ = 'tokens'
-
-    id = Column(UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    issued = Column(DateTime, default=datetime.utcnow, nullable=False)
-    status = Column(Status, default='active', nullable=False)
-
-
 class Event(Base):
     __tablename__ = 'events'
 

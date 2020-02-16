@@ -2,26 +2,53 @@ from flask import jsonify, make_response
 import logging
 
 
-def make_400(text='Invalid reqeust'):
-    logging.exception('400 - [{}]'.format(text))
-    body = jsonify(error=text)
-    return make_response(body, 400)
+# answers
 
-
-def make_ok(description=None, params=None):
+def make_200(description=None, extra=None):
     body = {
         'status': 'ok',
     }
     if description:
         body['description'] = description
-    if params:
-        body['params'] = params
+    if extra:
+        body['extra'] = extra
     return jsonify(body)
 
+
+def make_201(extra=None):
+    body = {
+        'status': 'Created',
+    }
+    if extra:
+        body['extra'] = extra
+    return jsonify(body), 201
+
+
+def make_400(text='Invalid reqeust'):
+    logging.exception('400 - [{}]'.format(text))
+    return jsonify(error=text), 400
+
+
+def make_404(text='No resource'):
+    logging.warning('404 - [{}]'.format(text))
+    return jsonify(error=text), 404
+
+
+def make_415(text='Wrong data', e):
+    logging.exception('415 - [{}]'.format(e))
+    return jsonify(error=text), 415
+
+
+# errors handlers
 
 def unauthorized(e):
     logging.warning('401 - [{}]'.format(e))
     return jsonify(error="Unauthorized"), 401
+
+
+def no_access(e):
+    logging.warning('403 - [{}]'.format(e))
+    return jsonify(error="No access"), 403
 
 
 def route_not_found(e):
@@ -32,3 +59,8 @@ def route_not_found(e):
 def method_not_allowed(e):
     logging.warning('405 - [{}]'.format(e))
     return jsonify(error="Wrong route method!"), 405
+
+
+def wrong_request_type(e):
+    logging.warning('415 - [{}]'.format(e))
+    return jsonify(error="Wrong request type!"), 415

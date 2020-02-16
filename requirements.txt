@@ -6,7 +6,6 @@ gevent
 nanoid
 pg8000
 psycopg2-binary
-PyJWT
 requests
 SQLAlchemy
 urllib3
