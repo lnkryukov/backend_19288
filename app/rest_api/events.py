@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 bp = Blueprint('events', __name__)
 
 
-@bp.route('/create_event', methods=['POST'])
+@bp.route('/event', methods=['POST'])
 @login_required
 def create_event():
     try:
@@ -26,9 +26,9 @@ def create_event():
         events_logic.create_event_creator(current_user.id, last_id)
         # create_event_manager if exists
 
-        return make_ok('Event was created', str(last_id))
+        return make_201(str(last_id))
     except KeyError as e:
-        return make_400('KeyError - \n{}'.format(str(e)))
+        return make_415('KeyError - \n{}'.format(str(e)))
     except IntegrityError as e:
         return make_400('IntegrityError - \n{}'.format(str(e)))
     except Exception as e:
@@ -56,7 +56,7 @@ def event(id):
 
 #-------------------------- TODO --------------------------
 
-@bp.route('/update_event', methods=['POST'])
+@bp.route('/event', methods=['PUT'])
 @login_required
 def update_event():
     try:

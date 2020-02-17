@@ -14,9 +14,8 @@ from sqlalchemy.exc import IntegrityError
 bp = Blueprint('users', __name__)
 
 
-@bp.route('/profile', methods=['GET'])
-@login_required
-def profile():
+@bp.route('/user', methods=['POST'])
+def user():
     try:
         as_creator, as_presenter, as_participant = events_logic.get_user_stat(current_user.id)
         return jsonify(creator=as_creator, presenter=as_presenter,
@@ -38,7 +37,7 @@ def join():
                                         int(args['event_id']), args['role'])
             if join:
                 return make_400(join)
-            return make_ok('Guest joined event')
+            return make_200('Guest joined event')
         else:
             return make_400('No such event')
     except Exception as e:
@@ -49,6 +48,26 @@ def join():
 def users():
     try:
         return jsonify(users_logic.get_users())
+    except Exception as e:
+        return make_400('Problem.\n{}'.format(str(e)))
+
+
+@bp.route('/user/role', methods=['GET'])
+def user_role():
+    try:
+        if current_user.is_authenticated:
+            return make_200(current_user.)
+            return make_400('User is currently authenticated')
+        else:
+            args = request.get_json()
+            if not args:
+                return make_400('Expected json')
+
+            pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
+                               bcrypt.gensalt())
+            users_logic.register_user(args['mail'], args['name'],
+                                      args['surname'], pw.decode('utf-8'))
+            return make_200('User was registered')
     except Exception as e:
         return make_400('Problem.\n{}'.format(str(e)))
 
@@ -64,7 +83,9 @@ def update_profile():
             return make_400('Expected json')
 
         users_logic.update_profile(current_user.id, args)
-        return make_ok('Profile info successfully updated.')
+        return make_200('Profile info successfully updated.')
+    except AttributeError as e:
+        return make_400('One ore more attribute is invalid. {}'.format(str(e)))
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))
 
@@ -79,7 +100,7 @@ def update_password():
 
         if current_user.change_password(args['old_password'],
                                         args['new_password']):
-            return make_ok('Password changed successfully.')
+            return make_200('Password changed successfully.')
         else:
             return make_400('Incorrect old password!')
     except Exception as e:

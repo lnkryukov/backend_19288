@@ -25,7 +25,7 @@ def make_201(extra=None):
 
 
 def make_400(text='Invalid reqeust'):
-    logging.exception('400 - [{}]'.format(text))
+    logging.warning('400 - [{}]'.format(text))
     return jsonify(error=text), 400
 
 
@@ -35,8 +35,13 @@ def make_404(text='No resource'):
 
 
 def make_415(text='Wrong data', e):
-    logging.exception('415 - [{}]'.format(e))
+    logging.exception('415 - [{}] [{}]'.format(text, e))
     return jsonify(error=text), 415
+
+
+def make_422(text='Wrong data'):
+    logging.exception('422 - [{}] '.format(text))
+    return jsonify(error=text), 422
 
 
 # errors handlers

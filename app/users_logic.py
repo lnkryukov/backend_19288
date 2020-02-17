@@ -1,7 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData
+from .exceptions import NotJsonError, NoData, ConfirmationLinkError
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -11,38 +11,6 @@ import requests
 import logging
 import os
 import nanoid
-
-
-def register_user(mail, name, surname, password, service_status='user'):
-    with get_session() as s:
-        user = s.query(User).filter(
-                User.mail == mail,
-                User.account_status == 'deleted',
-        ).one_or_none()
-
-        # checking unique link
-        confirmation_link = ''
-        while True:
-            confirmation_link = nanoid.generate(size=50)
-            exists = s.query(User).filter(
-                    User.confirmation_link == confirmation_link
-            ).one_or_none()
-            if not exists:
-                break
-
-        if user:
-            user.account_status = cfg.DEFAULT_USER_STATUS
-            user.confirmation_link = confirmation_link
-            user.service_status = service_status
-        else:
-            user = User(mail=mail, name=name,
-                        surname=surname, password=password,
-                        service_status=service_status,
-                        confirmation_link=confirmation_link)
-            s.add(user)
-        if cfg.DEFAULT_USER_STATUS == 'unconfirmed':
-            util.send_email(mail, confirmation_link)
-        logging.info('Registering new user [{}]'.format(mail))
 
 
 def confirm_user(confirmation_link):
@@ -82,20 +50,10 @@ def update_profile(id, args):
                 User.status == 'active',
         ).one_or_none()
 
-        if 'name' in args.keys():
-            user.name = args['name']
-        if 'surname' in args.keys():
-            user.surname = args['surname']
-        if 'phone' in args.keys():
-            user.phone = args['phone']
-        if 'organization' in args.keys():
-            user.organization = args['organization']
-        if 'position' in args.keys():
-            user.position = args['position']
-        if 'country' in args.keys():
-            user.country = args['country']
-        if 'bio' in args.keys():
-            user.bio = args['bio']
+        for arg in args.keys():
+            getattr(user, arg)
+        for arg in args.keys():
+            setattr(user, arg, args[arg])
 
 
 def get_user_stat(user_id):

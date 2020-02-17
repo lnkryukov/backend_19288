@@ -45,9 +45,3 @@ def create_tables(password):
         )
         s.add(root)
     logging.info('Default user with mail [root_mail] was created')
-
-
-def upgrade_schema():
-    logging.info('Upgrading tables schema')
-    from .models import Tokens as tb
-    tb.__table__.create(_engine)

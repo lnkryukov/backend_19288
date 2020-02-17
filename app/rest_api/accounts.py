@@ -5,9 +5,9 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import auth, users_logic
+from .. import auth, accounts_logic
 
-from ..exceptions import NotJsonError, NoData
+from ..exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUserError
 from sqlalchemy.exc import IntegrityError
 
 
@@ -22,7 +22,7 @@ def login():
         else:
             args = request.get_json()
             if not args:
-                return make_400('Expected json')
+                return make_415('Expected json', None)
             user = auth.check_user(args['mail'])
             if user:
                 pw = str(args['password']).encode('utf-8')
@@ -31,9 +31,11 @@ def login():
                     login_user(user)
                     return make_200('User was logined', user.service_status)
                 else:
-                    return make_400('Invalid password')
+                    return make_422('Invalid password')
             else:
-                return make_400('Invalid user')
+                return make_422('Invalid user')
+    except KeyError as e:
+        return make_415('KeyError - wrong json keys', e)
     except Exception as e:
         return make_400('Problem - \n{}'.format(str(e)))
 
@@ -52,21 +54,25 @@ def logout():
 def register():
     try:
         if current_user.is_authenticated:
-            return make_400('User is currently authenticated')
+            return make_400('User is currently logined')
         else:
             args = request.get_json()
             if not args:
-                return make_400('Expected json')
+                return make_415('Expected json', None)
 
             pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
                                bcrypt.gensalt())
-            users_logic.register_user(args['mail'], args['name'],
-                                      args['surname'], pw.decode('utf-8'))
+            accounts_logic.register_user(args['mail'], args['name'],
+                                         args['surname'], pw.decode('utf-8'))
             return make_200('User was registered')
     except KeyError as e:
-        return make_400('KeyError - \n{}'.format(str(e)))
+        return make_415('KeyError - wrong json keys', e)
+    except RegisterUserError as e:
+        return make_400('RegError - {}'.format(str(e)))
     except IntegrityError:
-        return make_400('User with this login already exists')
+        return make_400('User with this mail already exists')
+    except Exception as e:
+        return make_400('Problem - \n{}'.format(str(e)))
 
 
 @bp.route('/confirm', methods=['POST'])
@@ -74,8 +80,12 @@ def confirm():
     try:
         args = request.get_json()
         if not args:
-            return make_400('Expected json')
-        users_logic.confirm_user(args['link'])
-        return make_ok('User was confirmed')
+            return make_415('Expected json', None)
+        accounts_logic.confirm_user(args['link'])
+        return make_200('User was confirmed')
+    except KeyError as e:
+        return make_415('KeyError - wrong json keys', e)
+    except ConfirmationLinkError as e:
+        return make_400(str(e))
     except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
+        return make_400('Problem - {}'.format(str(e)))
