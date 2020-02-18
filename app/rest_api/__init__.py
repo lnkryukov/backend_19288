@@ -34,7 +34,7 @@ def make_404(text='No resource'):
     return jsonify(error=text), 404
 
 
-def make_415(text='Wrong data', e):
+def make_415(text='Wrong data', e=''):
     logging.exception('415 - [{}] [{}]'.format(text, e))
     return jsonify(error=text), 415
 

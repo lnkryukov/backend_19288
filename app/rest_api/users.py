@@ -5,17 +5,26 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import auth, users_logic, events_logic
+from .. import users_logic, events_logic
 
 from ..exceptions import NotJsonError, NoData
 from sqlalchemy.exc import IntegrityError
 
 
-bp = Blueprint('users', __name__)
+bp = Blueprint('users', __name__, url_prefix='/user')
 
 
-@bp.route('/user', methods=['POST'])
+@bp.route('/', methods=['GET'])
+@login_required
 def user():
+    try:
+        pass
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
+@bp.route('/', methods=['GET'])
+def user_stat():
     try:
         as_creator, as_presenter, as_participant = events_logic.get_user_stat(current_user.id)
         return jsonify(creator=as_creator, presenter=as_presenter,
@@ -56,7 +65,6 @@ def users():
 def user_role():
     try:
         if current_user.is_authenticated:
-            return make_200(current_user.)
             return make_400('User is currently authenticated')
         else:
             args = request.get_json()
@@ -103,5 +111,26 @@ def update_password():
             return make_200('Password changed successfully.')
         else:
             return make_400('Incorrect old password!')
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
+
+
+
+
+
+@bp.route('/test', methods=['POST'])
+@login_required
+def test():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_400('Expected json')
+
+        users_logic.update_profile(current_user.id, args)
+        return make_200('Profile info successfully updated.', current_user.name)
+    except AttributeError as e:
+        return make_400('One ore more attribute is invalid. {}'.format(str(e)))
     except Exception as e:
         return make_400('Problem. {}'.format(str(e)))

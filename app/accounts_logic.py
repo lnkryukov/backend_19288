@@ -11,6 +11,7 @@ import requests
 import logging
 import os
 import nanoid
+import uuid
 
 
 def register_user(mail, name, surname, password, service_status='user'):
@@ -58,10 +59,27 @@ def confirm_user(confirmation_link):
                 User.confirmation_link == confirmation_link
         ).one_or_none()
         if user:
-            if user.status == 'unconfirmed'
-                user.status = 'active'
+            if user.account_status == 'unconfirmed':
+                user.account_status = 'active'
                 logging.info('User [{}] is confirmed'.format(user.mail))
             else:
                 raise ConfirmationLinkError('User is currently confirmed by this link')
         else:
             raise ConfirmationLinkError('No user with this confirmation link')
+
+
+def change_password(user_id, old_password, new_password):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == user_id
+        ).one_or_none()
+        opw = str(old_password).encode('utf-8')
+        pw = str(user.password).encode('utf-8')
+        if bcrypt.checkpw(opw, pw):
+            npw = bcrypt.hashpw(str(new_password).encode('utf-8'),
+                               bcrypt.gensalt())
+            user.password = npw.decode('utf-8')
+            user.cookie_id = uuid.uuid4()
+            return 1
+        else:
+            return 0

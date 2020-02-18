@@ -13,20 +13,18 @@ from ..config import cfg
 Base = declarative_base()
 
 
-Status = ENUM('active', 'deleted',
-              name='status')
-User_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
-                   name='user_status')
+Account_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
+                   name='account_status')
 Participation_role = ENUM('creator', 'manager', 'presenter', 'participant',
                            name='participation_role')
-Service_status = ENUM('admin', 'moderator', 'user', name='participation_role')
+Service_status = ENUM('admin', 'moderator', 'user', name='service_status')
 
 
 class User(Base, UserMixin):
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
-    account_status = Column(User_status, default=cfg.DEFAULT_USER_STATUS,
+    account_status = Column(Account_status, default=cfg.DEFAULT_USER_STATUS,
                             nullable=False)
     confirmation_link = Column(String, nullable=False)
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
@@ -48,17 +46,6 @@ class User(Base, UserMixin):
 
     def get_id(self):
         return self.cookie_id
-
-    def change_password(self, old_password, new_password):
-        opw = str(old_password).encode('utf-8')
-        pw = str(self.password).encode('utf-8')
-        if bcrypt.checkpw(opw, pw):
-            npw = bcrypt.hashpw(str(new_password).encode('utf-8'),
-                               bcrypt.gensalt())
-            self.password = npw.decode('utf-8')
-            return 1
-        else:
-            return 0
 
 
 class Event(Base):

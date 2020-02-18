@@ -2,7 +2,6 @@ from .config import cfg
 from .db import User, get_session
 
 import bcrypt
-import jwt
 import time
 
 
@@ -17,5 +16,5 @@ def check_user(mail):
     with get_session() as s:
         return s.query(User).filter(
                 User.mail == mail,
-                User.status == 'active'
+                User.account_status == 'active'
         ).one_or_none()

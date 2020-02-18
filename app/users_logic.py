@@ -13,18 +13,21 @@ import os
 import nanoid
 
 
-def confirm_user(confirmation_link):
+def user_info(user_id):
     with get_session() as s:
-        user = s.query(User).filter(
-                User.confirmation_link == confirmation_link,
-                User.status == 'unconfirmed',
-        ).one_or_none()
-        if user:
-            user.status = 'active'
-            logging.info('User [{}] is confirmed'.format(user.mail))
-            return 'user confirmed'
-        else:
-            return 'user is currently confirmed by this link'
+        user = s.query(User).get(user_id)
+
+        return {
+            "mail": user.mail,
+            "name": user.name,
+            "surname": user.surname,
+            "service_status": user.service_status,
+            "phone": user.phone,
+            "organization": user.organization,
+            "position": user.position,
+            "country": user.country,
+            "bio": user.bio
+        }
 
 
 def get_users():
@@ -47,7 +50,7 @@ def update_profile(id, args):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == id,
-                User.status == 'active',
+                User.account_status == 'active',
         ).one_or_none()
 
         for arg in args.keys():
@@ -107,3 +110,19 @@ def get_user_stat(user_id):
             }
 
     return result_creator, result_presenter, result_participant
+
+
+# deprecated version
+
+def confirm_user(confirmation_link):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.confirmation_link == confirmation_link,
+                User.status == 'unconfirmed',
+        ).one_or_none()
+        if user:
+            user.status = 'active'
+            logging.info('User [{}] is confirmed'.format(user.mail))
+            return 'user confirmed'
+        else:
+            return 'user is currently confirmed by this link'

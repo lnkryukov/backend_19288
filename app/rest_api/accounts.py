@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, make_response
 from flask_login import (login_required, login_user, logout_user,
-                         login_fresh, current_user)
+                         login_fresh, current_user, fresh_login_required,
+                         user_needs_refresh)
 
 import bcrypt
 
@@ -11,7 +12,7 @@ from ..exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUs
 from sqlalchemy.exc import IntegrityError
 
 
-bp = Blueprint('auth', __name__)
+bp = Blueprint('accounts', __name__)
 
 
 @bp.route('/login', methods=['POST'])
@@ -89,3 +90,49 @@ def confirm():
         return make_400(str(e))
     except Exception as e:
         return make_400('Problem - {}'.format(str(e)))
+
+
+@bp.route('/change_password', methods=['POST'])
+@fresh_login_required
+def change_password():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_415('Expected json', None)
+        user = accounts_logic.change_password(current_user.id,
+                                              args['old_password'],
+                                              args['new_password'])
+        if user:
+            login_user(user)
+            return make_200('Password has beed changed', user.service_status)
+        else:
+            return make_422('Invalid password')
+    except KeyError as e:
+        return make_415('KeyError - wrong json keys', e)
+    except Exception as e:
+        return make_400('Problem - {}'.format(str(e)))
+
+
+# test route with multiple logins and cookies
+
+@bp.route('/log', methods=['POST'])
+def log():
+    try:
+        args = request.get_json()
+        if not args:
+            return make_415('Expected json', None)
+        user = auth.check_user(args['mail'])
+        if user:
+            pw = str(args['password']).encode('utf-8')
+            upw = str(user.password).encode('utf-8')
+            if bcrypt.checkpw(pw, upw):
+                login_user(user)
+                return make_200('User was logined', user.service_status)
+            else:
+                return make_422('Invalid password')
+        else:
+            return make_422('Invalid user')
+    except KeyError as e:
+        return make_415('KeyError - wrong json keys', e)
+    except Exception as e:
+        return make_400('Problem - \n{}'.format(str(e)))
