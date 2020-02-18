@@ -80,6 +80,6 @@ def change_password(user_id, old_password, new_password):
                                bcrypt.gensalt())
             user.password = npw.decode('utf-8')
             user.cookie_id = uuid.uuid4()
-            return 1
+            return user
         else:
-            return 0
+            return None
