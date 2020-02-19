@@ -8,7 +8,8 @@ import time
 def user_loader(user_id):
     with get_session() as s:
         return s.query(User).filter(
-                User.cookie_id == user_id
+                User.cookie_id == user_id,
+                User.account_status == 'active'
         ).one_or_none()
 
 

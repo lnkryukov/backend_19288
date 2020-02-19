@@ -21,12 +21,12 @@ def login():
         if current_user.is_authenticated:
             return make_400('User is currently authenticated')
         else:
-            args = request.get_json()
-            if not args:
+            data = request.get_json()
+            if not data:
                 return make_415('Expected json', None)
-            user = auth.check_user(args['mail'])
+            user = auth.check_user(data['mail'])
             if user:
-                pw = str(args['password']).encode('utf-8')
+                pw = str(data['password']).encode('utf-8')
                 upw = str(user.password).encode('utf-8')
                 if bcrypt.checkpw(pw, upw):
                     login_user(user)
@@ -57,14 +57,14 @@ def register():
         if current_user.is_authenticated:
             return make_400('User is currently logined')
         else:
-            args = request.get_json()
-            if not args:
+            data = request.get_json()
+            if not data:
                 return make_415('Expected json', None)
 
-            pw = bcrypt.hashpw(str(args['password']).encode('utf-8'),
+            pw = bcrypt.hashpw(str(data['password']).encode('utf-8'),
                                bcrypt.gensalt())
-            accounts_logic.register_user(args['mail'], args['name'],
-                                         args['surname'], pw.decode('utf-8'))
+            accounts_logic.register_user(data['mail'], data['name'],
+                                         data['surname'], pw.decode('utf-8'))
             return make_200('User was registered')
     except KeyError as e:
         return make_415('KeyError - wrong json keys', e)
@@ -79,10 +79,10 @@ def register():
 @bp.route('/confirm', methods=['POST'])
 def confirm():
     try:
-        args = request.get_json()
-        if not args:
+        data = request.get_json()
+        if not data:
             return make_415('Expected json', None)
-        accounts_logic.confirm_user(args['link'])
+        accounts_logic.confirm_user(data['link'])
         return make_200('User was confirmed')
     except KeyError as e:
         return make_415('KeyError - wrong json keys', e)
@@ -96,12 +96,12 @@ def confirm():
 @fresh_login_required
 def change_password():
     try:
-        args = request.get_json()
-        if not args:
+        data = request.get_json()
+        if not data:
             return make_415('Expected json', None)
         user = accounts_logic.change_password(current_user.id,
-                                              args['old_password'],
-                                              args['new_password'])
+                                              data['old_password'],
+                                              data['new_password'])
         if user:
             login_user(user)
             return make_200('Password has beed changed', user.service_status)
@@ -113,17 +113,27 @@ def change_password():
         return make_400('Problem - {}'.format(str(e)))
 
 
+bp.route('/delete', methods=['GET'])
+@fresh_login_required
+def self_delete():
+    try:
+        accounts_logic.self_delete(current_user.id)
+        logout_user()
+    except Exception as e:
+        return make_400('Problem. {}'.format(str(e)))
+
+
 # test route with multiple logins and cookies
 
 @bp.route('/log', methods=['POST'])
 def log():
     try:
-        args = request.get_json()
-        if not args:
+        data = request.get_json()
+        if not data:
             return make_415('Expected json', None)
-        user = auth.check_user(args['mail'])
+        user = auth.check_user(data['mail'])
         if user:
-            pw = str(args['password']).encode('utf-8')
+            pw = str(data['password']).encode('utf-8')
             upw = str(user.password).encode('utf-8')
             if bcrypt.checkpw(pw, upw):
                 login_user(user)

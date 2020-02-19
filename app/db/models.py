@@ -15,7 +15,7 @@ Base = declarative_base()
 
 Account_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
                    name='account_status')
-Participation_role = ENUM('creator', 'manager', 'presenter', 'participant',
+Participation_role = ENUM('creator', 'manager', 'presenter', 'viewer',
                            name='participation_role')
 Service_status = ENUM('admin', 'moderator', 'user', name='service_status')
 
@@ -55,7 +55,6 @@ class Event(Base):
     name = Column(String, nullable=False)
     sm_description = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    date_time = Column(DateTime, nullable=False)
 
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=True)
@@ -72,4 +71,4 @@ class Participation(Base):
     id = Column(Integer, primary_key=True)
     event = Column(Integer, ForeignKey('events.id'), nullable=False)
     participant = Column(Integer, ForeignKey('users.id'), nullable=False)
-    participation_role = Column(Participation_role, default='participant', nullable=False)
+    participation_role = Column(Participation_role, default='viewer', nullable=False)

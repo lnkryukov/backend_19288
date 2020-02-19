@@ -6,6 +6,8 @@ from .exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
 
+import bcrypt
+
 from datetime import datetime
 import requests
 import logging
@@ -83,3 +85,17 @@ def change_password(user_id, old_password, new_password):
             return user
         else:
             return None
+
+
+def self_delete(user_id):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == user_id
+        ).one_or_none()
+
+        user.account_status = 'deleted'
+        user.phone = None
+        user.organization = None
+        user.position = None
+        user.country = None
+        user.bio = None

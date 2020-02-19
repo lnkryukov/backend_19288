@@ -18,11 +18,11 @@ bp = Blueprint('events', __name__)
 @login_required
 def create_event():
     try:
-        args = request.get_json()
-        if not args:
+        data = request.get_json()
+        if not data:
             return make_400('Expected json')
 
-        last_id = events_logic.create_event(args)
+        last_id = events_logic.create_event(data)
         events_logic.create_event_creator(current_user.id, last_id)
         # create_event_manager if exists
 

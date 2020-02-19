@@ -1,7 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData, ConfirmationLinkError
+from .exceptions import NotJsonError, NoData, ConfirmationLinkError, WrongDataError
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -13,7 +13,7 @@ import os
 import nanoid
 
 
-def user_info(user_id):
+def get_user_info(user_id):
     with get_session() as s:
         user = s.query(User).get(user_id)
 
@@ -30,6 +30,56 @@ def user_info(user_id):
         }
 
 
+# TODO add pagination
+
+def get_user_events_by_role(user_id, role, offset, size):
+    result = {}
+    with get_session() as s:
+        events = s.query(Participation, Event).filter(
+                Participation.event == Event.id,
+                Participation.participant == user_id,
+                Participation.participation_role == role
+        ).order_by(desc(Event.start_date))
+
+        if offset and size:
+            offset = int(offset)
+            size = int(size)
+            if offset < 1 or size < 1:
+                raise WrongDataError('Offset or size has wrong values')
+
+            events = events.slice(offset, offset+size)
+        elif not offset and not size:
+            events = events.all()
+        else:
+            raise KeyError('Wrong query string arg.')
+
+        iterator = 1
+        for participant, event in events:
+            result[iterator] = {
+                'id': event.id,
+                'name': event.name,
+                'start_date': event.start_date
+            }
+            iterator += 1
+            
+    return result
+
+
+def update_profile(id, data):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == id,
+                User.account_status == 'active',
+        ).one_or_none()
+
+        for arg in data.keys():
+            getattr(user, arg)
+        for arg in data.keys():
+            setattr(user, arg, data[arg])
+
+
+# legacy functions - need to rework
+
 def get_users():
     result = {}
     with get_session() as s:
@@ -44,85 +94,3 @@ def get_users():
                 'account_status': user.account_status
             }
     return result
-
-
-def update_profile(id, args):
-    with get_session() as s:
-        user = s.query(User).filter(
-                User.id == id,
-                User.account_status == 'active',
-        ).one_or_none()
-
-        for arg in args.keys():
-            getattr(user, arg)
-        for arg in args.keys():
-            setattr(user, arg, args[arg])
-
-
-def get_user_stat(user_id):
-    result_creator = {}
-    result_presenter = {}
-    result_participant = {}
-    with get_session() as s:
-        as_creator = s.query(Participation, Event).filter(
-                Participation.event == Event.id,
-                Participation.participant == user_id,
-                Participation.participation_role == 'creator'
-        ).all()
-
-        for participant, event in as_creator:
-            result_creator[event.id] = {
-                'id': event.id,
-                'name': event.name,
-                'start_date': event.start_date,
-                'end_date': event.end_date,
-                'start_time': event.start_time
-            }
-
-        as_presenter = s.query(Participation, Event).filter(
-                Participation.event == Event.id,
-                Participation.participant == user_id,
-                Participation.participation_role == 'presenter'
-        ).all()
-
-        for participant, event in as_presenter:
-            result_presenter[event.id] = {
-                'id': event.id,
-                'name': event.name,
-                'start_date': event.start_date,
-                'end_date': event.end_date,
-                'start_time': event.start_time
-            }
-
-        as_participant = s.query(Participation, Event).filter(
-                Participation.event == Event.id,
-                Participation.participant == user_id,
-                Participation.participation_role == 'participant'
-        ).all()
-
-        for participant, event in as_participant:
-            result_participant[event.id] = {
-                'id': event.id,
-                'name': event.name,
-                'start_date': event.start_date,
-                'end_date': event.end_date,
-                'start_time': event.start_time
-            }
-
-    return result_creator, result_presenter, result_participant
-
-
-# deprecated version
-
-def confirm_user(confirmation_link):
-    with get_session() as s:
-        user = s.query(User).filter(
-                User.confirmation_link == confirmation_link,
-                User.status == 'unconfirmed',
-        ).one_or_none()
-        if user:
-            user.status = 'active'
-            logging.info('User [{}] is confirmed'.format(user.mail))
-            return 'user confirmed'
-        else:
-            return 'user is currently confirmed by this link'

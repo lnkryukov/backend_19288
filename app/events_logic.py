@@ -32,35 +32,33 @@ def get_events():
     return result
 
 
-def create_event(args):
-    start_date = args['start_date'].split('-')
+def create_event(data):
+    start_date = data['start_date'].split('-')
     date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
 
     date_end = None
     start_time = None
-    if 'end_date' in args.keys():
-        end_date = args['end_date'].split('-')
+    if 'end_date' in data.keys():
+        end_date = data['end_date'].split('-')
         date_end = date(int(end_date[0]), int(end_date[1]), int(end_date[2]))
-    if 'start_time' in args.keys():
-        start_time = args['start_time'].split(':')
+    if 'start_time' in data.keys():
+        start_time = data['start_time'].split(':')
         time_start = time(int(start_time[0]), int(start_time[1]), 0, 0)
     
     with get_session() as s:
-        last_event = s.query(Event).order_by(Event.id.desc()).first()
-        event = Event(name=args['name'], sm_description=args['sm_description'],
-                      description=args['description'], start_date=date_start,
+        event = Event(name=data['name'], sm_description=data['sm_description'],
+                      description=data['description'], start_date=date_start,
                       end_date=date_end, start_time=time_start,
-                      location=args['location'], site_link=args['site_link'],
-                      additional_info=args['additional_info'])
+                      location=data['location'], site_link=data['site_link'],
+                      additional_info=data['additional_info'])
         s.add(event)
+        session.flush()
+        session.refresh(event)
         logging.info('Creating event [{}] [{}] [{}] [{}]'.format(name,
                                                                  date_start,
                                                                  date_end,
                                                                  start_time))
-        if last_event:
-            return last_event.id + 1
-        else:
-            return 1
+        return event.id
 
 
 def create_event_creator(creator, last_id):
