@@ -44,7 +44,7 @@ def get_user_events_by_role(user_id, role, offset, size):
         if offset and size:
             offset = int(offset)
             size = int(size)
-            if offset < 1 or size < 1:
+            if offset < 0 or size < 1:
                 raise WrongDataError('Offset or size has wrong values')
 
             events = events.slice(offset, offset+size)
@@ -61,7 +61,7 @@ def get_user_events_by_role(user_id, role, offset, size):
                 'start_date': event.start_date
             }
             iterator += 1
-            
+
     return result
 
 
@@ -77,8 +77,6 @@ def update_profile(id, data):
         for arg in data.keys():
             setattr(user, arg, data[arg])
 
-
-# legacy functions - need to rework
 
 def get_users():
     result = {}

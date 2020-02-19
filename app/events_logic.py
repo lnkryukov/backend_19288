@@ -52,9 +52,9 @@ def create_event(data):
                       location=data['location'], site_link=data['site_link'],
                       additional_info=data['additional_info'])
         s.add(event)
-        session.flush()
-        session.refresh(event)
-        logging.info('Creating event [{}] [{}] [{}] [{}]'.format(name,
+        s.flush()
+        s.refresh(event)
+        logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
                                                                  date_end,
                                                                  start_time))
