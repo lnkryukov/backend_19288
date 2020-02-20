@@ -5,9 +5,9 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import users_logic, events_logic
+from .. import users_logic
 
-from ..exceptions import NotJsonError, NoData, WrongDataError
+from ..exceptions import NotJsonError, NoData, WrongDataError, WrongIdError
 from sqlalchemy.exc import IntegrityError
 
 
@@ -49,15 +49,14 @@ def update_profile():
 
 @bp.route('/events/<role>', methods=['GET'])
 @login_required
-def user_creator(role):
+def user_events(role):
     try:
         if role in ['creator', 'manager', 'presenter', 'viewer']:
             offset = request.args.get("offset", "")
             size = request.args.get("size", "")
             return jsonify(users_logic.get_user_events_by_role(current_user.id,
                                                                role,
-                                                               offset,
-                                                               size)
+                                                               offset, size)
             )
         else:
             return make_422('Unknown role requested.')
@@ -71,34 +70,61 @@ def user_creator(role):
         return make_400('Problem - {}'.format(str(e)))
 
 
-# legacy routes - need to rework
+# админка
 
-@bp.route('/join', methods=['POST'])
-@login_required
-def join():
+@bp.route('/all', methods=['GET'])
+def users_all():
     try:
-        data = request.get_json()
-        if not data:
-            return make_400('Expected json')
-
-        if events_logic.event_exist(int(data['event_id'])):
-            join = events_logic.join_event(current_user.id,
-                                        int(data['event_id']), data['role'])
-            if join:
-                return make_400(join)
-            return make_200('Guest joined event')
+        if current_user.service_status is not 'user':
+            offset = request.args.get("offset", "")
+            size = request.args.get("size", "")
+            return jsonify(users_logic.get_users(offset, size)
+            )
         else:
-            return make_400('No such event')
+            return make_403("AccessError - No rights.")
     except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
+        return make_400('Problem - {}'.format(str(e)))
 
 
-@bp.route('/users', methods=['GET'])
-def users():
+@bp.route('/<int:id>', methods=['GET'])
+@login_required
+def user_by_id(id):
     try:
-        return jsonify(users_logic.get_users())
+        if current_user.service_status is not 'user':
+            return jsonify(users_logic.get_user_info(id))
+        else:
+            return make_403("AccessError - No rights.")
+    except WrongIdError as e:
+        return make_422('WrongIdError - {}'.format(str(e)))
     except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
+        return make_400('Problem - {}'.format(str(e)))
+
+
+@bp.route('/<int:id>/events/<role>', methods=['GET'])
+@login_required
+def user_by_id_events(id, role):
+    try:
+        if current_user.service_status is not 'user':
+            if role in ['creator', 'manager', 'presenter', 'viewer']:
+                offset = request.args.get("offset", "")
+                size = request.args.get("size", "")
+                return jsonify(users_logic.get_user_events_by_role(id, role,
+                                                                   offset, size)
+                )
+            else:
+                return make_422('Unknown role requested.')
+        else:
+            return make_403("AccessError - No rights.")
+    except KeyError as e:
+        return make_415('KeyError - {}'.format(str(e)), e)
+    except WrongIdError as e:
+        return make_422('WrongIdError - {}'.format(str(e)))
+    except WrongDataError as e:
+        return make_422('WrongDataError - {}'.format(str(e)))
+    except ValueError as e:
+        return make_422('ValueError - {}'.format(str(e)))
+    except Exception as e:
+        return make_400('Problem - {}'.format(str(e)))
 
 
 # test routes

@@ -1,7 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData, ConfirmationLinkError, WrongDataError
+from .exceptions import NotJsonError, NoData, ConfirmationLinkError, WrongDataError, WrongIdError
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -16,7 +16,8 @@ import nanoid
 def get_user_info(user_id):
     with get_session() as s:
         user = s.query(User).get(user_id)
-
+        if not user:
+            raise WrongIdError('No user with this id')
         return {
             "mail": user.mail,
             "name": user.name,
@@ -30,11 +31,13 @@ def get_user_info(user_id):
         }
 
 
-# TODO add pagination
-
 def get_user_events_by_role(user_id, role, offset, size):
-    result = {}
+    result = []
     with get_session() as s:
+        user = s.query(User).get(user_id)
+        if not user:
+            raise WrongIdError('No user with this id')
+
         events = s.query(Participation, Event).filter(
                 Participation.event == Event.id,
                 Participation.participant == user_id,
@@ -46,21 +49,18 @@ def get_user_events_by_role(user_id, role, offset, size):
             size = int(size)
             if offset < 0 or size < 1:
                 raise WrongDataError('Offset or size has wrong values')
-
             events = events.slice(offset, offset+size)
         elif not offset and not size:
             events = events.all()
         else:
             raise KeyError('Wrong query string arg.')
 
-        iterator = 1
         for participant, event in events:
-            result[iterator] = {
+            result.append({
                 'id': event.id,
                 'name': event.name,
                 'start_date': event.start_date
-            }
-            iterator += 1
+            })
 
     return result
 
@@ -78,17 +78,29 @@ def update_profile(id, data):
             setattr(user, arg, data[arg])
 
 
-def get_users():
-    result = {}
+# админка
+
+def get_users(offset, size):
+    result = []
     with get_session() as s:
-        users = s.query(User).all()
+        users = s.query(User)
+        if offset and size:
+            offset = int(offset)
+            size = int(size)
+            if offset < 0 or size < 1:
+                raise WrongDataError('Offset or size has wrong values')
+            events = events.slice(offset, offset+size)
+        elif not offset and not size:
+            events = events.all()
+        else:
+            raise KeyError('Wrong query string arg.')
         for user in users:
-            result[user.id] = {
+            result.append({
                 'id': user.id,
                 'mail': user.mail,
                 'name': user.name,
                 'surname': user.surname,
                 'service_status': user.service_status,
                 'account_status': user.account_status
-            }
+            })
     return result

@@ -56,6 +56,26 @@ def event(id):
 
 #-------------------------- TODO --------------------------
 
+@bp.route('/join', methods=['POST'])
+@login_required
+def join():
+    try:
+        data = request.get_json()
+        if not data:
+            return make_400('Expected json')
+
+        if events_logic.event_exist(int(data['event_id'])):
+            join = events_logic.join_event(current_user.id,
+                                        int(data['event_id']), data['role'])
+            if join:
+                return make_400(join)
+            return make_200('Guest joined event')
+        else:
+            return make_400('No such event')
+    except Exception as e:
+        return make_400('Problem.\n{}'.format(str(e)))
+
+
 @bp.route('/event', methods=['PUT'])
 @login_required
 def update_event():

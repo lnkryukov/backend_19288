@@ -29,6 +29,11 @@ def make_400(text='Invalid reqeust'):
     return jsonify(error=text), 400
 
 
+def make_403(text='No access'):
+    logging.warning('403 - [{}]'.format(text))
+    return jsonify(error=text), 403
+
+
 def make_404(text='No resource'):
     logging.warning('404 - [{}]'.format(text))
     return jsonify(error=text), 404

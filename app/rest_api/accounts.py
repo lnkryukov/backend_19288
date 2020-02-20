@@ -123,6 +123,21 @@ def self_delete():
         return make_400('Problem. {}'.format(str(e)))
 
 
+@bp.route('/user/<int:id>/ban', methods=['GET'])
+@login_required
+def ban_user_by_id(id):
+    try:
+        if current_user.service_status is not 'user':
+            accounts_logic.ban_user(id)
+            return make_200('Successfully baned this user')
+        else:
+            return make_403("AccessError - No rights.")
+    except WrongIdError as e:
+        return make_422('WrongIdError - {}'.format(str(e)))
+    except Exception as e:
+        return make_400('Problem - {}'.format(str(e)))
+
+
 # test route with multiple logins and cookies
 
 @bp.route('/log', methods=['POST'])

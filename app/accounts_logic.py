@@ -1,7 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUserError
+from .exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUserError, WrongIdError
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -99,3 +99,14 @@ def self_delete(user_id):
         user.position = None
         user.country = None
         user.bio = None
+
+
+def ban_user(user_id):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == user_id
+        ).one_or_none()
+
+        if not user:
+            raise WrongIdError('No user with this id')
+        user.account_status = 'banned'
