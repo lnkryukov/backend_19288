@@ -42,8 +42,8 @@ def make_409(err):
 
 
 def make_415(err='Wrong data'):
-    logging.warning('415 - [{}] [{}]'.format(err))
-    return jsonify(error=err), 415
+    logging.warning('415 - [{}] [{}]'.format(str(err)))
+    return jsonify(error=str(err)), 415
 
 
 def make_422(err):

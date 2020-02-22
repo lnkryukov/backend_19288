@@ -1,5 +1,6 @@
 class NotJsonError(Exception):
-    pass
+    def __init__(self, text_exception):
+        self.text = text_exception
 
 
 class ConfirmationLinkError(Exception):
