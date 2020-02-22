@@ -1,10 +1,10 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData
+from .exceptions import (NotJsonError, NoData, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from datetime import date, time
 import requests
@@ -13,13 +13,50 @@ import os
 import nanoid
 
 
-def get_events():
-    result = {}
+def get_event_info(event_id):
     with get_session() as s:
-        events = s.query(Event).all()
+        event = s.query(Event, Participation, User).filter(
+                Event.id == event_id,
+                Participation.event == Event.id,
+                Participation.participant == User.id,
+                Participation.participation_role == 'creator'
+        ).first()
+
+        if not event:
+            raise WrongIdError('No event with this id')
+
+        return {
+            "creator_mail": event.User.mail,
+            "phone": event.User.phone,
+            "name": event.Event.name,
+            "sm_description": event.Event.sm_description,
+            "description": event.Event.description,
+            "start_date": event.Event.start_date,
+            "end_date": event.Event.end_date,
+            "start_time": event.Event.start_time,
+            "location": event.Event.location,
+            "site_link": event.Event.site_link,
+            "additional_info": event.Event.additional_info
+        }
+
+
+def get_events(offset, size):
+    result = []
+    with get_session() as s:
+        events = s.query(Event).order_by(desc(Event.start_date))
+        if offset and size:
+            offset = int(offset)
+            size = int(size)
+            if offset < 0 or size < 1:
+                raise WrongDataError('Offset or size has wrong values')
+            events = events.slice(offset, offset+size)
+        elif not offset and not size:
+            events = events.all()
+        else:
+            raise KeyError('Wrong query string arg.')
 
         for event in events:
-            result[event.id] = {
+            result.append({
                 'id': event.id,
                 'name': event.name,
                 'sm_description': event.sm_description,
@@ -28,11 +65,11 @@ def get_events():
                 'start_time': event.start_time,
                 'location': event.location,
                 'site_link': event.site_link
-            }
+            })
     return result
 
 
-def create_event(data):
+def create_event(user_id, data):
     start_date = data['start_date'].split('-')
     date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
 
@@ -54,6 +91,9 @@ def create_event(data):
         s.add(event)
         s.flush()
         s.refresh(event)
+        participation = Participation(event=event.id, participant=user_id,
+                                      participation_role='creator')
+
         logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
                                                                  date_end,
@@ -61,12 +101,26 @@ def create_event(data):
         return event.id
 
 
-def create_event_creator(creator, last_id):
+def update_event(user_id, event_id, data):
     with get_session() as s:
-        participation = Participation(event=last_id, participant=creator,
-                                      participation_role='creator')
-        s.add(participation)
+        event = s.query(User, Event, Participation).filter(
+                User.id == user_id,
+                Event.id == event_id,
+                Participation.event == Event.id,
+                Participation.participant == User.id,
+                or_(Participation.participation_role == 'creator',
+                    User.service_status == 'admin',
+                    User.service_status == 'moderator')
+                User.account_status == 'active',
+        ).one_or_none()
+        ????????????????????????????????????????????????????????????????????????????
+        for arg in data.keys():
+            getattr(user, arg)
+        for arg in data.keys():
+            setattr(user, arg, data[arg])
 
+
+# old functions
 
 def check_participation(user_id, event_id):
     with get_session() as s:
@@ -149,7 +203,7 @@ def event_info(id):
             "location": event.Event.location,
             "site_link": event.Event.site_link,
             "additional_info": event.Event.additional_info
-        }    
+        }
 
 
 

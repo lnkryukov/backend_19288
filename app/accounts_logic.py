@@ -1,7 +1,8 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData, ConfirmationLinkError, RegisterUserError, WrongIdError
+from .exceptions import (NotJsonError, NoData, ConfirmationLinkError,
+                         RegisterUserError, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -67,7 +68,7 @@ def confirm_user(confirmation_link):
             else:
                 raise ConfirmationLinkError('User is currently confirmed by this link')
         else:
-            raise ConfirmationLinkError('No user with this confirmation link')
+            raise WrongIdError('No user with this confirmation link')
 
 
 def change_password(user_id, old_password, new_password):

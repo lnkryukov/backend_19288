@@ -5,53 +5,40 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import auth, users_logic, events_logic
-
-from ..exceptions import NotJsonError, NoData
-from sqlalchemy.exc import IntegrityError
+from .. import events_logic
 
 
-bp = Blueprint('events', __name__)
+bp = Blueprint('events', __name__, url_prefix='/event')
 
 
-@bp.route('/event', methods=['POST'])
+@bp.route('/<int:id>', methods=['GET'])
+def event_by_id(id):
+    return jsonify(events_logic.get_event_info(id))
+
+
+@bp.route('/<int:id>', methods=['PUT'])
+def event_by_id(id):
+    pass
+
+
+@bp.route('/', methods=['POST'])
 @login_required
 def create_event():
-    try:
-        data = request.get_json()
-        if not data:
-            return make_400('Expected json')
+    data = request.get_json()
+    if not data:
+        return make_415('Expected json')
 
-        last_id = events_logic.create_event(data)
-        events_logic.create_event_creator(current_user.id, last_id)
-        # create_event_manager if exists
+    last_id = events_logic.create_event(current_user.id, data)
+    # create_event_manager if exists
 
-        return make_201(str(last_id))
-    except KeyError as e:
-        return make_415('KeyError - \n{}'.format(str(e)))
-    except IntegrityError as e:
-        return make_400('IntegrityError - \n{}'.format(str(e)))
-    except Exception as e:
-        return make_400('Problem - \n{}'.format(str(e)))
+    return make_201(str(last_id))
 
 
-@bp.route('/events', methods=['GET'])
+@bp.route('/all', methods=['GET'])
 def events():
-    try:
-        return jsonify(events_logic.get_events())
-    except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
-
-
-@bp.route('/event/<int:id>', methods=['GET'])
-def event(id):
-    try:
-        if events_logic.event_exist(id):
-            return jsonify(events_logic.event_info(id))
-        else:
-            return make_400('No such event')
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
+    offset = request.args.get("offset", "")
+    size = request.args.get("size", "")
+    return jsonify(events_logic.get_events(offset, size))
 
 
 #-------------------------- TODO --------------------------
@@ -59,27 +46,15 @@ def event(id):
 @bp.route('/join', methods=['POST'])
 @login_required
 def join():
-    try:
-        data = request.get_json()
-        if not data:
-            return make_400('Expected json')
+    data = request.get_json()
+    if not data:
+        return make_400('Expected json')
 
-        if events_logic.event_exist(int(data['event_id'])):
-            join = events_logic.join_event(current_user.id,
-                                        int(data['event_id']), data['role'])
-            if join:
-                return make_400(join)
-            return make_200('Guest joined event')
-        else:
-            return make_400('No such event')
-    except Exception as e:
-        return make_400('Problem.\n{}'.format(str(e)))
-
-
-@bp.route('/event', methods=['PUT'])
-@login_required
-def update_event():
-    try:
-        pass
-    except Exception as e:
-        return make_400('Problem. {}'.format(str(e)))
+    if events_logic.event_exist(int(data['event_id'])):
+        join = events_logic.join_event(current_user.id,
+                                    int(data['event_id']), data['role'])
+        if join:
+            return make_400(join)
+        return make_200('Guest joined event')
+    else:
+        return make_400('No such event')

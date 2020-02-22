@@ -1,7 +1,8 @@
 from .config import cfg
 from .db import *
 from . import util
-from .exceptions import NotJsonError, NoData, ConfirmationLinkError, WrongDataError, WrongIdError
+from .exceptions import (NotJsonError, NoData, ConfirmationLinkError
+                         WrongDataError, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
@@ -48,7 +49,7 @@ def get_user_events_by_role(user_id, role, offset, size):
             offset = int(offset)
             size = int(size)
             if offset < 0 or size < 1:
-                raise WrongDataError('Offset or size has wrong values')
+                raise WrongDataError('Offset or size has wrong values!')
             events = events.slice(offset, offset+size)
         elif not offset and not size:
             events = events.all()
@@ -61,14 +62,13 @@ def get_user_events_by_role(user_id, role, offset, size):
                 'name': event.name,
                 'start_date': event.start_date
             })
-
     return result
 
 
-def update_profile(id, data):
+def update_profile(user_id, data):
     with get_session() as s:
         user = s.query(User).filter(
-                User.id == id,
+                User.id == user_id,
                 User.account_status == 'active',
         ).one_or_none()
 

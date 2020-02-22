@@ -5,9 +5,6 @@ import logging
 # answers
 
 def make_200(description=None, extra=None):
-    body = {
-        'status': 'ok',
-    }
     if description:
         body['description'] = description
     if extra:
@@ -16,37 +13,44 @@ def make_200(description=None, extra=None):
 
 
 def make_201(extra=None):
-    body = {
-        'status': 'Created',
-    }
     if extra:
         body['extra'] = extra
     return jsonify(body), 201
 
 
-def make_400(text='Invalid reqeust'):
-    logging.warning('400 - [{}]'.format(text))
-    return jsonify(error=text), 400
+def make_400(err):
+    error = 'Incorrect request!'
+    if isinstance(err, KeyError) or isinstance(err, AttributeError):
+        err = 'Wrong json key(s)!'
+    logging.warning('400 - [{}] '.format(str(err)))
+    return jsonify(error=str(err)), 400
 
 
-def make_403(text='No access'):
-    logging.warning('403 - [{}]'.format(text))
-    return jsonify(error=text), 403
+def make_403(err='No access'):
+    logging.warning('403 - [{}]'.format(err))
+    return jsonify(error=err), 403
 
 
-def make_404(text='No resource'):
-    logging.warning('404 - [{}]'.format(text))
-    return jsonify(error=text), 404
+def make_404(err):
+    logging.warning('404 - [{}]'.format(str(err)))
+    return jsonify(error=str(err)), 404
 
 
-def make_415(text='Wrong data', e=''):
-    logging.exception('415 - [{}] [{}]'.format(text, e))
-    return jsonify(error=text), 415
+def make_409(err):
+    logging.warning('409 - [{}]'.format(str(err)))
+    return jsonify(error=str(err)), 409
 
 
-def make_422(text='Wrong data'):
-    logging.exception('422 - [{}] '.format(text))
-    return jsonify(error=text), 422
+def make_415(err='Wrong data'):
+    logging.warning('415 - [{}] [{}]'.format(err))
+    return jsonify(error=err), 415
+
+
+def make_422(err):
+    if isinstance(err, ValueError):
+        err = 'Offset or size has wrong data!'
+    logging.warning('422 - [{}] '.format(str(err)))
+    return jsonify(error=str(err)), 422
 
 
 # errors handlers
