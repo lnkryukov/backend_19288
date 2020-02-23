@@ -13,12 +13,21 @@ bp = Blueprint('events', __name__, url_prefix='/event')
 
 @bp.route('/<int:id>', methods=['GET'])
 def event_by_id(id):
-    return jsonify(events_logic.get_event_info(id))
+    return jsonify(part=events_logic.check_participation(current_user.id, id),
+                   event=events_logic.get_event_info(id))
 
 
 @bp.route('/<int:id>', methods=['PUT'])
+@login_required
 def event_by_id(id):
-    pass
+    if current_user.service_status is not 'user' or
+       events_logic.check_participation(current_user.id, id) in ['creator', 'manager']:
+        data = request.get_json()
+        if not data:
+            return make_415('Expected json')
+        events_logic.update_event(id, data)
+    else:
+        return make_403("No rights!")
 
 
 @bp.route('/', methods=['POST'])
@@ -41,20 +50,21 @@ def events():
     return jsonify(events_logic.get_events(offset, size))
 
 
-#-------------------------- TODO --------------------------
-
-@bp.route('/join', methods=['POST'])
+@bp.route('/<int:id>/join', methods=['POST'])
 @login_required
-def join():
+def join(id):
     data = request.get_json()
     if not data:
-        return make_400('Expected json')
+        return make_415('Expected json')
 
-    if events_logic.event_exist(int(data['event_id'])):
-        join = events_logic.join_event(current_user.id,
-                                    int(data['event_id']), data['role'])
-        if join:
-            return make_400(join)
-        return make_200('Guest joined event')
-    else:
-        return make_400('No such event')
+    events_logic.join_event(current_user.id, id, data)
+
+
+@bp.route('/<int:id>/presenters', methods=['GET'])
+@login_required
+def join(id):
+    data = request.get_json()
+    if not data:
+        return make_415('Expected json')
+
+    events_logic.get_presenters(id)

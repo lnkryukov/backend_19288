@@ -72,3 +72,5 @@ class Participation(Base):
     event = Column(Integer, ForeignKey('events.id'), nullable=False)
     participant = Column(Integer, ForeignKey('users.id'), nullable=False)
     participation_role = Column(Participation_role, default='viewer', nullable=False)
+    report = Column(TEXT, nullable=True)
+    presenter_description = Column(TEXT, nullable=True)

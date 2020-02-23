@@ -16,6 +16,7 @@ def add_error_handlers(app):
     app.register_error_handler(WrongIdError, rest_api.make_404)
     app.register_error_handler(RegisterUserError, rest_api.make_409)
     app.register_error_handler(ConfirmationLinkError, rest_api.make_409)
+    app.register_error_handler(JoinUserError, rest_api.make_409)
     app.register_error_handler(NotJsonError, rest_api.make_415)
     app.register_error_handler(WrongDataError, rest_api.make_422)
     app.register_error_handler(ValueError, rest_api.make_422)

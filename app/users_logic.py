@@ -72,10 +72,13 @@ def update_profile(user_id, data):
                 User.account_status == 'active',
         ).one_or_none()
 
-        for arg in data.keys():
-            getattr(user, arg)
-        for arg in data.keys():
-            setattr(user, arg, data[arg])
+        if user:
+            for arg in data.keys():
+                getattr(user, arg)
+            for arg in data.keys():
+                setattr(user, arg, data[arg])
+        else:
+            raise WrongIdError('No user with this id')
 
 
 # админка

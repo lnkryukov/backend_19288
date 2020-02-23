@@ -82,6 +82,21 @@ def change_password():
         return make_422('Invalid password')
 
 
+@bp.route('/close_all_sessions', methods=['POST'])
+@fresh_login_required
+def close_all_sessions():
+    data = request.get_json()
+    if not data:
+        return make_415('Expected json')
+    user = accounts_logic.close_all_sessions(current_user.id,
+                                             data['old_password'])
+    if user:
+        login_user(user)
+        return make_200('Logout from all other sessions.', user.service_status)
+    else:
+        return make_422('Invalid password')
+
+
 bp.route('/delete', methods=['GET'])
 @fresh_login_required
 def self_delete():

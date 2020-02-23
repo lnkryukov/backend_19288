@@ -21,3 +21,8 @@ class WrongDataError(Exception):
 class WrongIdError(Exception):
     def __init__(self, text_exception):
         self.text = text_exception
+
+
+class JoinUserError(Exception):
+    def __init__(self, text_exception):
+        self.text = text_exception

@@ -2,7 +2,7 @@ from .config import cfg
 from .db import *
 from . import util
 from . import logger
-from .exceptions import (NotJsonError, NoData, WrongIdError)
+from .exceptions import (NotJsonError, NoData, WrongIdError, JoinUserError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc, or_
@@ -103,24 +103,15 @@ def create_event(user_id, data):
 
 def update_event(user_id, event_id, data):
     with get_session() as s:
-        event = s.query(User, Event, Participation).filter(
-                User.id == user_id,
-                Event.id == event_id,
-                Participation.event == Event.id,
-                Participation.participant == User.id,
-                or_(Participation.participation_role == 'creator',
-                    User.service_status == 'admin',
-                    User.service_status == 'moderator')
-                User.account_status == 'active',
-        ).one_or_none()
-        ????????????????????????????????????????????????????????????????????????????
+        event = s.query(Event).get(event_id)
+        if not event:
+            raise WrongIdError('No event with this id')
+        
         for arg in data.keys():
             getattr(user, arg)
         for arg in data.keys():
             setattr(user, arg, data[arg])
 
-
-# old functions
 
 def check_participation(user_id, event_id):
     with get_session() as s:
@@ -135,7 +126,7 @@ def check_participation(user_id, event_id):
 
 
 def get_presenters(id):
-    result = {}
+    result = []
     with get_session() as s:
         users = s.query(User, Participation).filter(
                 User.id == Participation.participant,
@@ -143,94 +134,41 @@ def get_presenters(id):
                 Participation.participation_role == 'presenter' 
         ).all()
 
-        i = 1
         for user, participant in users:
-            result[i] = {
+            result.append({
                 'name': user.name,
                 'surname': user.surname,
-                'participation_role': participant.participation_role,
-            }
-            i += 1
+                'report': participant.report,
+                'presenter_description': participant.presenter_description
+            })
 
     return result
 
 
-def join_event(user_id, event_id, role):
+def join_event(user_id, event_id, data):
     with get_session() as s:
+        event = s.query(Event).get(event_id)
+        if not event:
+            raise WrongIdError('No event with this id')
+
         is_consists = s.query(Participation).filter(
                 Participation.participant == user_id,
                 Participation.event == event_id
         ).one_or_none()
 
         if not is_consists:
-            participation = Participation(event=event_id, participant=user_id,
-                                          participation_role=role)
+            role = 'viewer'
+            participation = Participation(event=event_id,
+                                          participant=user_id,
+                                          participation_role='viewer')
+            if data['role'] == 'presenter':
+                participation.participation_role = 'presenter'
+                participation.report = data['report']
+                participation.presenter_description = data['presenter_description']
+                role = 'presenter'
             s.add(participation)
             logger.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
                                                                     event_id,
                                                                     role))
-            return 0
         else:
-            return 'User has already joined this event'
-
-
-def event_exist(event_id):
-    with get_session() as s:
-        exists = s.query(Event).filter(
-                Event.id == event_id
-        ).count()
-    return True if exists > 0 else False
-
-
-def event_info(id):
-    with get_session() as s:
-        event = s.query(Event, Participation, User).filter(
-                Event.id == id,
-                Participation.event == Event.id,
-                Participation.participant == User.id,
-                Participation.participation_role == 'creator'
-        ).first()
-
-        return {
-            "creator_mail": event.User.mail,
-            "phone": event.User.phone,
-            "name": event.Event.name,
-            "sm_description": event.Event.sm_description,
-            "description": event.Event.description,
-            "start_date": event.Event.start_date,
-            "end_date": event.Event.end_date,
-            "start_time": event.Event.start_time,
-            "location": event.Event.location,
-            "site_link": event.Event.site_link,
-            "additional_info": event.Event.additional_info
-        }
-
-
-
-
-
-# TODO TODO
-
-
-
-
-def update_event(user_id, event_id, params):
-    with get_session() as s:
-        event = s.query(Participation, Event).filter(
-                Event.id == id,
-                Participation.event == Event.id,
-                Participation.participant == user_id,
-                Participation.participation_role.in_(['creator', 'manager'])
-        ).one_or_none()
-
-        if event is None:
-            return "You have no rights to edit this event"
-        else:
-            ev = event.Event
-
-            try:
-                print(ev['name'])
-            except Exception as e:
-                print(e)
-
-            return "Updated successfully"
+            raise JoinUserError('User has already joined this event!')

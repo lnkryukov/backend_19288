@@ -88,6 +88,20 @@ def change_password(user_id, old_password, new_password):
             return None
 
 
+def close_all_sessions(user_id, old_password):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == user_id
+        ).one_or_none()
+        opw = str(old_password).encode('utf-8')
+        pw = str(user.password).encode('utf-8')
+        if bcrypt.checkpw(opw, pw):
+            user.cookie_id = uuid.uuid4()
+            return user
+        else:
+            return None
+
+
 def self_delete(user_id):
     with get_session() as s:
         user = s.query(User).filter(
