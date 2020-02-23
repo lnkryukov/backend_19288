@@ -1,9 +1,10 @@
-from ..config import cfg
 from .models import *
+from ..config import cfg
+from .. import logger
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
-import logging
 
 
 _engine = create_engine(cfg.DB_CONNECTION_STRING)
@@ -24,15 +25,15 @@ def get_session():
 
 
 def create_tables(password):
-    logging.info('Dropping existing tables')
+    logger.info('Dropping existing tables')
     try:
         Base.metadata.reflect(_engine)
         Base.metadata.drop_all(_engine)
     except Exception as e:
-        logging.info('Failed to drop tables.\n{}'.format(str(e)))
-    logging.info('Creating tables')
+        logger.info('Failed to drop tables.\n{}'.format(str(e)))
+    logger.info('Creating tables')
     Base.metadata.create_all(_engine)
-    logging.info('Tables was created')
+    logger.info('Tables was created')
     with get_session() as s:
         root = User(
             mail='root_mail',
@@ -44,4 +45,4 @@ def create_tables(password):
             confirmation_link='none',
         )
         s.add(root)
-    logging.info('Default user with mail [root_mail] was created')
+    logger.info('Default user with mail [root_mail] was created')

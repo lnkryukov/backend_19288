@@ -1,6 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
+from . import logger
 from .exceptions import (NotJsonError, NoData, ConfirmationLinkError,
                          RegisterUserError, WrongIdError)
 
@@ -11,7 +12,6 @@ import bcrypt
 
 from datetime import datetime
 import requests
-import logging
 import os
 import nanoid
 import uuid
@@ -53,7 +53,7 @@ def register_user(mail, name, surname, password, service_status='user'):
             s.add(user)
         if cfg.DEFAULT_USER_STATUS == 'unconfirmed':
             util.send_email(mail, confirmation_link)
-        logging.info('Registering new user [{}]'.format(mail))
+        logger.info('Registering new user [{}]'.format(mail))
 
 
 def confirm_user(confirmation_link):
@@ -64,7 +64,7 @@ def confirm_user(confirmation_link):
         if user:
             if user.account_status == 'unconfirmed':
                 user.account_status = 'active'
-                logging.info('User [{}] is confirmed'.format(user.mail))
+                logger.info('User [{}] is confirmed'.format(user.mail))
             else:
                 raise ConfirmationLinkError('User is currently confirmed by this link')
         else:

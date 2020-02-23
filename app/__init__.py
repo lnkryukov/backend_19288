@@ -10,6 +10,7 @@ from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
 import logging
+import sys
 
 
 app = Flask(__name__)
@@ -27,16 +28,20 @@ Request.on_json_loading_failed = on_json_loading_failed
 
 CORS(app)
 
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
-                    level=logging.INFO)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(auth.user_loader)
+
+logger = logging.getLogger('eventsproj')
+formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
+console_output_handler = logging.StreamHandler(sys.stderr)
+console_output_handler.setFormatter(formatter)
+logger.addHandler(console_output_handler)
+logger.setLevel(logging.INFO)
 
 
 def run():
     monkey.patch_all(ssl=False)
     http_server = WSGIServer((cfg.HOST, cfg.PORT), app)
-    logging.info('Started server')
+    logger.info('Started server')
     http_server.serve_forever()

@@ -1,6 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
+from . import logger
 from .exceptions import (NotJsonError, NoData, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
@@ -8,7 +9,6 @@ from sqlalchemy import desc, or_
 
 from datetime import date, time
 import requests
-import logging
 import os
 import nanoid
 
@@ -94,7 +94,7 @@ def create_event(user_id, data):
         participation = Participation(event=event.id, participant=user_id,
                                       participation_role='creator')
 
-        logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
+        logger.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
                                                                  date_end,
                                                                  start_time))
@@ -166,7 +166,7 @@ def join_event(user_id, event_id, role):
             participation = Participation(event=event_id, participant=user_id,
                                           participation_role=role)
             s.add(participation)
-            logging.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
+            logger.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
                                                                     event_id,
                                                                     role))
             return 0

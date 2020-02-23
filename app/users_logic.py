@@ -1,6 +1,7 @@
 from .config import cfg
 from .db import *
 from . import util
+from . import logger
 from .exceptions import (NotJsonError, NoData, ConfirmationLinkError
                          WrongDataError, WrongIdError)
 
@@ -9,7 +10,6 @@ from sqlalchemy import desc
 
 from datetime import datetime
 import requests
-import logging
 import os
 import nanoid
 
