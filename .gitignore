@@ -110,6 +110,11 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
-
 # setup.sh
 setup.sh
+
+# local logs, git ext and more
+service.log
+git-aacp
+git-ak
+todo.md

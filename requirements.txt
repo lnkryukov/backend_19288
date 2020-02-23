@@ -1,0 +1,11 @@
+bcrypt
+Flask
+flask-cors
+Flask-Login
+gevent
+nanoid
+pg8000
+psycopg2-binary
+requests
+SQLAlchemy
+urllib3
