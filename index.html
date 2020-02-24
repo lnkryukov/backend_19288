@@ -56,10 +56,15 @@
           <a class="nav-link js-scroll-trigger" href="#setup">setup.sh</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" data-toggle="collapse" href="#restapi" data-target="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">REST API</a>
-          <div class="collapse" id="collapseExample">
+          <div class="btn-group">
+            <a class="nav-link js-scroll-trigger" href="#restapi">REST API</a>
+            <a class="nav-link btn dropdown-toggle-split" data-toggle="collapse" aria-haspopup="true" aria-expanded="false" aria-controls="collapsemenu" data-target="#collapsemenu">
+              <span class="sr-only">Dropdown</span>
+              <i class="far fa-caret-square-down"></i>
+            </a>
+          </div>
+          <div class="collapse" id="collapsemenu">
             <div class="card card-body bg-dark">
-              <a class="nav-link js-scroll-trigger" href="#restapi">General info</a>
               <a class="nav-link js-scroll-trigger" href="#restapi_accounts">Accounts</a>
               <a class="nav-link js-scroll-trigger" href="#restapi_users">Users</a>
               <a class="nav-link js-scroll-trigger" href="#restapi_events">Events</a>
@@ -244,7 +249,7 @@
 
     <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="restapi">
       <div class="w-100">
-        <h2 class="mb-5">General info</h2>
+        <h2 class="mb-5">REST API</h2>
         <p>Далее идет описание REST API.</p>
         <p>Основным форматом является json (но не всегда), для чего необходимо указывать в заголовках <kbd>application/json</kbd>. В случае отсутсвия данного заголовка или же некорретно составленного тела будет возвращена ошибка с http кодом 415.</p>
         <p>Ниже приведены описания всех возможных ответов сервера:</p>
@@ -476,6 +481,17 @@
     *   в случе проблем:
         *    400 с `error: DESCRIPTION`
 </pre>
+      </div>
+    </section>
+
+    <hr class="m-0">
+
+    <section class="resume-section p-3 p-lg-5 d-flex align-items-center" id="restapi_events">
+      <div class="w-100">
+        <h2 class="mb-5">Events</h2>
+        <p>Ручки, связанные с мероприятиями.</p>
+
+
       </div>
     </section>
 
