@@ -20,7 +20,7 @@ def user():
 @bp.route('/status', methods=['GET'])
 @login_required
 def user_status():
-    return jsonify(current_user.account_status)
+    return jsonify(service_status=current_user.account_status)
 
 
 @bp.route('/', methods=['PUT'])

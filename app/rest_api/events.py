@@ -13,8 +13,12 @@ bp = Blueprint('events', __name__, url_prefix='/event')
 
 @bp.route('/<int:id>', methods=['GET'])
 def event_by_id(id):
-    return jsonify(part=events_logic.check_participation(current_user.id, id),
-                   event=events_logic.get_event_info(id))
+    if current_user.is_authenticated:
+        return jsonify(part=events_logic.check_participation(current_user.id, id),
+                       event=events_logic.get_event_info(id))
+    else:
+        return jsonify(part='not joined',
+                       event=events_logic.get_event_info(id))
 
 
 @bp.route('/<int:id>', methods=['PUT'])
@@ -26,6 +30,7 @@ def event_by_id(id):
         if not data:
             return make_415('Expected json')
         events_logic.update_event(id, data)
+        return make_200('Successfully updated.')
     else:
         return make_403("No rights!")
 
@@ -58,13 +63,13 @@ def join(id):
         return make_415('Expected json')
 
     events_logic.join_event(current_user.id, id, data)
+    return make_200('Successfully joined')
 
 
 @bp.route('/<int:id>/presenters', methods=['GET'])
-@login_required
 def join(id):
     data = request.get_json()
     if not data:
         return make_415('Expected json')
 
-    events_logic.get_presenters(id)
+    return jsonify(events_logic.get_presenters(id))

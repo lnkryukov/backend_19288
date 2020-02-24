@@ -20,6 +20,7 @@ def add_error_handlers(app):
     app.register_error_handler(NotJsonError, rest_api.make_415)
     app.register_error_handler(WrongDataError, rest_api.make_422)
     app.register_error_handler(ValueError, rest_api.make_422)
+    app.register_error_handler(IndexError, rest_api.make_422)
 
 
 def on_json_loading_failed(err, e):

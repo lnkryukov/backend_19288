@@ -89,7 +89,7 @@ def close_all_sessions():
     if not data:
         return make_415('Expected json')
     user = accounts_logic.close_all_sessions(current_user.id,
-                                             data['old_password'])
+                                             data['password'])
     if user:
         login_user(user)
         return make_200('Logout from all other sessions.', user.service_status)
@@ -97,11 +97,18 @@ def close_all_sessions():
         return make_422('Invalid password')
 
 
-bp.route('/delete', methods=['GET'])
+bp.route('/delete', methods=['POST'])
 @fresh_login_required
 def self_delete():
-    accounts_logic.self_delete(current_user.id)
-    logout_user()
+    data = request.get_json()
+    if not data:
+        return make_415('Expected json')
+    ans = accounts_logic.self_delete(current_user.id, password)
+    if ans:
+        logout_user()
+        return make_200('Successfully delete account.')
+    else:
+        return make_422('Invalid password')
 
 
 @bp.route('/user/<int:id>/ban', methods=['GET'])

@@ -88,12 +88,12 @@ def change_password(user_id, old_password, new_password):
             return None
 
 
-def close_all_sessions(user_id, old_password):
+def close_all_sessions(user_id, password):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == user_id
         ).one_or_none()
-        opw = str(old_password).encode('utf-8')
+        opw = str(password).encode('utf-8')
         pw = str(user.password).encode('utf-8')
         if bcrypt.checkpw(opw, pw):
             user.cookie_id = uuid.uuid4()
@@ -102,18 +102,23 @@ def close_all_sessions(user_id, old_password):
             return None
 
 
-def self_delete(user_id):
+def self_delete(user_id, password):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == user_id
         ).one_or_none()
-
-        user.account_status = 'deleted'
-        user.phone = None
-        user.organization = None
-        user.position = None
-        user.country = None
-        user.bio = None
+        opw = str(password).encode('utf-8')
+        pw = str(user.password).encode('utf-8')
+        if bcrypt.checkpw(opw, pw):
+            user.account_status = 'deleted'
+            user.phone = None
+            user.organization = None
+            user.position = None
+            user.country = None
+            user.bio = None
+            return 'ok'
+        else:
+            return ''
 
 
 def ban_user(user_id):

@@ -75,8 +75,9 @@ def update_profile(user_id, data):
         if user:
             for arg in data.keys():
                 getattr(user, arg)
-            for arg in data.keys():
-                setattr(user, arg, data[arg])
+                if arg == 'mail' or arg == 'password':
+                    raise KeyError('No mail or password changing here')
+                setattr(user, arg, data[arg])                
         else:
             raise WrongIdError('No user with this id')
 

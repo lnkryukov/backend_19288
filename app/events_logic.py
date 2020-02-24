@@ -107,10 +107,21 @@ def update_event(user_id, event_id, data):
         if not event:
             raise WrongIdError('No event with this id')
         
+
+
         for arg in data.keys():
-            getattr(user, arg)
-        for arg in data.keys():
-            setattr(user, arg, data[arg])
+            getattr(event, arg)
+            if arg == 'start_date' or 'end_date':
+                sdate = data[arg].split('-')
+                date_start = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
+                setattr(event, arg, date_start)
+            elif arg == 'start_time':
+                start_time = data[arg].split(':')
+                time_start = time(int(start_time[0]), int(start_time[1]), 0, 0)
+                setattr(event, arg, time_start)
+            else:
+                setattr(event, arg, data[arg])
+            
 
 
 def check_participation(user_id, event_id):
@@ -128,6 +139,9 @@ def check_participation(user_id, event_id):
 def get_presenters(id):
     result = []
     with get_session() as s:
+        event = s.query(Event).get(id)
+        if not event:
+            raise WrongIdError('No event with this id')
         users = s.query(User, Participation).filter(
                 User.id == Participation.participant,
                 Participation.event == id,
@@ -171,4 +185,4 @@ def join_event(user_id, event_id, data):
                                                                     event_id,
                                                                     role))
         else:
-            raise JoinUserError('User has already joined this event!')
+            raise JoinUserError('User has already joined this event as [{}]!'.format(is_consists.participation_role))
