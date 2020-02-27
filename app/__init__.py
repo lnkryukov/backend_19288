@@ -32,16 +32,19 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(auth.user_loader)
 
-logger = logging.getLogger('eventsproj')
-formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-console_output_handler = logging.StreamHandler(sys.stderr)
-console_output_handler.setFormatter(formatter)
-logger.addHandler(console_output_handler)
-logger.setLevel(logging.INFO)
+#logger = logging.getLogger('eventsproj')
+#formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
+#console_output_handler = logging.StreamHandler(sys.stderr)
+#console_output_handler.setFormatter(formatter)
+#logger.addHandler(console_output_handler)
+#logger.setLevel(logging.INFO)
+
+logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
+                    level=logging.INFO)
 
 
 def run():
     monkey.patch_all(ssl=False)
     http_server = WSGIServer((cfg.HOST, cfg.PORT), app)
-    logger.info('Started server')
+    logging.info('Started server')
     http_server.serve_forever()

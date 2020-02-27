@@ -12,7 +12,7 @@ def random_string_digits(str_len=8):
 
 
 # возможно переписать как отдельный модуль ибо каждый раз логин+анлогин хз
-def send_email(mail, link):
+def send_email(email, link):
     server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
     server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
     message = cfg.SITE_ADDR + "/confirm/" + link
@@ -21,6 +21,6 @@ def send_email(mail, link):
     msg.set_content(message)
     msg['Subject'] = "Your confirmation link"
     msg['From'] = cfg.MAIL_LOGIN
-    msg['To'] = mail
+    msg['To'] = email
     server.send_message(msg)
     server.quit()

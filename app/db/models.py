@@ -30,7 +30,7 @@ class User(Base, UserMixin):
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
                        unique=True, nullable=False)
     # primary info
-    mail = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     password = Column(TEXT, nullable=False)
@@ -69,8 +69,8 @@ class Participation(Base):
     __tablename__ = 'participations'
 
     id = Column(Integer, primary_key=True)
-    event = Column(Integer, ForeignKey('events.id'), nullable=False)
-    participant = Column(Integer, ForeignKey('users.id'), nullable=False)
+    e_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    u_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     participation_role = Column(Participation_role, default='viewer', nullable=False)
     report = Column(TEXT, nullable=True)
     presenter_description = Column(TEXT, nullable=True)

@@ -5,17 +5,17 @@ import bcrypt
 import time
 
 
-def user_loader(user_id):
+def user_loader(uc_id):
     with get_session() as s:
         return s.query(User).filter(
-                User.cookie_id == user_id,
+                User.cookie_id == uc_id,
                 User.account_status == 'active'
         ).one_or_none()
 
 
-def check_user(mail):
+def check_user(email):
     with get_session() as s:
         return s.query(User).filter(
-                User.mail == mail,
+                User.email == email,
                 User.account_status == 'active'
         ).one_or_none()

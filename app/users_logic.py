@@ -1,8 +1,8 @@
 from .config import cfg
 from .db import *
 from . import util
-from . import logger
-from .exceptions import (NotJsonError, NoData, ConfirmationLinkError
+import logging
+from .exceptions import (NotJsonError, ConfirmationLinkError,
                          WrongDataError, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
@@ -14,13 +14,13 @@ import os
 import nanoid
 
 
-def get_user_info(user_id):
+def get_user_info(u_id):
     with get_session() as s:
-        user = s.query(User).get(user_id)
+        user = s.query(User).get(u_id)
         if not user:
             raise WrongIdError('No user with this id')
         return {
-            "mail": user.mail,
+            "email": user.email,
             "name": user.name,
             "surname": user.surname,
             "service_status": user.service_status,
@@ -32,16 +32,16 @@ def get_user_info(user_id):
         }
 
 
-def get_user_events_by_role(user_id, role, offset, size):
+def get_user_events_by_role(u_id, role, offset, size):
     result = []
     with get_session() as s:
-        user = s.query(User).get(user_id)
+        user = s.query(User).get(u_id)
         if not user:
             raise WrongIdError('No user with this id')
 
         events = s.query(Participation, Event).filter(
-                Participation.event == Event.id,
-                Participation.participant == user_id,
+                Participation.e_id == Event.id,
+                Participation.u_id == u_id,
                 Participation.participation_role == role
         ).order_by(desc(Event.start_date))
 
@@ -65,18 +65,18 @@ def get_user_events_by_role(user_id, role, offset, size):
     return result
 
 
-def update_profile(user_id, data):
+def update_profile(u_id, data):
     with get_session() as s:
         user = s.query(User).filter(
-                User.id == user_id,
+                User.id == u_id,
                 User.account_status == 'active',
         ).one_or_none()
 
         if user:
             for arg in data.keys():
                 getattr(user, arg)
-                if arg == 'mail' or arg == 'password':
-                    raise KeyError('No mail or password changing here')
+                if arg == 'email' or arg == 'password':
+                    raise KeyError('No email or password changing here')
                 setattr(user, arg, data[arg])                
         else:
             raise WrongIdError('No user with this id')
@@ -101,7 +101,7 @@ def get_users(offset, size):
         for user in users:
             result.append({
                 'id': user.id,
-                'mail': user.mail,
+                'email': user.email,
                 'name': user.name,
                 'surname': user.surname,
                 'service_status': user.service_status,

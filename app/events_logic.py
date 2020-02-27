@@ -1,8 +1,8 @@
 from .config import cfg
 from .db import *
 from . import util
-from . import logger
-from .exceptions import (NotJsonError, NoData, WrongIdError, JoinUserError)
+import logging
+from .exceptions import (NotJsonError, WrongIdError, JoinUserError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc, or_
@@ -13,12 +13,12 @@ import os
 import nanoid
 
 
-def get_event_info(event_id):
+def get_event_info(e_id):
     with get_session() as s:
         event = s.query(Event, Participation, User).filter(
-                Event.id == event_id,
-                Participation.event == Event.id,
-                Participation.participant == User.id,
+                Event.id == e_id,
+                Participation.e_id == Event.id,
+                Participation.u_id == User.id,
                 Participation.participation_role == 'creator'
         ).first()
 
@@ -26,7 +26,7 @@ def get_event_info(event_id):
             raise WrongIdError('No event with this id')
 
         return {
-            "creator_mail": event.User.mail,
+            "creator_mail": event.User.email,
             "phone": event.User.phone,
             "name": event.Event.name,
             "sm_description": event.Event.sm_description,
@@ -69,7 +69,7 @@ def get_events(offset, size):
     return result
 
 
-def create_event(user_id, data):
+def create_event(u_id, data):
     start_date = data['start_date'].split('-')
     date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
 
@@ -91,23 +91,21 @@ def create_event(user_id, data):
         s.add(event)
         s.flush()
         s.refresh(event)
-        participation = Participation(event=event.id, participant=user_id,
+        participation = Participation(e_id=event.id, u_id=u_id,
                                       participation_role='creator')
 
-        logger.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
+        logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
                                                                  date_end,
                                                                  start_time))
         return event.id
 
 
-def update_event(user_id, event_id, data):
+def update_event(e_id, data):
     with get_session() as s:
-        event = s.query(Event).get(event_id)
+        event = s.query(Event).get(e_id)
         if not event:
             raise WrongIdError('No event with this id')
-        
-
 
         for arg in data.keys():
             getattr(event, arg)
@@ -124,11 +122,11 @@ def update_event(user_id, event_id, data):
             
 
 
-def check_participation(user_id, event_id):
+def check_participation(u_id, e_id):
     with get_session() as s:
         participation = s.query(Participation).filter(
-                Participation.event == event_id,
-                Participation.participant == user_id
+                Participation.e_id == e_id,
+                Participation.u_id == u_id
         ).one_or_none()
         if participation:
             return participation.participation_role
@@ -136,15 +134,15 @@ def check_participation(user_id, event_id):
             return 'not joined'
 
 
-def get_presenters(id):
+def get_presenters(e_id):
     result = []
     with get_session() as s:
-        event = s.query(Event).get(id)
+        event = s.query(Event).get(e_id)
         if not event:
             raise WrongIdError('No event with this id')
         users = s.query(User, Participation).filter(
-                User.id == Participation.participant,
-                Participation.event == id,
+                User.id == Participation.u_id,
+                Participation.e_id == e_id,
                 Participation.participation_role == 'presenter' 
         ).all()
 
@@ -159,21 +157,20 @@ def get_presenters(id):
     return result
 
 
-def join_event(user_id, event_id, data):
+def join_event(u_id, e_id, data):
     with get_session() as s:
-        event = s.query(Event).get(event_id)
+        event = s.query(Event).get(e_id)
         if not event:
             raise WrongIdError('No event with this id')
 
         is_consists = s.query(Participation).filter(
-                Participation.participant == user_id,
-                Participation.event == event_id
+                Participation.participant == u_id,
+                Participation.e_id == e_id
         ).one_or_none()
 
         if not is_consists:
             role = 'viewer'
-            participation = Participation(event=event_id,
-                                          participant=user_id,
+            participation = Participation(e_id=e_id, u_id=u_id,
                                           participation_role='viewer')
             if data['role'] == 'presenter':
                 participation.participation_role = 'presenter'
@@ -181,8 +178,8 @@ def join_event(user_id, event_id, data):
                 participation.presenter_description = data['presenter_description']
                 role = 'presenter'
             s.add(participation)
-            logger.info('User [id {}] joined event [id {}] as [{}]'.format(user_id,
-                                                                    event_id,
+            logging.info('User [id {}] joined event [id {}] as [{}]'.format(u_id,
+                                                                    e_id,
                                                                     role))
         else:
             raise JoinUserError('User has already joined this event as [{}]!'.format(is_consists.participation_role))
