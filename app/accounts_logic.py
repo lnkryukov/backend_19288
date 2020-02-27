@@ -111,6 +111,7 @@ def self_delete(u_id, password):
         pw = str(user.password).encode('utf-8')
         if bcrypt.checkpw(opw, pw):
             user.account_status = 'deleted'
+            user.cookie_id = uuid.uuid4()
             user.phone = None
             user.organization = None
             user.position = None

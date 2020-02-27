@@ -81,8 +81,7 @@ def change_password():
 def close_all_sessions():
     data = get_json()
 
-    user = accounts_logic.close_all_sessions(current_user.id,
-                                             data['password'])
+    user = accounts_logic.close_all_sessions(current_user.id, data['password'])
     if user:
         login_user(user)
         return make_200('Logout from all other sessions.', user.service_status)
@@ -90,12 +89,12 @@ def close_all_sessions():
         return make_422('Invalid password')
 
 
-bp.route('/delete', methods=['POST'])
+@bp.route('/delete', methods=['POST'])
 @fresh_login_required
 def self_delete():
     data = get_json()
 
-    ans = accounts_logic.self_delete(current_user.id, password)
+    ans = accounts_logic.self_delete(current_user.id, data['password'])
     if ans:
         logout_user()
         return make_200('Successfully delete account.')
