@@ -93,9 +93,9 @@ def get_users(offset, size):
             size = int(size)
             if offset < 0 or size < 1:
                 raise WrongDataError('Offset or size has wrong values')
-            events = events.slice(offset, offset+size)
+            users = users.slice(offset, offset+size)
         elif not offset and not size:
-            events = events.all()
+            users = users.all()
         else:
             raise KeyError('Wrong query string arg.')
         for user in users:
