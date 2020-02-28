@@ -118,6 +118,3 @@ service.log
 git-aacp
 git-ak
 todo.md
-routes_test.py
-testing.py
-tests/
