@@ -1,5 +1,5 @@
 from sqlalchemy import (Column, Integer, String, ForeignKey,
-                        DateTime, Boolean, UniqueConstraint)
+                        DateTime, Date, Time, Boolean, UniqueConstraint)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import ENUM, UUID, TEXT
 from flask_login import UserMixin
@@ -56,9 +56,9 @@ class Event(Base):
     sm_description = Column(String, nullable=False)
     description = Column(String, nullable=False)
 
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=True)
-    start_time = Column(DateTime, nullable=True)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=True)
+    start_time = Column(Time, nullable=True)
 
     location = Column(String, nullable=False)
     site_link = Column(String, nullable=False)

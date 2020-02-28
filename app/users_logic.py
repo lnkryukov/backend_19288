@@ -60,7 +60,7 @@ def get_user_events_by_role(u_id, role, offset, size):
             result.append({
                 'id': event.id,
                 'name': event.name,
-                'start_date': event.start_date
+                'start_date': event.start_date.isoformat()
             })
     return result
 

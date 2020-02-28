@@ -7,7 +7,7 @@ from .exceptions import (NotJsonError, WrongIdError, JoinUserError)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc, or_
 
-from datetime import date, time
+from datetime import date, time, timezone
 import requests
 import os
 import nanoid
@@ -31,9 +31,9 @@ def get_event_info(e_id):
             "name": event.Event.name,
             "sm_description": event.Event.sm_description,
             "description": event.Event.description,
-            "start_date": event.Event.start_date,
-            "end_date": event.Event.end_date,
-            "start_time": event.Event.start_time,
+            "start_date": event.Event.start_date.isoformat(),
+            "end_date": event.Event.end_date.isoformat(),
+            "start_time": event.Event.start_time.isoformat(),
             "location": event.Event.location,
             "site_link": event.Event.site_link,
             "additional_info": event.Event.additional_info
@@ -60,9 +60,9 @@ def get_events(offset, size):
                 'id': event.id,
                 'name': event.name,
                 'sm_description': event.sm_description,
-                'start_date': event.start_date,
-                'end_date': event.end_date,
-                'start_time': event.start_time,
+                'start_date': event.start_date.isoformat(),
+                'end_date': event.end_date.isoformat(),
+                'start_time': event.start_time.isoformat(),
                 'location': event.location,
                 'site_link': event.site_link
             })
@@ -73,14 +73,14 @@ def create_event(u_id, data):
     start_date = data['start_date'].split('-')
     date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
 
-    date_end = None
-    start_time = None
+    date_end = date_start
+    time_start = None
     if 'end_date' in data.keys():
         end_date = data['end_date'].split('-')
         date_end = date(int(end_date[0]), int(end_date[1]), int(end_date[2]))
     if 'start_time' in data.keys():
         start_time = data['start_time'].split(':')
-        time_start = time(int(start_time[0]), int(start_time[1]), 0, 0)
+        time_start = time(int(start_time[0]), int(start_time[1]), 0, 0, timezone.utc)
     
     with get_session() as s:
         event = Event(name=data['name'], sm_description=data['sm_description'],
@@ -93,6 +93,7 @@ def create_event(u_id, data):
         s.refresh(event)
         participation = Participation(e_id=event.id, u_id=u_id,
                                       participation_role='creator')
+        s.add(participation)
 
         logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
@@ -109,10 +110,10 @@ def update_event(e_id, data):
 
         for arg in data.keys():
             getattr(event, arg)
-            if arg == 'start_date' or 'end_date':
+            if arg == 'start_date' or arg == 'end_date':
                 sdate = data[arg].split('-')
-                date_start = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
-                setattr(event, arg, date_start)
+                date_s = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
+                setattr(event, arg, date_s)
             elif arg == 'start_time':
                 start_time = data[arg].split(':')
                 time_start = time(int(start_time[0]), int(start_time[1]), 0, 0)
@@ -164,7 +165,7 @@ def join_event(u_id, e_id, data):
             raise WrongIdError('No event with this id')
 
         is_consists = s.query(Participation).filter(
-                Participation.participant == u_id,
+                Participation.u_id == u_id,
                 Participation.e_id == e_id
         ).one_or_none()
 

@@ -68,7 +68,7 @@ def make_415(err='Wrong data'):
 
 def make_422(err):
     if isinstance(err, ValueError):
-        err = 'Some numbers have wrong data!'
+        err = 'Wrong data!'
     if isinstance(err, IndexError):
         err = 'Incorrect date or time format'
     logging.warning('422 - [{}]'.format(str(err)))
