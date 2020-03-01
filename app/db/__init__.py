@@ -36,11 +36,11 @@ def create_tables(password):
     logging.info('Tables was created')
     with get_session() as s:
         root = User(
-            email='root_mail',
+            email=cfg.SUPER_ADMIN_MAIL,
             password=password,
-            name='Name',
-            surname='Surname',
-            service_status='admin',
+            name='Super',
+            surname='Admin',
+            service_status='superadmin',
             account_status='active',
             confirmation_link='none',
         )

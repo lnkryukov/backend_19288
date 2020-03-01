@@ -28,11 +28,14 @@ def user_loader(uc_id):
 def pre_login(email, password):
     with get_session() as s:
         user = s.query(User).filter(
-                User.email == email,
-                User.account_status == 'active'
+                User.email == email
         ).one_or_none()
 
         if not user:
+            raise WrongIdError('Invalid user')
+        if user.account_status == 'banned':
+            raise RegisterUserError('Trying to login banned user!')
+        if user.account_status == 'deleted':
             raise WrongIdError('Invalid user')
 
         pw = str(password).encode('utf-8')
@@ -169,7 +172,8 @@ def self_delete(u_id, password):
 def ban_user(u_id):
     with get_session() as s:
         user = s.query(User).filter(
-                User.id == u_id
+                User.id == u_id,
+                User.service_status != 'superadmin'
         ).one_or_none()
 
         if not user:
@@ -181,7 +185,8 @@ def change_privileges(u_id, role):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == u_id,
-                User.account_status == 'active'
+                User.account_status == 'active',
+                User.service_status != 'superadmin'
         ).one_or_none()
 
         if not user:

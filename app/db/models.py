@@ -17,7 +17,7 @@ Account_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
                    name='account_status')
 Participation_role = ENUM('creator', 'manager', 'presenter', 'viewer',
                            name='participation_role')
-Service_status = ENUM('admin', 'moderator', 'user', name='service_status')
+Service_status = ENUM('superadmin', 'admin', 'moderator', 'user', name='service_status')
 
 
 class User(Base, UserMixin):

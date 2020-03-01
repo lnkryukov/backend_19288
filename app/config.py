@@ -20,6 +20,7 @@ cfg.DB_CONNECTION_STRING = _get_db_connection_string()
 cfg.RUNTIME_FOLDER = os.path.dirname(os.path.abspath(__file__))
 cfg.SCRIPTS_FOLDER = os.getenv('SCRIPT_FOLDER', '{}/scripts'.format(cfg.RUNTIME_FOLDER))
 
+cfg.SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
 cfg.DEFAULT_USER_STATUS = os.getenv('DEFAULT_USER_STATUS')
 cfg.MAKE_ALL_LOGS = os.getenv('MAKE_ALL_LOGS', False)
 

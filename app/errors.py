@@ -1,5 +1,6 @@
 from .rest_api import *
 from .exceptions import *
+from .util import send_500_email
 from sqlalchemy.exc import IntegrityError
 
 
@@ -9,6 +10,7 @@ def add_error_handlers(app):
     app.register_error_handler(404, route_not_found)
     app.register_error_handler(405, method_not_allowed)
     app.register_error_handler(415, wrong_request_type)
+    app.register_error_handler(500, send_500_email)
 
     app.register_error_handler(IntegrityError, make_400)
     app.register_error_handler(KeyError, make_400)

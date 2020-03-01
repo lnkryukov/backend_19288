@@ -38,3 +38,17 @@ def send_reset_email(email, new_password):
     msg['To'] = email
     server.send_message(msg)
     server.quit()
+
+
+def send_500_email(error):
+    server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
+    server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
+    message = str(error) 
+
+    msg = EmailMessage()
+    msg.set_content(message)
+    msg['Subject'] = "Your new password link"
+    msg['From'] = cfg.MAIL_LOGIN
+    msg['To'] = cfg.SUPER_ADMIN_MAIL
+    server.send_message(msg)
+    server.quit()

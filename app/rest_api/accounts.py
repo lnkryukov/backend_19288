@@ -100,11 +100,21 @@ def ban_user_by_id(u_id):
 
 
 @bp.route('/user/<int:u_id>/admin', methods=['PUT'])
+@login_required
+def change_privileges_to_admin_by_id(u_id):
+    if current_user.service_status is 'superadmin':
+        role=request.path[request.path.rfind('/') + 1:]
+        accounts_logic.change_privileges(u_id, role)
+        return make_200('Successfully changed privilegy of user')
+    else:
+        return make_403("No rights!")
+
+
 @bp.route('/user/<int:u_id>/moderator', methods=['PUT'])
 @bp.route('/user/<int:u_id>/user', methods=['PUT'])
 @login_required
 def change_privileges_by_id(u_id):
-    if current_user.service_status is 'admin':
+    if current_user.service_status in ['superadmin', 'admin']:
         role=request.path[request.path.rfind('/') + 1:]
         accounts_logic.change_privileges(u_id, role)
         return make_200('Successfully changed privilegy of user')
