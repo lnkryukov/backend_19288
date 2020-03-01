@@ -1,8 +1,10 @@
 from .requester import test_route
 from colorama import init, Fore, Back, Style
+import os
 
 
 def test_accounts():
+    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'LOGIN with incorrect email',
                     'url': '/login',
@@ -17,7 +19,7 @@ def test_accounts():
     {'description': 'LOGIN with incorrect password',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": "root_mail", "password": "123456789"},
+                    'data': {"email": SUPER_ADMIN_MAIL, "password": "123456789"},
                     'valid_code': '<Response [422]>',
                     'valid_data': {'error': 'Invalid password'},
                     'need_decision': False,
@@ -27,7 +29,7 @@ def test_accounts():
     {'description': 'LOGIN with incorrect keys',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"mail": "root_mail", "password": "1234"},
+                    'data': {"mail": SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [400]>',
                     'valid_data': {'error': 'Wrong json key(s)!'},
                     'need_decision': False,
@@ -37,9 +39,9 @@ def test_accounts():
     {'description': 'LOGIN correct',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": "root_mail", "password": "1234"},
+                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'User was logined', 'extra': 'admin'},
+                    'valid_data': {'description': 'User was logined', 'extra': 'superadmin'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': True,
@@ -48,7 +50,7 @@ def test_accounts():
     {'description': 'LOGIN repeat correct',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": "root_mail", "password": "1234"},
+                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [409]>',
                     'valid_data': {'error': 'User is currently authenticated!'},
                     'need_decision': False,
@@ -78,7 +80,7 @@ def test_accounts():
     {'description': 'REGISTER user exists',
                     'url': '/register',
                     'method': 'post',
-                    'data': {"email": "root_mail", "name": "naaaaaaaame", "surname": "surnaaaaaaaame", "password": "1234"},
+                    'data': {"email": SUPER_ADMIN_MAIL, "name": "naaaaaaaame", "surname": "surnaaaaaaaame", "password": "1234"},
                     'valid_code': '<Response [409]>',
                     'valid_data': {'error': 'Trying to register existing user'},
                     'need_decision': False,
@@ -88,7 +90,7 @@ def test_accounts():
     {'description': 'REGISTER then login',
                     'url': '/register',
                     'method': 'post',
-                    'data': {"email": "root_mail", "password": "1234"},
+                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [409]>',
                     'valid_data': {'error': 'User is currently authenticated!'},
                     'need_decision': False,
@@ -244,8 +246,8 @@ def test_accounts():
                     'url': '/login',
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "password": "1234"},
-                    'valid_code': '<Response [404]>', # move to 409 banned
-                    'valid_data':  {'error': 'Invalid user'},
+                    'valid_code': '<Response [409]>',
+                    'valid_data': {'error': 'Trying to login banned user!'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False

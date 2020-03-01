@@ -2,10 +2,11 @@ from .requester import test_route
 from colorama import init, Fore, Back, Style
 import requests
 import json
+import os
 
 
 def test_events(cookies={}):
-
+    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'CREATE EVENT wrong keys',
                     'url': '/event/',
@@ -237,7 +238,7 @@ def test_events(cookies={}):
 
     if not hasattr(cookies, 'admin'):
         data = {
-            "email": "root_mail",
+            "email": SUPER_ADMIN_MAIL,
             "password": "1234"
         }
         answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})

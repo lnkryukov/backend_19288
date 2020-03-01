@@ -2,15 +2,18 @@ from .requester import test_route
 from colorama import init, Fore, Back, Style
 import requests
 import json
+import os
+
 
 def test_users(cookies={}):
+    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'GET CURRENT USER INFO',
                     'url': '/user/',
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'country': None, 'email': 'root_mail', 'name': 'Name', 'organization': None, 'phone': None, 'position': None, 'service_status': 'admin', 'surname': 'Surname'},
+                    'valid_data': {'bio': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'Super', 'organization': None, 'phone': None, 'position': None, 'service_status': 'superadmin', 'surname': 'Admin'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -20,7 +23,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'service_status': 'admin'},
+                    'valid_data': {'service_status': 'superadmin'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -50,7 +53,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'country': None, 'email': 'root_mail', 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'admin', 'surname': 'Surname'},
+                    'valid_data': {'bio': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'superadmin', 'surname': 'Admin'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -233,7 +236,7 @@ def test_users(cookies={}):
 
     if not hasattr(cookies, 'admin'):
         data = {
-            "email": "root_mail",
+            "email": SUPER_ADMIN_MAIL,
             "password": "1234"
         }
         answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
