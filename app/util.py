@@ -24,3 +24,17 @@ def send_email(email, link):
     msg['To'] = email
     server.send_message(msg)
     server.quit()
+
+
+def send_reset_email(email, new_password):
+    server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
+    server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
+    message = 'Your new password - ' + new_password 
+
+    msg = EmailMessage()
+    msg.set_content(message)
+    msg['Subject'] = "Your new password link"
+    msg['From'] = cfg.MAIL_LOGIN
+    msg['To'] = email
+    server.send_message(msg)
+    server.quit()

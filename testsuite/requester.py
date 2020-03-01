@@ -8,7 +8,10 @@ root_url = 'http://127.0.0.1:45000'
 json_headers = {'Content-type': 'application/json'}
 
 
-def test_route(url, cookies, method, data, i, description, valid_code, valid_data, code_passed, data_passed, data_skipped, get_cookie, skippable):
+def test_route(i, code_passed, data_passed,
+               description, url, method, data,
+               valid_code, valid_data, need_decision,
+               cookie, get_cookie):
     print(Back.BLUE + '=======================( TEST [' + str(i+1) + '] )=======================' + Style.RESET_ALL)
     print()
     print('url: ' + url)
@@ -16,18 +19,18 @@ def test_route(url, cookies, method, data, i, description, valid_code, valid_dat
     print('test: ' + description)
     print()
     if method == 'post':
-        if cookies:
-            answer = requests.post(root_url + url, data=json.dumps(data), headers=json_headers, cookies=cookies)
+        if cookie:
+            answer = requests.post(root_url + url, data=json.dumps(data), headers=json_headers, cookies=cookie)
         else:
             answer = requests.post(root_url + url, data=json.dumps(data), headers=json_headers)
     elif method == 'get':
-        if cookies:
-            answer = requests.get(root_url + url, cookies=cookies)
+        if cookie:
+            answer = requests.get(root_url + url, cookies=cookie)
         else:
             answer = requests.get(root_url + url)
     elif method == 'put':
-        if cookies:
-            answer = requests.put(root_url + url, data=json.dumps(data), headers=json_headers, cookies=cookies)
+        if cookie:
+            answer = requests.put(root_url + url, data=json.dumps(data), headers=json_headers, cookies=cookie)
         else:
             answer = requests.put(root_url + url, data=json.dumps(data), headers=json_headers)
     else:
@@ -56,13 +59,17 @@ def test_route(url, cookies, method, data, i, description, valid_code, valid_dat
         print(Back.GREEN + '>>DATA PASS' + Style.RESET_ALL)
         data_passed += 1
     else:
-        if skippable:
-            print(Back.MAGENTA + '>>DATA SKIP' + Style.RESET_ALL)
-            data_skipped += 1
+        if need_decision:
+            ans = input(Back.MAGENTA + 'DECISION (YES/other): ' + Style.RESET_ALL)
+            if ans == 'YES':
+                print(Back.GREEN + '>>DATA PASS' + Style.RESET_ALL)
+                data_passed += 1
+            else:
+                print(Back.RED + '>>DATA ERR' + Style.RESET_ALL)
         else:
             print(Back.RED + '>>DATA ERR' + Style.RESET_ALL)
     i += 1
     print()
     if get_cookie:
-        return i, answer.cookies, code_passed, data_passed, data_skipped
-    return i, code_passed, data_passed, data_skipped
+        return i, code_passed, data_passed, answer.cookies
+    return i, code_passed, data_passed

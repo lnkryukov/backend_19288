@@ -88,6 +88,23 @@ def change_password(u_id, old_password, new_password):
             return None
 
 
+def reset_password(email):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.email == email,
+                User.account_status == 'active'
+        ).one_or_none()
+
+        if not user:
+            raise WrongIdError('Invalid user')
+
+        new_password = util.random_string_digits(20)
+        npw = bcrypt.hashpw(str(new_password).encode('utf-8'), bcrypt.gensalt())
+        user.password = npw.decode('utf-8')
+        user.cookie_id = uuid.uuid4()
+        util.send_reset_email(email, new_password)        
+
+
 def close_all_sessions(u_id, password):
     with get_session() as s:
         user = s.query(User).filter(
@@ -131,3 +148,19 @@ def ban_user(u_id):
         if not user:
             raise WrongIdError('No user with this id')
         user.account_status = 'banned'
+
+
+def change_privileges(u_id, role):
+    with get_session() as s:
+        user = s.query(User).filter(
+                User.id == u_id,
+                User.account_status == 'active'
+        ).one_or_none()
+
+        if not user:
+            raise WrongIdError('No user with this id')
+
+        if user.service_status == role:
+            raise JoinUserError('User already has that role!')
+        
+        user.service_status = role

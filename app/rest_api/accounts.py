@@ -62,7 +62,7 @@ def confirm():
 
 
 @bp.route('/change_password', methods=['POST'])
-@fresh_login_required
+@login_required #@fresh_login_required
 def change_password():
     data = get_json()
 
@@ -76,8 +76,16 @@ def change_password():
         return make_422('Invalid password')
 
 
+@bp.route('/reset_password', methods=['POST'])
+def reset_password():
+    data = get_json()
+
+    accounts_logic.reset_password(data['email'])
+    return make_200('Successfully reset password - see new in your email')
+
+
 @bp.route('/close_all_sessions', methods=['POST'])
-@fresh_login_required
+@login_required #@fresh_login_required
 def close_all_sessions():
     data = get_json()
 
@@ -90,7 +98,7 @@ def close_all_sessions():
 
 
 @bp.route('/delete', methods=['POST'])
-@fresh_login_required
+@login_required #@fresh_login_required
 def self_delete():
     data = get_json()
 
@@ -108,5 +116,18 @@ def ban_user_by_id(u_id):
     if current_user.service_status is not 'user':
         accounts_logic.ban_user(u_id)
         return make_200('Successfully baned this user')
+    else:
+        return make_403("No rights!")
+
+
+@bp.route('/user/<int:u_id>/admin', methods=['PUT'])
+@bp.route('/user/<int:u_id>/moderator', methods=['PUT'])
+@bp.route('/user/<int:u_id>/user', methods=['PUT'])
+@login_required
+def change_privileges_by_id(u_id):
+    if current_user.service_status is 'admin':
+        role=request.path[request.path.rfind('/') + 1:]
+        accounts_logic.change_privileges(u_id, role)
+        return make_200('Successfully changed privilegy of user')
     else:
         return make_403("No rights!")
