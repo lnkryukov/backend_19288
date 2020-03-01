@@ -1,4 +1,4 @@
-from . import auth
+from .accounts_logic import user_loader
 from .config import cfg
 from .rest_api import accounts, users, events
 from .errors import add_error_handlers, on_json_loading_failed
@@ -30,7 +30,7 @@ CORS(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.user_loader(auth.user_loader)
+login_manager.user_loader(user_loader)
 
 #logger = logging.getLogger('eventsproj')
 #formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')

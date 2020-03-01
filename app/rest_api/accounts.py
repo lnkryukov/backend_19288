@@ -3,10 +3,8 @@ from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user, fresh_login_required,
                          user_needs_refresh)
 
-import bcrypt
-
 from . import *
-from .. import auth, accounts_logic
+from .. import accounts_logic
 
 
 bp = Blueprint('accounts', __name__)
@@ -19,17 +17,9 @@ def login():
 
     data = get_json()
 
-    user = auth.check_user(data['email'])
-    if user:
-        pw = str(data['password']).encode('utf-8')
-        upw = str(user.password).encode('utf-8')
-        if bcrypt.checkpw(pw, upw):
-            login_user(user)
-            return make_200('User was logined', user.service_status)
-        else:
-            return make_422('Invalid password')
-    else:
-        return make_404('Invalid user')
+    user = accounts_logic.pre_login(data['email'], data['password'])
+    login_user(user)
+    return make_200('User was logined', user.service_status)
 
 
 @bp.route('/logout', methods=['GET', 'POST'])
@@ -46,10 +36,8 @@ def register():
 
     data = get_json()
 
-    pw = bcrypt.hashpw(str(data['password']).encode('utf-8'),
-                       bcrypt.gensalt())
     accounts_logic.register_user(data['email'], data['name'],
-                                 data['surname'], pw.decode('utf-8'))
+                                 data['surname'], data['password'])
     return make_201('User was registered.')
 
 
@@ -69,11 +57,8 @@ def change_password():
     user = accounts_logic.change_password(current_user.id,
                                           data['old_password'],
                                           data['new_password'])
-    if user:
-        login_user(user)
-        return make_200('Password has beed changed', user.service_status)
-    else:
-        return make_422('Invalid password')
+    login_user(user)
+    return make_200('Password has beed changed', user.service_status)
 
 
 @bp.route('/reset_password', methods=['POST'])
@@ -90,11 +75,8 @@ def close_all_sessions():
     data = get_json()
 
     user = accounts_logic.close_all_sessions(current_user.id, data['password'])
-    if user:
-        login_user(user)
-        return make_200('Logout from all other sessions.', user.service_status)
-    else:
-        return make_422('Invalid password')
+    login_user(user)
+    return make_200('Logout from all other sessions.', user.service_status)
 
 
 @bp.route('/delete', methods=['POST'])
@@ -102,12 +84,9 @@ def close_all_sessions():
 def self_delete():
     data = get_json()
 
-    ans = accounts_logic.self_delete(current_user.id, data['password'])
-    if ans:
-        logout_user()
-        return make_200('Successfully delete account.')
-    else:
-        return make_422('Invalid password')
+    accounts_logic.self_delete(current_user.id, data['password'])
+    logout_user()
+    return make_200('Successfully delete account.')
 
 
 @bp.route('/user/<int:u_id>/ban', methods=['GET'])
