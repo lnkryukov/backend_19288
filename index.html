@@ -200,7 +200,7 @@
         <h2 class="mb-5">Running</h2>
         <p>Сервис берёт свои настройки (БД, параметры почты и др.) через переменные окружения, поэтому рекомендуется использовать специальный скрипт (например <a class="js-scroll-trigger" href="#setup">setup.sh</a>) и инициилизировать переменные окручения через <kbd>. setup.sh</kbd> / <kbd>source setup.sh</kbd></p>
         <p></p>
-        <p>При первом запуске необходимо указать <kbd>--create-tables password</kbd>, где первый параметр (пере)создает в БД нужные таблицы, а второй - пароль от начальной учетной записи <code>root_mail</code></p>
+        <p>При первом запуске необходимо указать <kbd>--create-tables password</kbd>, где первый параметр (пере)создает в БД нужные таблицы, а второй - пароль от начальной учетной записи <code>SUPER_ADMIN_MAIL</code>, определенной в <code>setup.sh</code></p>
         <p></p>
         <p>Запуск происходит через <kbd>python3 main.py</kbd> или же через <kbd>nohup python3 main.py > service.log &</kbd> если необходимо запустить сервис в фоне с записью логов в <code>service.log</code></p>
       </div>
@@ -230,6 +230,8 @@
         <code># порт приложения</code>
         <div><kbd>export PORT=""</kbd></div>
         <p></p>
+        <code># почта супер-администратора</code>
+        <div><kbd>export SUPER_ADMIN_MAIL=""</kbd></div>
         <code># подтверждение регистрации по электронной почте</code>
         <code># 'active' (account_status) для отключения подтверждения</code>
         <code># 'unconfirmed' (account_status) для включения</code>
@@ -281,7 +283,7 @@
           <li>Авторизация пользователя в системе.</li>
           <li><code>Принимает</code></li>
           <ul>
-            <li><kbd>mail</kbd> - почта пользователя</li>
+            <li><kbd>email</kbd> - почта пользователя</li>
             <li><kbd>password</kbd> - пароль пользователя</li>
           </ul>
           <li><code>200 OK</code></li>
@@ -292,6 +294,7 @@
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>404 - </code>пользователь не найден</li>
           <li><code>409 - </code>пользователь уже авторизован</li>
+          <li><code>409 - </code>попытка авторизации в забаненого пользователя</li>
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
           <li><code>422 - </code>неверный пароль</li>
         </ul>
@@ -311,7 +314,7 @@
           <li>Регистрация пользователя в системе.</li>
           <li><code>Принимает</code></li>
           <ul>
-            <li><kbd>mail</kbd> - почта пользователя</li>
+            <li><kbd>email</kbd> - почта пользователя</li>
             <li><kbd>name</kbd> - имя пользователя</li>
             <li><kbd>surname</kbd> - фамилия пользователя</li>
             <li><kbd>password</kbd> - пароль пользователя</li>
@@ -322,7 +325,7 @@
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>409 - </code>пользователь уже авторизован</li>
-          <li><code>409 - </code>пользователь с таким <code>mail</code> уже зарегистрирован или забанен</li>
+          <li><code>409 - </code>пользователь с таким <code>email</code> уже зарегистрирован или забанен</li>
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
@@ -339,7 +342,7 @@
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>404 - </code>пользователь с таким <code>link</code> не найден</li>
-          <li><code>409 - </code>пользователь с таким <code>link</code> уже подтвержден</li>
+          <li><code>409 - </code>пользователь с таким <code>link</code> уже подтвержден или не может быть подтверждён</li>
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
@@ -360,6 +363,23 @@
           <li><code>401 - </code>не залогинен</li>
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
           <li><code>422 - </code>неверный пароль</li>
+          <li><code>422 - </code>старый пароль совпадает с новым</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/reset_password</kbd><code> - [POST]</code></div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Сброс пароля.</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>email</kbd> - почта аккаунта</li>
+          </ul>
+          <li><code>200 OK</code></li>
+          <ul>
+            <li><kbd>description</kbd> с указанием посмотреть новый пароль на почте</li>
+          </ul>
+          <li><code>400 - </code>некорректные ключи json</li>
+          <li><code>404 - </code>пользователь с таким <code>email</code> не найден</li>
+          <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
         <div class="text-warning"><kbd>/close_all_sessions</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
@@ -412,7 +432,24 @@
           <li><code>401 - </code>не залогинен</li>
           <li><code>403 - </code>нет прав на выполнение</li>
           <li><code>404 - </code>пользователь с таким <code>id</code> не найден</li>
-          <li><code>422 - </code>неверный пароль</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/user/[id]/[status]</kbd><code> - [PUT] - </code>LOGIN+RIGHTS REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Изменение привилегий.</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id пользователя из url</li>
+            <li><kbd>[status]</kbd> - новый status для пользователя из url - <code>admin</code>/<code>moderator</code>/<code>user</code></li>
+          </ul>
+          <li><code>200 OK</code></li>
+          <ul>
+            <li><kbd>description</kbd></li>
+          </ul>
+          <li><code>401 - </code>не залогинен</li>
+          <li><code>403 - </code>нет прав на выполнение</li>
+          <li><code>404 - </code>пользователь с таким <code>id</code> не найден</li>
+          <li><code>409 - </code>пользователь уже имеет такой статус</li>
         </ul>
       </div>
     </section>
@@ -430,7 +467,7 @@
           <li>Получение информации о текущем пользователе.</li>
           <li><code>200 OK</code></li>
           <ul>
-            <li><kbd>mail</kbd> - почта текущего пользователя</li>
+            <li><kbd>email</kbd> - почта текущего пользователя</li>
             <li><kbd>name</kbd> - имя текущего пользователя</li>
             <li><kbd>surname</kbd> - фамилия текущего пользователя</li>
             <li><kbd>service_status</kbd> - статус текущего пользователя в системе</li>
@@ -493,7 +530,7 @@
             <li>Список</li>
             <li><kbd>id</kbd> - id мероприятия</li>
             <li><kbd>name</kbd> - название мероприятия</li>
-            <li><kbd>start_date</kbd> - дата начала мероприятия</li>
+            <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
           </ul>
           <li><code>400 - </code>некорректные параметры query string</li>
           <li><code>401 - </code>не залогинен</li>
@@ -515,7 +552,7 @@
           <ul>
             <li>Список</li>
             <li><kbd>id</kbd> - id пользователя</li>
-            <li><kbd>mail</kbd> - почта пользователя</li>
+            <li><kbd>email</kbd> - почта пользователя</li>
             <li><kbd>name</kbd> - имя пользователя</li>
             <li><kbd>surname</kbd> - фамилия пользователя</li>
             <li><kbd>service_status</kbd> - статус пользователя</li>
@@ -536,7 +573,7 @@
           </ul>
           <li><code>200 OK</code></li>
           <ul>
-            <li><kbd>mail</kbd> - почта пользователя</li>
+            <li><kbd>email</kbd> - почта пользователя</li>
             <li><kbd>name</kbd> - имя пользователя</li>
             <li><kbd>surname</kbd> - фамилия пользователя</li>
             <li><kbd>service_status</kbd> - статус пользователя в системе</li>
@@ -569,7 +606,7 @@
             <li>Список</li>
             <li><kbd>id</kbd> - id мероприятия</li>
             <li><kbd>name</kbd> - название мероприятия</li>
-            <li><kbd>start_date</kbd> - дата начала мероприятия</li>
+            <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
           </ul>
           <li><code>400 - </code>некорректные параметры query string</li>
           <li><code>401 - </code>не залогинен</li>
@@ -588,32 +625,30 @@
         <p>Ручки, связанные с мероприятиями.</p>
         <p>Все ручки данной категории имеют префикс <code>/event</code> (т.е. первая ручка <code>/</code> является <code>/event/[id]</code>.</p>
 
-        <div class="text-warning"><kbd>/[id]</kbd><code> - [GET]</code></div>
+        <div class="text-warning"><kbd>/</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
         <ul class="list-group-flush" style="list-style-type:none;">
-          <li>Получение информации о мероприятии.</li>
+          <li>Создание мероприятия.</li>
           <li><code>Принимает</code></li>
           <ul>
-            <li><kbd>[id]</kbd> - id мероприяния из url</li>
+            <li><kbd>name</kbd> - название мероприятия</li>
+            <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
+            <li><kbd>description</kbd> - полное описание мероприятия</li>
+            <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
+            <li><kbd>end_date</kbd> - дата окончания мероприятия в iso формате (ключ может отсутствовать, если мероприятие проводится один день)</li>
+            <li><kbd>start_time</kbd> - время начала мероприятия в iso формате (может остуствовать, если мероприятие проводится несколько дней)</li>
+            <li><kbd>location</kbd> - место проведения мероприятия</li>
+            <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
+            <li><kbd>additional_info</kbd> - дополнительная информация мероприятия</li>
           </ul>
-          <li><code>200 OK</code></li>
+          <li><code>201 CREATED</code></li>
           <ul>
-            <li><kbd>part</kbd> - тип учатия в мероприятии (создатель, мэнэджер, докладчик и т.д.)</li>
-            <li><kbd>event</kbd> - данные по мероприятию</li>
-            <ul>
-              <li><kbd>creator_mail</kbd> - почта создателя мероприятия</li>
-              <li><kbd>phone</kbd> - телефон создателя мероприятия</li>
-              <li><kbd>name</kbd> - название мероприятия</li>
-              <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
-              <li><kbd>description</kbd> - полное описание мероприятия</li>
-              <li><kbd>start_date</kbd> - дата начала мероприятия</li>
-              <li><kbd>end_date</kbd> - дата окончания мероприятия (ключ может отсутствовать, если мероприятие проводится один день)</li>
-              <li><kbd>start_time</kbd> - время начала мероприятия (может остуствовать)</li>
-              <li><kbd>location</kbd> - место проведения мероприятия</li>
-              <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
-              <li><kbd>additional_info</kbd> - дополнительная информация мероприятия</li>
-            </ul>
+            <li><kbd>extra</kbd> - id созданного мероприятия</li>
           </ul>
-         <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
+          <li><code>400 - </code>некорректные ключи json</li>
+          <li><code>401 - </code>не залогинен</li>
+          <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
+          <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
+          <li><code>422 - </code>некорректные данные (скорее всего даты и время)</li>
         </ul>
 
         <div class="text-warning"><kbd>/[id]</kbd><code> - [PUT] - </code>LOGIN+RIGHTS REQUIRED</div>
@@ -628,9 +663,9 @@
               <li><kbd>name</kbd> - название мероприятия</li>
               <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
               <li><kbd>description</kbd> - полное описание мероприятия</li>
-              <li><kbd>start_date</kbd> - дата начала мероприятия</li>
-              <li><kbd>end_date</kbd> - дата окончания мероприятия (ключ может отсутствовать, если мероприятие проводится один день)</li>
-              <li><kbd>start_time</kbd> - время начала мероприятия (может остуствовать)</li>
+              <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
+              <li><kbd>end_date</kbd> - дата окончания мероприятия в iso формате (ключ может отсутствовать, если мероприятие проводится один день)</li>
+              <li><kbd>start_time</kbd> - время начала мероприятия в iso формате (может остуствовать)</li>
               <li><kbd>location</kbd> - место проведения мероприятия</li>
               <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
               <li><kbd>additional_info</kbd> - дополнительная информация мероприятия</li>
@@ -647,30 +682,32 @@
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
-        <div class="text-warning"><kbd>/</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
+        <div class="text-warning"><kbd>/[id]</kbd><code> - [GET]</code></div>
         <ul class="list-group-flush" style="list-style-type:none;">
-          <li>Создание мероприятия.</li>
+          <li>Получение информации о мероприятии.</li>
           <li><code>Принимает</code></li>
           <ul>
-            <li><kbd>name</kbd> - название мероприятия</li>
-            <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
-            <li><kbd>description</kbd> - полное описание мероприятия</li>
-            <li><kbd>start_date</kbd> - дата начала мероприятия</li>
-            <li><kbd>end_date</kbd> - дата окончания мероприятия (ключ может отсутствовать, если мероприятие проводится один день)</li>
-            <li><kbd>start_time</kbd> - время начала мероприятия (может остуствовать, если мероприятие проводится несколько дней)</li>
-            <li><kbd>location</kbd> - место проведения мероприятия</li>
-            <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
-            <li><kbd>additional_info</kbd> - дополнительная информация мероприятия</li>
+            <li><kbd>[id]</kbd> - id мероприяния из url</li>
           </ul>
-          <li><code>201 CREATED</code></li>
+          <li><code>200 OK</code></li>
           <ul>
-            <li><kbd>extra</kbd> - id созданного мероприятия</li>
+            <li><kbd>part</kbd> - тип учатия в мероприятии (создатель, мэнэджер, докладчик и т.д.)</li>
+            <li><kbd>event</kbd> - данные по мероприятию</li>
+            <ul>
+              <li><kbd>creator_email</kbd> - почта создателя мероприятия</li>
+              <li><kbd>phone</kbd> - телефон создателя мероприятия</li>
+              <li><kbd>name</kbd> - название мероприятия</li>
+              <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
+              <li><kbd>description</kbd> - полное описание мероприятия</li>
+              <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
+              <li><kbd>end_date</kbd> - дата окончания мероприятия в iso формате</li>
+              <li><kbd>start_time</kbd> - время начала мероприятия в iso формате</li>
+              <li><kbd>location</kbd> - место проведения мероприятия</li>
+              <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
+              <li><kbd>additional_info</kbd> - дополнительная информация мероприятия</li>
+            </ul>
           </ul>
-          <li><code>400 - </code>некорректные ключи json</li>
-          <li><code>401 - </code>не залогинен</li>
-          <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
-          <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
-          <li><code>422 - </code>некорректные данные (скорее всего даты и время)</li>
+         <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
         </ul>
 
         <div class="text-warning"><kbd>/all</kbd><code> - [GET]</code></div>
@@ -690,9 +727,9 @@
             <li><kbd>id</kbd> - id мероприятия</li>
             <li><kbd>name</kbd> - название мероприятия</li>
             <li><kbd>sm_description</kbd> - краткое описание мероприятия</li>
-            <li><kbd>start_date</kbd> - дата начала мероприятия</li>
-            <li><kbd>end_date</kbd> - дата окончания мероприятия (ключ может отсутствовать, если мероприятие проводится один день)</li>
-            <li><kbd>start_time</kbd> - время начала мероприятия (может остуствовать, если мероприятие проводится несколько дней)</li>
+            <li><kbd>start_date</kbd> - дата начала мероприятия в iso формате</li>
+            <li><kbd>end_date</kbd> - дата окончания мероприятия в iso формате</li>
+            <li><kbd>start_time</kbd> - время начала мероприятия в iso формате</li>
             <li><kbd>location</kbd> - место проведения мероприятия</li>
             <li><kbd>site_link</kbd> - ссылка на собственный сайт мероприятия</li>
           </ul>
