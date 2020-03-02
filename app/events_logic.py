@@ -26,7 +26,7 @@ def get_event_info(e_id):
             raise WrongIdError('No event with this id')
 
         return {
-            "creator_mail": event.User.email,
+            "creator_email": event.User.email,
             "phone": event.User.phone,
             "name": event.Event.name,
             "sm_description": event.Event.sm_description,

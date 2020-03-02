@@ -97,7 +97,7 @@ def confirm_user(confirmation_link):
                 user.account_status = 'active'
                 logging.info('User [{}] is confirmed'.format(user.email))
             else:
-                raise ConfirmationLinkError('User is currently confirmed by this link')
+                raise ConfirmationLinkError("User is currently confirmed by this link or can't be confirmed")
         else:
             raise WrongIdError('No user with this confirmation link')
 
