@@ -110,6 +110,8 @@ def update_event(e_id, data):
 
         for arg in data.keys():
             getattr(event, arg)
+            if arg == 'id':
+                raise JoinUserError("Can't change id")
             if arg == 'start_date' or arg == 'end_date':
                 sdate = data[arg].split('-')
                 date_s = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
