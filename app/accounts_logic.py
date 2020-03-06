@@ -21,7 +21,7 @@ def user_loader(uc_id):
     with get_session() as s:
         return s.query(User).filter(
                 User.cookie_id == uc_id,
-                User.account_status == 'active'
+                User.status == 'active'
         ).one_or_none()
 
 
@@ -33,9 +33,9 @@ def pre_login(email, password):
 
         if not user:
             raise WrongIdError('Invalid user')
-        if user.account_status == 'banned':
+        if user.status == 'banned':
             raise RegisterUserError('Trying to login banned user!')
-        if user.account_status == 'deleted':
+        if user.status == 'deleted':
             raise WrongIdError('Invalid user')
 
         pw = str(password).encode('utf-8')
@@ -65,14 +65,16 @@ def register_user(email, name, surname, password, service_status='user'):
         pw = bcrypt.hashpw(str(password).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         if user:
-            if user.account_status == 'deleted':
+            if user.status == 'deleted':
                 user.password = pw
                 user.name = name
                 user.surname = surname
-                user.account_status = cfg.DEFAULT_USER_STATUS
+                user.status = cfg.DEFAULT_USER_STATUS
                 user.confirmation_link = confirmation_link
                 user.service_status = service_status
-            elif user.account_status == 'banned':
+                user.registration_date = datetime.utcnow()
+                user.disable_date = None
+            elif user.status == 'banned':
                 raise RegisterUserError('User with this email was banned')
             else:
                 raise RegisterUserError('Trying to register existing user')
@@ -93,8 +95,8 @@ def confirm_user(confirmation_link):
                 User.confirmation_link == confirmation_link
         ).one_or_none()
         if user:
-            if user.account_status == 'unconfirmed':
-                user.account_status = 'active'
+            if user.status == 'unconfirmed':
+                user.status = 'active'
                 logging.info('User [{}] is confirmed'.format(user.email))
             else:
                 raise ConfirmationLinkError("User is currently confirmed by this link or can't be confirmed")
@@ -125,7 +127,7 @@ def reset_password(email):
     with get_session() as s:
         user = s.query(User).filter(
                 User.email == email,
-                User.account_status == 'active'
+                User.status == 'active'
         ).one_or_none()
 
         if not user:
@@ -160,13 +162,8 @@ def self_delete(u_id, password):
         pw = str(user.password).encode('utf-8')
         if not bcrypt.checkpw(opw, pw):
             raise WrongDataError('Invalid password')
-        user.account_status = 'deleted'
-        user.cookie_id = uuid.uuid4()
-        user.phone = None
-        user.organization = None
-        user.position = None
-        user.country = None
-        user.bio = None
+        user.status = 'deleted'
+        user.disable_date = datetime.utcnow()
 
 
 def ban_user(u_id):
@@ -178,14 +175,15 @@ def ban_user(u_id):
 
         if not user:
             raise WrongIdError('No user with this id')
-        user.account_status = 'banned'
+        user.status = 'banned'
+        user.disable_date = datetime.utcnow()
 
 
 def change_privileges(u_id, role):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == u_id,
-                User.account_status == 'active',
+                User.status == 'active',
                 User.service_status != 'superadmin'
         ).one_or_none()
 

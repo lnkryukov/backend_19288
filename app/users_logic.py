@@ -28,7 +28,9 @@ def get_user_info(u_id):
             "organization": user.organization,
             "position": user.position,
             "country": user.country,
-            "bio": user.bio
+            "town": user.town,
+            "bio": user.bio,
+            "birth": user.birth,
         }
 
 
@@ -60,6 +62,7 @@ def get_user_events_by_role(u_id, role, offset, size):
             result.append({
                 'id': event.id,
                 'name': event.name,
+                'status': event.status,
                 'start_date': event.start_date.isoformat()
             })
     return result
@@ -69,13 +72,13 @@ def update_profile(u_id, data):
     with get_session() as s:
         user = s.query(User).filter(
                 User.id == u_id,
-                User.account_status == 'active',
+                User.status == 'active',
         ).one_or_none()
 
         if user:
             for arg in data.keys():
                 getattr(user, arg)
-                if arg in ['email', 'password', 'id', 'account_status', 'confirmation_link', 'cookie_id', 'service_status']:
+                if arg in ['email', 'password', 'id', 'status', 'confirmation_link', 'cookie_id', 'service_status', 'registration_date', 'disable_date']:
                     raise KeyError('No email or password changing here')
                 setattr(user, arg, data[arg])                
         else:
@@ -105,6 +108,6 @@ def get_users(offset, size):
                 'name': user.name,
                 'surname': user.surname,
                 'service_status': user.service_status,
-                'account_status': user.account_status
+                'status': user.status
             })
     return result

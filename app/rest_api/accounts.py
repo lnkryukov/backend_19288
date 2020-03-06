@@ -19,7 +19,7 @@ def login():
 
     user = accounts_logic.pre_login(data['email'], data['password'])
     login_user(user)
-    return make_200('User was logined', user.service_status)
+    return make_200('User was logined')
 
 
 @bp.route('/logout', methods=['GET', 'POST'])
@@ -58,7 +58,7 @@ def change_password():
                                           data['old_password'],
                                           data['new_password'])
     login_user(user)
-    return make_200('Password has beed changed', user.service_status)
+    return make_200('Password has beed changed')
 
 
 @bp.route('/reset_password', methods=['POST'])
@@ -76,7 +76,7 @@ def close_all_sessions():
 
     user = accounts_logic.close_all_sessions(current_user.id, data['password'])
     login_user(user)
-    return make_200('Logout from all other sessions.', user.service_status)
+    return make_200('Logout from all other sessions.')
 
 
 @bp.route('/delete', methods=['POST'])
@@ -87,6 +87,12 @@ def self_delete():
     accounts_logic.self_delete(current_user.id, data['password'])
     logout_user()
     return make_200('Successfully delete account.')
+
+
+@bp.route('/status', methods=['GET'])
+@login_required
+def user_status():
+    return jsonify(service_status=current_user.service_status)
 
 
 @bp.route('/user/<int:u_id>/ban', methods=['GET'])

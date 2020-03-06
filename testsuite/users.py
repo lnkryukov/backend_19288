@@ -13,17 +13,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'Super', 'organization': None, 'phone': None, 'position': None, 'service_status': 'superadmin', 'surname': 'Admin'},
-                    'need_decision': False,
-                    'cookie': 'admin',
-                    'get_cookie': False
-    },
-    {'description': 'GET CURRENT USER STATUS',
-                    'url': '/user/status',
-                    'method': 'get',
-                    'data': {},
-                    'valid_code': '<Response [200]>',
-                    'valid_data': {'service_status': 'superadmin'},
+                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'Super', 'organization': None, 'phone': None, 'position': None, 'service_status': 'superadmin', 'surname': 'Admin', 'town': None},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -33,7 +23,7 @@ def test_users(cookies={}):
                     'method': 'put',
                     'data': {"email": "mail@mail", "password": "1234", "name": "kek"},
                     'valid_code': '<Response [400]>',
-                    'valid_data': {'error': 'No email or password changing here'},
+                    'valid_data': {'error': 'Wrong json key(s)!'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -53,7 +43,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'superadmin', 'surname': 'Admin'},
+                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'superadmin', 'surname': 'Admin', 'town': None},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False

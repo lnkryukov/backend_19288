@@ -41,8 +41,8 @@ def create_tables(password):
             name='Super',
             surname='Admin',
             service_status='superadmin',
-            account_status='active',
+            status='active',
             confirmation_link='none',
         )
         s.add(root)
-    logging.info('Default user with mail [root_mail] was created')
+    logging.info('Default user with mail [' + cfg.SUPER_ADMIN_MAIL + '] was created')

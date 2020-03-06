@@ -34,6 +34,18 @@ def put_event_by_id(e_id):
         return make_403("No rights!")
 
 
+@bp.route('/<int:e_id>/delete', methods=['GET'])
+@login_required
+def delete_event_by_id(e_id):
+    if (current_user.service_status is not 'user' or
+        events_logic.check_participation(current_user.id, e_id) is 'creator'):
+
+        events_logic.delete_event(e_id)
+        return make_200('Successfully deleted.')
+    else:
+        return make_403("No rights!")
+
+
 @bp.route('/', methods=['POST'])
 @login_required
 def create_event():

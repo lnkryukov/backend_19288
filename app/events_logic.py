@@ -18,6 +18,7 @@ def get_event_info(e_id):
         event = s.query(Event, Participation, User).filter(
                 Event.id == e_id,
                 Participation.e_id == Event.id,
+                Event.status == 'active',
                 Participation.u_id == User.id,
                 Participation.participation_role == 'creator'
         ).first()
@@ -43,7 +44,7 @@ def get_event_info(e_id):
 def get_events(offset, size):
     result = []
     with get_session() as s:
-        events = s.query(Event).order_by(desc(Event.start_date))
+        events = s.query(Event).filter(Event.status == 'active').order_by(desc(Event.start_date))
         if offset and size:
             offset = int(offset)
             size = int(size)
@@ -105,13 +106,13 @@ def create_event(u_id, data):
 def update_event(e_id, data):
     with get_session() as s:
         event = s.query(Event).get(e_id)
-        if not event:
+        if not event or event.status == 'deleted':
             raise WrongIdError('No event with this id')
 
         for arg in data.keys():
             getattr(event, arg)
-            if arg == 'id':
-                raise JoinUserError("Can't change id")
+            if arg in ['id', 'status', 'views']:
+                raise JoinUserError("Can't change this field")
             if arg == 'start_date' or arg == 'end_date':
                 sdate = data[arg].split('-')
                 date_s = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
@@ -122,17 +123,29 @@ def update_event(e_id, data):
                 setattr(event, arg, time_start)
             else:
                 setattr(event, arg, data[arg])
-            
 
+
+def delete_event(e_id):
+    with get_session() as s:
+        event = s.query(Event).get(e_id)
+        if not event:
+            raise WrongIdError('No event with this id')
+        if event.status == 'deleted':
+            raise JoinUserError("Event already deleted")
+
+        event.status = 'deleted'
+            
 
 def check_participation(u_id, e_id):
     with get_session() as s:
-        participation = s.query(Participation).filter(
+        participation = s.query(Event, Participation).filter(
+                Participation.e_id == Event.id,
+                Event.status == 'active',
                 Participation.e_id == e_id,
                 Participation.u_id == u_id
         ).one_or_none()
         if participation:
-            return participation.participation_role
+            return participation.Participation.participation_role
         else:
             return 'not joined'
 
@@ -141,7 +154,7 @@ def get_presenters(e_id):
     result = []
     with get_session() as s:
         event = s.query(Event).get(e_id)
-        if not event:
+        if not event or event.status == 'deleted':
             raise WrongIdError('No event with this id')
         users = s.query(User, Participation).filter(
                 User.id == Participation.u_id,
@@ -163,7 +176,7 @@ def get_presenters(e_id):
 def join_event(u_id, e_id, data):
     with get_session() as s:
         event = s.query(Event).get(e_id)
-        if not event:
+        if not event or event.status == 'deleted':
             raise WrongIdError('No event with this id')
 
         is_consists = s.query(Participation).filter(

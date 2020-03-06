@@ -13,8 +13,8 @@ from ..config import cfg
 Base = declarative_base()
 
 
-Account_status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
-                   name='account_status')
+Status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
+                   name='status')
 Participation_role = ENUM('creator', 'manager', 'presenter', 'viewer',
                            name='participation_role')
 Service_status = ENUM('superadmin', 'admin', 'moderator', 'user', name='service_status')
@@ -24,7 +24,7 @@ class User(Base, UserMixin):
     __tablename__ = 'users'
     
     id = Column(Integer, primary_key=True)
-    account_status = Column(Account_status, default=cfg.DEFAULT_USER_STATUS,
+    status = Column(Status, default=cfg.DEFAULT_USER_STATUS,
                             nullable=False)
     confirmation_link = Column(String, nullable=False)
     cookie_id = Column(UUID(as_uuid=True), default=uuid.uuid4,
@@ -35,11 +35,15 @@ class User(Base, UserMixin):
     surname = Column(String, nullable=False)
     password = Column(TEXT, nullable=False)
     service_status = Column(Service_status, default='user', nullable=False)
+    registration_date = Column(DateTime, default=datetime.utcnow, nullable=False)
+    disable_date = Column(DateTime, nullable=True)
     # secondary info
     phone = Column(String, nullable=True)
     organization = Column(String, nullable=True)
     position = Column(String, nullable=True)
     country = Column(String, nullable=True)
+    town = Column(String, nullable=True)
+    birth = Column(Date, nullable=True)
 
     # био можно отредактировать при регистрации в качестве спикера
     bio = Column(TEXT, nullable=True)
@@ -52,6 +56,9 @@ class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True)
+    status = Column(Status, default='active', nullable=False)
+    views = Column(Integer, default=0, nullable=False)
+
     name = Column(String, nullable=False)
     sm_description = Column(String, nullable=False)
     description = Column(String, nullable=False)
@@ -62,7 +69,9 @@ class Event(Base):
 
     location = Column(String, nullable=False)
     site_link = Column(String, nullable=False)
+
     additional_info = Column(TEXT, nullable=False)
+    guests_info = Column(TEXT, nullable=True)
 
 
 class Participation(Base):
@@ -74,3 +83,4 @@ class Participation(Base):
     participation_role = Column(Participation_role, default='viewer', nullable=False)
     report = Column(TEXT, nullable=True)
     presenter_description = Column(TEXT, nullable=True)
+    aprove_report = Column(Boolean, default=False)

@@ -17,12 +17,6 @@ def user():
     return jsonify(users_logic.get_user_info(current_user.id))
 
 
-@bp.route('/status', methods=['GET'])
-@login_required
-def user_status():
-    return jsonify(service_status=current_user.service_status)
-
-
 @bp.route('/', methods=['PUT'])
 @login_required
 def update_profile():
