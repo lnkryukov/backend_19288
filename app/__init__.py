@@ -19,6 +19,8 @@ app.config.update(
     SECRET_KEY=cfg.SECRET_KEY,
     SESSION_COOKIE_HTTPONLY=False,
     REMEMBER_COOKIE_HTTPONLY=False,
+    SESSION_COOKIE_DOMAIN='127.0.0.1:3000',
+    SESSION_COOKIE_PATH='/'
 )
 
 app.register_blueprint(accounts.bp)
