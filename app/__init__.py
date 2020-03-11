@@ -17,6 +17,8 @@ app = Flask(__name__)
 app.config.update(
     CSRF_ENABLED=cfg.CSRF_ENABLED,
     SECRET_KEY=cfg.SECRET_KEY,
+    SESSION_COOKIE_HTTPONLY=False,
+    REMEMBER_COOKIE_HTTPONLY=False,
 )
 
 app.register_blueprint(accounts.bp)

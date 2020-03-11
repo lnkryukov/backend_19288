@@ -13,7 +13,7 @@ def make_ok(code=200, description=None, extra=None):
 
 
 def get_json():
-    data = request.get_json()
+    data = request.get_json() # force=True need to try
     if data is None:
         make_415('Expected json')
         #abort(415, 'Expected json')

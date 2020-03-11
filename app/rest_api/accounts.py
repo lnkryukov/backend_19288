@@ -19,7 +19,8 @@ def login():
 
     user = accounts_logic.pre_login(data['email'], data['password'])
     login_user(user)
-    return make_200('User was logined')
+    return jsonify(description='User was logined', name=user.name, surname=user.surname)
+    #return make_200('User was logined')
 
 
 @bp.route('/logout', methods=['GET', 'POST'])
