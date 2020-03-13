@@ -1,7 +1,9 @@
 import random
 import string
 import smtplib
-from email.message import EmailMessage
+import logging
+from flask_mail import Message
+import app
 from .config import cfg
 
 
@@ -13,42 +15,37 @@ def random_string_digits(str_len=8):
 
 # возможно переписать как отдельный модуль ибо каждый раз логин+анлогин хз
 def send_email(email, link):
-    server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
-    server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
-    message = cfg.SITE_ADDR + "/confirm/" + link
 
-    msg = EmailMessage()
-    msg.set_content(message)
-    msg['Subject'] = "Your confirmation link"
-    msg['From'] = cfg.MAIL_LOGIN
-    msg['To'] = email
-    server.send_message(msg)
-    server.quit()
+    msg = Message(
+        body = '{}"/confirm/"{}'.format(cfg.SITE_ADDR, link),
+        subject = 'Congress Events confirmation link',
+        recipients = [email],
+    )
 
+    logging.info('Sending confirmation message')
+
+    app.mail.send(msg)
 
 def send_reset_email(email, new_password):
-    server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
-    server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
-    message = 'Your new password - ' + new_password 
 
-    msg = EmailMessage()
-    msg.set_content(message)
-    msg['Subject'] = "Your new password link"
-    msg['From'] = cfg.MAIL_LOGIN
-    msg['To'] = email
-    server.send_message(msg)
-    server.quit()
+    msg = Message(
+        body = 'Your new password - '.format(new_password),
+        subject = 'Congress Events password reset',
+        recipients = [email]
+    )
 
+    logging.info('Sending password reset message')
+
+    app.mail.send(msg)
 
 def send_500_email(error):
-    server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
-    server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
-    message = str(error) 
 
-    msg = EmailMessage()
-    msg.set_content(message)
-    msg['Subject'] = "Your new password link"
-    msg['From'] = cfg.MAIL_LOGIN
-    msg['To'] = cfg.SUPER_ADMIN_MAIL
-    server.send_message(msg)
-    server.quit()
+    msg = Message(
+        str(error),
+        subject='Congress Events goes KA-BOOOM',
+        recipients = [email],
+    )
+
+    logging.info('Sending 500 error message')
+
+    app.mail.send(msg)

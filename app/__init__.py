@@ -6,6 +6,7 @@ from .errors import add_error_handlers, on_json_loading_failed
 from flask import Flask, Request
 from flask_login import LoginManager
 from flask_cors import CORS
+from flask_mail import Mail
 from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
@@ -20,7 +21,12 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=False,
     REMEMBER_COOKIE_HTTPONLY=False,
     SESSION_COOKIE_DOMAIN='192.168.255.99',
-    SESSION_COOKIE_PATH='/'
+    SESSION_COOKIE_PATH='/',
+    MAIL_SERVER=cfg.MAIL_SERVER,
+    MAIL_PORT = cfg.MAIL_PORT,
+    MAIL_USERNAME = cfg.MAIL_USERNAME,
+    MAIL_PASSWORD = cfg.MAIL_PASSWORD,
+    MAIL_DEFAULT_SENDER = cfg.MAIL_DEFAULT_SENDER
 )
 
 app.register_blueprint(accounts.bp)
@@ -31,6 +37,7 @@ add_error_handlers(app)
 Request.on_json_loading_failed = on_json_loading_failed
 
 CORS(app)
+mail = Mail(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
