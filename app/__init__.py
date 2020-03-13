@@ -17,10 +17,10 @@ app = Flask(__name__)
 app.config.update(
     CSRF_ENABLED=cfg.CSRF_ENABLED,
     SECRET_KEY=cfg.SECRET_KEY,
-    SESSION_COOKIE_HTTPONLY=False,
-    REMEMBER_COOKIE_HTTPONLY=False,
-    SESSION_COOKIE_DOMAIN='192.168.255.99',
-    SESSION_COOKIE_PATH='/'
+    # SESSION_COOKIE_HTTPONLY=False,
+    # REMEMBER_COOKIE_HTTPONLY=False,
+    # SESSION_COOKIE_DOMAIN='192.168.255.99',
+    # SESSION_COOKIE_PATH='/'
 )
 
 app.register_blueprint(accounts.bp)
