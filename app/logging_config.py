@@ -54,30 +54,10 @@ LOGGING = {
         'level': LOG_LEVEL
     },
     'loggers': { 
-        '': {  # root logger
-            'handlers': ['default'],
-            'propagate': True,
-            'level': LOG_LEVEL
-        },
-        'sqlalchemy': {
-            'handlers': ['default'],
-            'propagate': True,
-            'level': 100 if DISABLE_EXISTING_LOGGERS else LOG_LEVEL
-        },
-        'flask_cors': {
-            'handlers': ['default'],
-            'propagate': True,
-            'level': 100 if DISABLE_EXISTING_LOGGERS else LOG_LEVEL
-        },
-        'urllib3': {
-            'handlers': ['default'],
-            'propagate': True,
-            'level': 100 if DISABLE_EXISTING_LOGGERS else LOG_LEVEL
-        },
-        'urllib3': {
-            'handlers': ['default'],
-            'propagate': True,
-            'level': 100 if DISABLE_EXISTING_LOGGERS else LOG_LEVEL
-        },
+        # 'requests': {  # root logger
+        #     'handlers': ['default'],
+        #     'propagate': True,
+        #     'level': 500
+        # },
     }
 }
