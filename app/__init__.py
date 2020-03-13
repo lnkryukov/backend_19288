@@ -10,8 +10,8 @@ from gevent.pywsgi import WSGIServer
 from gevent import monkey
 
 import logging
+import logging.config
 import sys
-
 
 app = Flask(__name__)
 app.config.update(
@@ -36,19 +36,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(user_loader)
 
-#logger = logging.getLogger('eventsproj')
-#formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-#console_output_handler = logging.StreamHandler(sys.stderr)
-#console_output_handler.setFormatter(formatter)
-#logger.addHandler(console_output_handler)
-#logger.setLevel(logging.INFO)
-
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
-                    level=logging.INFO)
-
-
 def run():
     monkey.patch_all(ssl=False)
-    http_server = WSGIServer((cfg.HOST, cfg.PORT), app)
+    logger = logging.getLogger('gevent') if cfg.DISABLE_EXISTING_LOGGERS is False else None
+    http_server = WSGIServer(
+        (cfg.HOST, cfg.PORT),
+        app,
+        log = logger, # Gevent игнорирует конфигурацию логгеров, поэтому ему отедльно нужно сказать, чтобы перестал это делать
+        error_log = logger
+    )
     logging.info('Started server')
     http_server.serve_forever()
