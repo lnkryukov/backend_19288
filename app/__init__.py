@@ -1,4 +1,4 @@
-from .accounts_logic import user_loader
+from .logic.accounts import user_loader
 from .config import cfg
 from .rest_api import accounts, users, events
 from .errors import add_error_handlers, on_json_loading_failed
@@ -17,10 +17,10 @@ app = Flask(__name__)
 app.config.update(
     CSRF_ENABLED=cfg.CSRF_ENABLED,
     SECRET_KEY=cfg.SECRET_KEY,
-    SESSION_COOKIE_HTTPONLY=False,
-    REMEMBER_COOKIE_HTTPONLY=False,
-    SESSION_COOKIE_DOMAIN='192.168.255.99',
-    SESSION_COOKIE_PATH='/'
+    #SESSION_COOKIE_HTTPONLY=False,
+    #REMEMBER_COOKIE_HTTPONLY=False,
+    #SESSION_COOKIE_DOMAIN='192.168.255.99',
+    #SESSION_COOKIE_PATH='/'
 )
 
 app.register_blueprint(accounts.bp)
@@ -35,13 +35,6 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(user_loader)
-
-#logger = logging.getLogger('eventsproj')
-#formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-#console_output_handler = logging.StreamHandler(sys.stderr)
-#console_output_handler.setFormatter(formatter)
-#logger.addHandler(console_output_handler)
-#logger.setLevel(logging.INFO)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)

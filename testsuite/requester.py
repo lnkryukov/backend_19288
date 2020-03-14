@@ -2,9 +2,10 @@ import requests
 import json
 from sys import exit
 from colorama import init, Fore, Back, Style
+from .config import cfg
 
 
-root_url = 'http://127.0.0.1:45000'
+root_url = 'http://' + cfg.HOST + ':' + cfg.PORT
 json_headers = {'Content-type': 'application/json'}
 
 

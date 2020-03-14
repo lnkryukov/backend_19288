@@ -1,13 +1,14 @@
-from .config import cfg
-from .db import *
-from . import util
+from ..config import cfg
+from ..db import *
+from .. import util
 import logging
-from .exceptions import (NotJsonError, ConfirmationLinkError,
-                         RegisterUserError, WrongIdError, WrongDataError)
+#from .exceptions import (NotJsonError, ConfirmationLinkError,
+#                         RegisterUserError, WrongIdError, WrongDataError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
 
+from flask import abort
 import bcrypt
 
 from datetime import datetime
@@ -32,16 +33,20 @@ def pre_login(email, password):
         ).one_or_none()
 
         if not user:
-            raise WrongIdError('Invalid user')
+            #raise WrongIdError('Invalid user')
+            abort(404, 'Invalid user')
         if user.status == 'banned':
-            raise RegisterUserError('Trying to login banned user!')
+            #raise RegisterUserError('Trying to login banned user!')
+            abort(409, 'Trying to login banned user')
         if user.status == 'deleted':
-            raise WrongIdError('Invalid user')
+            #raise WrongIdError('Invalid user')
+            abort(404, 'Invalid user')
 
         pw = str(password).encode('utf-8')
         upw = str(user.password).encode('utf-8')
         if not bcrypt.checkpw(pw, upw):
-            raise WrongDataError('Invalid password')
+            #raise WrongDataError('Invalid password')
+            abort(422, 'Invalid password')
         return user
             
 
@@ -75,9 +80,11 @@ def register_user(email, name, surname, password, service_status='user'):
                 user.registration_date = datetime.utcnow()
                 user.disable_date = None
             elif user.status == 'banned':
-                raise RegisterUserError('User with this email was banned')
+                #raise RegisterUserError('User with this email was banned')
+                abort(409, 'User with this email was banned')
             else:
-                raise RegisterUserError('Trying to register existing user')
+                #raise RegisterUserError('Trying to register existing user')
+                abort(409, 'Trying to register existing user')
         else:
             user = User(email=email, name=name,
                         surname=surname, password=pw,
@@ -94,14 +101,14 @@ def confirm_user(confirmation_link):
         user = s.query(User).filter(
                 User.confirmation_link == confirmation_link
         ).one_or_none()
-        if user:
-            if user.status == 'unconfirmed':
-                user.status = 'active'
-                logging.info('User [{}] is confirmed'.format(user.email))
-            else:
-                raise ConfirmationLinkError("User is currently confirmed by this link or can't be confirmed")
-        else:
-            raise WrongIdError('No user with this confirmation link')
+        if not user:
+            #raise WrongIdError('No user with this confirmation link')
+            abort(404, 'No user with this confirmation link')
+        if user.status is not 'unconfirmed':
+            #raise ConfirmationLinkError("User is currently confirmed by this link or can't be confirmed")
+            abort(409, "User is currently confirmed by this link or can't be confirmed")
+        user.status = 'active'
+        logging.info('User [{}] is confirmed'.format(user.email))            
 
 
 def change_password(u_id, old_password, new_password):
@@ -114,9 +121,11 @@ def change_password(u_id, old_password, new_password):
         pw = str(user.password).encode('utf-8')
 
         if not bcrypt.checkpw(opw, pw):
-            raise WrongDataError('Invalid password')
+            #raise WrongDataError('Invalid password')
+            abort(422, 'Invalid password')
         if bcrypt.checkpw(npw, pw):
-            raise WrongDataError('Old and new passwords are equal')
+            #raise WrongDataError('Old and new passwords are equal')
+            abort(409, 'Old and new passwords are equal')
         npw = bcrypt.hashpw(npw, bcrypt.gensalt())
         user.password = npw.decode('utf-8')
         user.cookie_id = uuid.uuid4()
@@ -131,7 +140,8 @@ def reset_password(email):
         ).one_or_none()
 
         if not user:
-            raise WrongIdError('Invalid user')
+            #raise WrongIdError('Invalid user')
+            abort(404, 'Invalid user')
 
         new_password = util.random_string_digits(20)
         npw = bcrypt.hashpw(str(new_password).encode('utf-8'), bcrypt.gensalt())
@@ -148,7 +158,8 @@ def close_all_sessions(u_id, password):
         opw = str(password).encode('utf-8')
         pw = str(user.password).encode('utf-8')
         if not bcrypt.checkpw(opw, pw):
-            raise WrongDataError('Invalid password')
+            #raise WrongDataError('Invalid password')
+            abort(422, 'Invalid password')
         user.cookie_id = uuid.uuid4()
         return user
 
@@ -161,7 +172,8 @@ def self_delete(u_id, password):
         opw = str(password).encode('utf-8')
         pw = str(user.password).encode('utf-8')
         if not bcrypt.checkpw(opw, pw):
-            raise WrongDataError('Invalid password')
+            #raise WrongDataError('Invalid password')
+            abort(422, 'Invalid password')
         user.status = 'deleted'
         user.disable_date = datetime.utcnow()
 
@@ -172,9 +184,9 @@ def ban_user(u_id):
                 User.id == u_id,
                 User.service_status != 'superadmin'
         ).one_or_none()
-
         if not user:
-            raise WrongIdError('No user with this id')
+            #raise WrongIdError('No user with this id')
+            abort(404, 'No user with this id')
         user.status = 'banned'
         user.disable_date = datetime.utcnow()
 
@@ -186,11 +198,10 @@ def change_privileges(u_id, role):
                 User.status == 'active',
                 User.service_status != 'superadmin'
         ).one_or_none()
-
         if not user:
-            raise WrongIdError('No user with this id')
-
+            #raise WrongIdError('No user with this id')
+            abort(404, 'No user with this id')
         if user.service_status == role:
-            raise JoinUserError('User already has that role!')
-        
+            #raise JoinUserError('User already has that role!')
+            abort(409, 'User already has that role')
         user.service_status = role

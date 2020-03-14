@@ -5,7 +5,7 @@ from flask_login import (login_required, login_user, logout_user,
 import bcrypt
 
 from . import *
-from .. import events_logic
+from ..logic import events as events_logic
 
 
 bp = Blueprint('events', __name__, url_prefix='/event')
@@ -24,37 +24,33 @@ def event_by_id(e_id):
 @bp.route('/<int:e_id>', methods=['PUT'])
 @login_required
 def put_event_by_id(e_id):
-    if (current_user.service_status is not 'user' or
-        events_logic.check_participation(current_user.id, e_id) in ['creator', 'manager']):
-        data = get_json()
-
-        events_logic.update_event(e_id, data)
-        return make_200('Successfully updated.')
-    else:
-        return make_403("No rights!")
+    if (current_user.service_status is 'user' and
+        events_logic.check_participation(current_user.id, e_id) not in ['creator', 'manager']):
+        return make_4xx(403, "No rights")
+    data = get_json()
+    events_logic.update_event(e_id, data)
+    #return make_200('Successfully updated.')
+    return make_ok(200, 'Successfully updated')
 
 
 @bp.route('/<int:e_id>/delete', methods=['GET'])
 @login_required
 def delete_event_by_id(e_id):
-    if (current_user.service_status is not 'user' or
-        events_logic.check_participation(current_user.id, e_id) is 'creator'):
-
-        events_logic.delete_event(e_id)
-        return make_200('Successfully deleted.')
-    else:
-        return make_403("No rights!")
+    if (current_user.service_status is 'user' and
+        events_logic.check_participation(current_user.id, e_id) is not 'creator'):
+        return make_4xx(403, "No rights")
+    events_logic.delete_event(e_id)
+    #return make_200('Successfully deleted.')
+    return make_ok(200, 'Successfully deleted')
 
 
 @bp.route('/', methods=['POST'])
 @login_required
 def create_event():
     data = get_json()
-
     last_id = events_logic.create_event(current_user.id, data)
-    # create_event_manager if exists
-
-    return make_201(str(last_id))
+    #return make_201(str(last_id))
+    return make_ok(201, str(last_id))
 
 
 @bp.route('/all', methods=['GET'])
@@ -68,13 +64,11 @@ def events():
 @login_required
 def join(e_id):
     data = get_json()
-
     events_logic.join_event(current_user.id, e_id, data)
-    return make_200('Successfully joined')
+    #return make_200('Successfully joined')
+    return make_ok(200, 'Successfully joined')
 
 
 @bp.route('/<int:e_id>/presenters', methods=['GET'])
 def presenters(e_id):
-    data = get_json()
-
     return jsonify(events_logic.get_presenters(e_id))

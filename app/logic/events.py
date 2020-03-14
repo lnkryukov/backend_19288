@@ -1,12 +1,13 @@
-from .config import cfg
-from .db import *
-from . import util
+from ..config import cfg
+from ..db import *
+from .. import util
 import logging
-from .exceptions import (NotJsonError, WrongIdError, JoinUserError)
+#from .exceptions import (NotJsonError, WrongIdError, JoinUserError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc, or_
 
+from flask import abort
 from datetime import date, time, timezone
 import requests
 import os
@@ -24,7 +25,8 @@ def get_event_info(e_id):
         ).first()
 
         if not event:
-            raise WrongIdError('No event with this id')
+            #raise WrongIdError('No event with this id')
+            abort(404, 'No event with this id')
 
         return {
             "creator_email": event.User.email,
@@ -49,12 +51,14 @@ def get_events(offset, size):
             offset = int(offset)
             size = int(size)
             if offset < 0 or size < 1:
-                raise WrongDataError('Offset or size has wrong values')
+                #raise WrongDataError('Offset or size has wrong values')
+                abort(422, 'Offset or size has wrong values')
             events = events.slice(offset, offset+size)
         elif not offset and not size:
             events = events.all()
         else:
-            raise KeyError('Wrong query string arg.')
+            #raise KeyError('Wrong query string arg.')
+            abort(400, 'Wrong query string arg')
 
         for event in events:
             result.append({
@@ -95,6 +99,7 @@ def create_event(u_id, data):
         participation = Participation(e_id=event.id, u_id=u_id,
                                       participation_role='creator')
         s.add(participation)
+        # create_event_manager if exists
 
         logging.info('Creating event [{}] [{}] [{}] [{}]'.format(data['name'],
                                                                  date_start,
@@ -107,12 +112,14 @@ def update_event(e_id, data):
     with get_session() as s:
         event = s.query(Event).get(e_id)
         if not event or event.status == 'deleted':
-            raise WrongIdError('No event with this id')
+            #raise WrongIdError('No event with this id')
+            abort(404, 'No event with this id')
 
         for arg in data.keys():
             getattr(event, arg)
             if arg in ['id', 'status', 'views']:
-                raise JoinUserError("Can't change this field")
+                #raise JoinUserError("Can't change this field")
+                abort(400, "Can't change this field(s)")
             if arg == 'start_date' or arg == 'end_date':
                 sdate = data[arg].split('-')
                 date_s = date(int(sdate[0]), int(sdate[1]), int(sdate[2]))
@@ -129,10 +136,11 @@ def delete_event(e_id):
     with get_session() as s:
         event = s.query(Event).get(e_id)
         if not event:
-            raise WrongIdError('No event with this id')
+            #raise WrongIdError('No event with this id')
+            abort(404, 'No event with this id')
         if event.status == 'deleted':
-            raise JoinUserError("Event already deleted")
-
+            #raise JoinUserError("Event already deleted")
+            abort(409, 'Event already deleted')
         event.status = 'deleted'
             
 
@@ -155,7 +163,8 @@ def get_presenters(e_id):
     with get_session() as s:
         event = s.query(Event).get(e_id)
         if not event or event.status == 'deleted':
-            raise WrongIdError('No event with this id')
+            #raise WrongIdError('No event with this id')
+            abort(404, 'No event with this id')
         users = s.query(User, Participation).filter(
                 User.id == Participation.u_id,
                 Participation.e_id == e_id,
@@ -177,25 +186,26 @@ def join_event(u_id, e_id, data):
     with get_session() as s:
         event = s.query(Event).get(e_id)
         if not event or event.status == 'deleted':
-            raise WrongIdError('No event with this id')
+            #raise WrongIdError('No event with this id')
+            abort(404, 'No event with this id')
 
         is_consists = s.query(Participation).filter(
                 Participation.u_id == u_id,
                 Participation.e_id == e_id
         ).one_or_none()
 
-        if not is_consists:
-            role = 'viewer'
-            participation = Participation(e_id=e_id, u_id=u_id,
-                                          participation_role='viewer')
-            if data['role'] == 'presenter':
-                participation.participation_role = 'presenter'
-                participation.report = data['report']
-                participation.presenter_description = data['presenter_description']
-                role = 'presenter'
-            s.add(participation)
-            logging.info('User [id {}] joined event [id {}] as [{}]'.format(u_id,
-                                                                    e_id,
-                                                                    role))
-        else:
-            raise JoinUserError('User has already joined this event as [{}]!'.format(is_consists.participation_role))
+        if is_consists:
+            #raise JoinUserError('User has already joined this event as [{}]!'.format(is_consists.participation_role))
+            abort(409, 'User has already joined this event as [{}]'.format(is_consists.participation_role))
+        role = 'viewer'
+        participation = Participation(e_id=e_id, u_id=u_id,
+                                      participation_role='viewer')
+        if data['role'] == 'presenter':
+            participation.participation_role = 'presenter'
+            participation.report = data['report']
+            participation.presenter_description = data['presenter_description']
+            role = 'presenter'
+        s.add(participation)
+        logging.info('User [id {}] joined event [id {}] as [{}]'.format(u_id,
+                                                                        e_id,
+                                                                        role))            

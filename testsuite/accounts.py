@@ -1,10 +1,10 @@
 from .requester import test_route
 from colorama import init, Fore, Back, Style
 import os
+from .config import cfg
 
 
 def test_accounts():
-    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'LOGIN with incorrect email',
                     'url': '/login',
@@ -19,7 +19,7 @@ def test_accounts():
     {'description': 'LOGIN with incorrect password',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": SUPER_ADMIN_MAIL, "password": "123456789"},
+                    'data': {"email": cfg.SUPER_ADMIN_MAIL, "password": "123456789"},
                     'valid_code': '<Response [422]>',
                     'valid_data': {'error': 'Invalid password'},
                     'need_decision': False,
@@ -29,9 +29,9 @@ def test_accounts():
     {'description': 'LOGIN with incorrect keys',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"mail": SUPER_ADMIN_MAIL, "password": "1234"},
+                    'data': {"mail": cfg.SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [400]>',
-                    'valid_data': {'error': 'Wrong json key(s)!'},
+                    'valid_data': {'error': 'Wrong json key(s)'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False
@@ -39,9 +39,9 @@ def test_accounts():
     {'description': 'LOGIN correct',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
+                    'data': {"email": cfg.SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'User was logined'},
+                    'valid_data': {'description': 'User was logined', 'name': 'Super', 'surname': 'Admin'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': True,
@@ -60,9 +60,9 @@ def test_accounts():
     {'description': 'LOGIN repeat correct',
                     'url': '/login',
                     'method': 'post',
-                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
+                    'data': {"email": cfg.SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [409]>',
-                    'valid_data': {'error': 'User is currently authenticated!'},
+                    'valid_data': {'error': 'User is currently authenticated'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -82,7 +82,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "name": "naaaaaaaame", "surname": "surnaaaaaaaame", "password": "1234"},
                     'valid_code': '<Response [201]>',
-                    'valid_data': {'extra': 'User was registered.'},
+                    'valid_data': {'description': 'User was registered'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False
@@ -90,7 +90,7 @@ def test_accounts():
     {'description': 'REGISTER user exists',
                     'url': '/register',
                     'method': 'post',
-                    'data': {"email": SUPER_ADMIN_MAIL, "name": "naaaaaaaame", "surname": "surnaaaaaaaame", "password": "1234"},
+                    'data': {"email": cfg.SUPER_ADMIN_MAIL, "name": "naaaaaaaame", "surname": "surnaaaaaaaame", "password": "1234"},
                     'valid_code': '<Response [409]>',
                     'valid_data': {'error': 'Trying to register existing user'},
                     'need_decision': False,
@@ -100,9 +100,9 @@ def test_accounts():
     {'description': 'REGISTER then login',
                     'url': '/register',
                     'method': 'post',
-                    'data': {"email": SUPER_ADMIN_MAIL, "password": "1234"},
+                    'data': {"email": cfg.SUPER_ADMIN_MAIL, "password": "1234"},
                     'valid_code': '<Response [409]>',
-                    'valid_data': {'error': 'User is currently authenticated!'},
+                    'valid_data': {'error': 'User is currently authenticated'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -112,7 +112,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'User was logined'},
+                    'valid_data': {'description': 'User was logined', 'name': 'naaaaaaaame', 'surname': 'surnaaaaaaaame'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': True,
@@ -165,7 +165,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'Logout from all other sessions.'},
+                    'valid_data': {'description': 'Logout from all other sessions'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': True,
@@ -176,7 +176,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'Successfully delete account.'},
+                    'valid_data': {'description': 'Successfully delete account'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -206,7 +206,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "name": "name", "surname": "surname", "password": "1234"},
                     'valid_code': '<Response [201]>',
-                    'valid_data': {'extra': 'User was registered.'},
+                    'valid_data': {'description': 'User was registered'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False
@@ -216,7 +216,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'User was logined'},
+                    'valid_data': {'description': 'User was logined', 'name': 'name', 'surname': 'surname'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': True,
@@ -227,7 +227,7 @@ def test_accounts():
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [403]>',
-                    'valid_data':  {'error': 'No rights!'},
+                    'valid_data':  {'error': 'No rights'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -257,7 +257,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail.mail", "password": "1234"},
                     'valid_code': '<Response [409]>',
-                    'valid_data': {'error': 'Trying to login banned user!'},
+                    'valid_data': {'error': 'Trying to login banned user'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False
@@ -277,7 +277,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail", "name": "Name", "surname": "Surname", "password": "1234"},
                     'valid_code': '<Response [201]>',
-                    'valid_data':  {'extra': 'User was registered.'},
+                    'valid_data':  {'description': 'User was registered'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': False
@@ -287,7 +287,7 @@ def test_accounts():
                     'method': 'post',
                     'data': {"email": "mail@mail", "password": "1234"},
                     'valid_code': '<Response [200]>',
-                    'valid_data':  {'description': 'User was logined'},
+                    'valid_data':  {'description': 'User was logined', 'name': 'Name', 'surname': 'Surname'},
                     'need_decision': False,
                     'cookie': 'none',
                     'get_cookie': True,

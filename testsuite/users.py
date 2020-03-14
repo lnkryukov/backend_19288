@@ -3,17 +3,17 @@ from colorama import init, Fore, Back, Style
 import requests
 import json
 import os
+from .config import cfg
 
 
 def test_users(cookies={}):
-    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'GET CURRENT USER INFO',
                     'url': '/user/',
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'Super', 'organization': None, 'phone': None, 'position': None, 'service_status': 'superadmin', 'surname': 'Admin', 'town': None},
+                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': 'python_send@mail.ru', 'name': 'Super', 'organization': None, 'phone': None, 'position': None, 'service_status': 'superadmin', 'sex': None, 'surname': 'Admin', 'town': None},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -23,7 +23,7 @@ def test_users(cookies={}):
                     'method': 'put',
                     'data': {"email": "mail@mail", "password": "1234", "name": "kek"},
                     'valid_code': '<Response [400]>',
-                    'valid_data': {'error': 'Wrong json key(s)!'},
+                    'valid_data': {'error': "Can't change this field(s)"},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -33,7 +33,7 @@ def test_users(cookies={}):
                     'method': 'put',
                     'data': {"name": "kek", "phone": "88005553535"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'Profile info successfully updated.'},
+                    'valid_data': {'description': 'Profile info successfully updated'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -43,7 +43,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': SUPER_ADMIN_MAIL, 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'superadmin', 'surname': 'Admin', 'town': None},
+                    'valid_data': {'bio': None, 'birth': None, 'country': None, 'email': 'python_send@mail.ru', 'name': 'kek', 'organization': None, 'phone': '88005553535', 'position': None, 'service_status': 'superadmin', 'sex': None, 'surname': 'Admin', 'town': None},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -53,7 +53,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [404]>',
-                    'valid_data': {'error': 'Unknown route!'},
+                    'valid_data': {'error': 'Unknown route'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -143,7 +143,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [403]>',
-                    'valid_data': {'error': 'No rights!'},
+                    'valid_data': {'error': 'No rights'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -163,7 +163,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [403]>',
-                    'valid_data': {'error': 'AccessError - No rights.'},
+                    'valid_data': {'error': 'No rights'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -213,7 +213,7 @@ def test_users(cookies={}):
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [403]>',
-                    'valid_data': {'error': 'AccessError - No rights.'},
+                    'valid_data': {'error': 'No rights'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -224,12 +224,14 @@ def test_users(cookies={}):
     code_passed = 0
     data_passed = 0
 
+    root_url = 'http://' + cfg.HOST + ':' + cfg.PORT
+
     if not hasattr(cookies, 'admin'):
         data = {
-            "email": SUPER_ADMIN_MAIL,
+            "email": cfg.SUPER_ADMIN_MAIL,
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
         cookies['admin'] = answer.cookies
     if not hasattr(cookies, 'user'):
         data = {
@@ -238,12 +240,12 @@ def test_users(cookies={}):
             "surname": "Surname",
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/register', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/register', data=json.dumps(data), headers={'Content-type': 'application/json'})
         data = {
             "email": "mail@mail",
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
         cookies['user'] = answer.cookies
     if not hasattr(cookies, 'none'):
         cookies['none'] = ''

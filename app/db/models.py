@@ -44,8 +44,7 @@ class User(Base, UserMixin):
     country = Column(String, nullable=True)
     town = Column(String, nullable=True)
     birth = Column(Date, nullable=True)
-
-    # био можно отредактировать при регистрации в качестве спикера
+    sex = Column(String, nullable=True)
     bio = Column(TEXT, nullable=True)
 
     def get_id(self):
