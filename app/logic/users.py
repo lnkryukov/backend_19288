@@ -21,6 +21,11 @@ def get_user_info(u_id):
         if not user:
             #raise WrongIdError('No user with this id')
             abort(404, 'No user with this id')
+
+        birth = None
+        if user.birth is not None:
+            birth = user.birth.isoformat()
+
         return {
             "email": user.email,
             "name": user.name,
@@ -32,7 +37,7 @@ def get_user_info(u_id):
             "country": user.country,
             "town": user.town,
             "bio": user.bio,
-            "birth": user.birth,
+            "birth": birth,
             "sex": user.sex,
         }
 
@@ -89,7 +94,12 @@ def update_profile(u_id, data):
             if arg in ['email', 'password', 'id', 'status', 'confirmation_link', 'cookie_id', 'service_status', 'registration_date', 'disable_date']:
                 #raise KeyError('No email or password changing here')
                 abort(400, "Can't change this field(s)")
-            setattr(user, arg, data[arg])
+            if arg is 'birth':
+                birth = data[arg].split('-')
+                birth_date = date(int(birth[0]), int(birth[1]), int(birth[2]))
+                setattr(user, arg, birth_date)
+            else:
+                setattr(user, arg, data[arg])
 
 
 # админка

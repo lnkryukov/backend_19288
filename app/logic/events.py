@@ -77,15 +77,10 @@ def get_events(offset, size):
 def create_event(u_id, data):
     start_date = data['start_date'].split('-')
     date_start = date(int(start_date[0]), int(start_date[1]), int(start_date[2]))
-
-    date_end = date_start
-    time_start = None
-    if 'end_date' in data.keys():
-        end_date = data['end_date'].split('-')
-        date_end = date(int(end_date[0]), int(end_date[1]), int(end_date[2]))
-    if 'start_time' in data.keys():
-        start_time = data['start_time'].split(':')
-        time_start = time(int(start_time[0]), int(start_time[1]), 0, 0, timezone.utc)
+    end_date = data['end_date'].split('-')
+    date_end = date(int(end_date[0]), int(end_date[1]), int(end_date[2]))
+    start_time = data['start_time'].split(':')
+    time_start = time(int(start_time[0]), int(start_time[1]), 0, 0, timezone.utc)
     
     with get_session() as s:
         event = Event(name=data['name'], sm_description=data['sm_description'],
