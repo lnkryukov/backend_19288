@@ -289,7 +289,8 @@
           <li><code>200 OK</code></li>
           <ul>
             <li><kbd>description</kbd></li>
-            <li><kbd>extra</kbd> с ролью пользователя в системе.</li>
+            <li><kbd>name</kbd> - имя пользователя</li>
+            <li><kbd>surname</kbd> - фамилия пользователя</li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>404 - </code>пользователь не найден</li>
@@ -321,7 +322,7 @@
           </ul>
           <li><code>201 CREATED</code></li>
           <ul>
-            <li><kbd>extra</kbd></li>
+            <li><kbd>description</kbd></li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>409 - </code>пользователь уже авторизован</li>
@@ -329,21 +330,19 @@
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
-        <div><kbd>/confirm</kbd><code> - [POST]</code></div>
+        <div><kbd>/confirm/[link]</kbd><code> - [GET]</code></div>
         <ul class="list-group-flush" style="list-style-type:none;">
           <li>Подтверждение аккаунта по ссылке.</li>
           <li><code>Принимает</code></li>
           <ul>
-            <li><kbd>link</kbd> - ссылка подтверждения пользователя</li>
+            <li><kbd>link</kbd> - ссылка подтверждения пользователя из url</li>
           </ul>
           <li><code>200 OK</code></li>
           <ul>
             <li><kbd>description</kbd></li>
           </ul>
-          <li><code>400 - </code>некорректные ключи json</li>
           <li><code>404 - </code>пользователь с таким <code>link</code> не найден</li>
           <li><code>409 - </code>пользователь с таким <code>link</code> уже подтвержден или не может быть подтверждён</li>
-          <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
         </ul>
 
         <div class="text-warning"><kbd>/change_password</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
@@ -357,7 +356,6 @@
           <li><code>200 OK</code></li>
           <ul>
             <li><kbd>description</kbd></li>
-            <li><kbd>extra</kbd> с ролью пользователя в системе.</li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>401 - </code>не залогинен</li>
@@ -392,7 +390,6 @@
           <li><code>200 OK</code></li>
           <ul>
             <li><kbd>description</kbd></li>
-            <li><kbd>extra</kbd> с ролью пользователя в системе.</li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>401 - </code>не залогинен</li>
@@ -410,12 +407,21 @@
           <li><code>200 OK</code></li>
           <ul>
             <li><kbd>description</kbd></li>
-            <li><kbd>extra</kbd> с ролью пользователя в системе.</li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>401 - </code>не залогинен</li>
           <li><code>415 - </code>прислан не json, или же он составлен неверно</li>
           <li><code>422 - </code>неверный пароль</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/status</kbd><code> - [GET] - </code>LOGIN REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Получение статуса текущего пользователя в системе.</li>
+          <li><code>200 OK</code></li>
+          <ul>
+            <li><kbd>service_status</kbd> - статус</li>
+          </ul>
+          <li><code>401 - </code>не залогинен</li>
         </ul>
 
         <div class="text-warning"><kbd>/user/[id]/ban</kbd><code> - [GET] - </code>LOGIN+RIGHTS REQUIRED</div>
@@ -434,13 +440,13 @@
           <li><code>404 - </code>пользователь с таким <code>id</code> не найден</li>
         </ul>
 
-        <div class="text-warning"><kbd>/user/[id]/[status]</kbd><code> - [PUT] - </code>LOGIN+RIGHTS REQUIRED</div>
+        <div class="text-warning"><kbd>/user/[id]/role/[role]</kbd><code> - [PUT] - </code>LOGIN+RIGHTS REQUIRED</div>
         <ul class="list-group-flush" style="list-style-type:none;">
           <li>Изменение привилегий.</li>
           <li><code>Принимает</code></li>
           <ul>
             <li><kbd>[id]</kbd> - id пользователя из url</li>
-            <li><kbd>[status]</kbd> - новый status для пользователя из url - <code>admin</code>/<code>moderator</code>/<code>user</code></li>
+            <li><kbd>[role]</kbd> - новая role для пользователя из url - <code>admin</code>/<code>moderator</code>/<code>user</code></li>
           </ul>
           <li><code>200 OK</code></li>
           <ul>
@@ -460,7 +466,7 @@
       <div class="w-100">
         <h2 class="mb-5">Users</h2>
         <p>Ручки, связанные с информацией о пользователях.</p>
-        <p>Все ручки данной категории имеют префикс <code>/user</code> (т.е. первая ручка <code>/</code> является <code>/user/</code>.</p>
+        <p>Все ручки данной категории имеют префикс <code>/user</code> (т.е. первая ручка <code>/</code> является <code>/user/</code>).</p>
 
         <div class="text-warning"><kbd>/</kbd><code> - [GET] - </code>LOGIN REQUIRED</div>
         <ul class="list-group-flush" style="list-style-type:none;">
@@ -475,17 +481,10 @@
             <li><kbd>organization</kbd> - организация/компания текущего пользователя</li>
             <li><kbd>position</kbd> - должность текущего пользователя</li>
             <li><kbd>country</kbd> - страна текущего пользователя</li>
+            <li><kbd>town</kbd> - город текущего пользователя</li>
+            <li><kbd>sex</kbd> - пол текущего пользователя</li>
+            <li><kbd>birth</kbd> - дата рождения текущего пользователя в iso формате</li>
             <li><kbd>bio</kbd> - дополнительное описание текущего пользователя</li>
-          </ul>
-          <li><code>401 - </code>не залогинен</li>
-        </ul>
-
-        <div class="text-warning"><kbd>/status</kbd><code> - [GET] - </code>LOGIN REQUIRED</div>
-        <ul class="list-group-flush" style="list-style-type:none;">
-          <li>Получение статуса текущего пользователя в системе.</li>
-          <li><code>200 OK</code></li>
-          <ul>
-            <li><kbd>service_status</kbd> - статус</li>
           </ul>
           <li><code>401 - </code>не залогинен</li>
         </ul>
@@ -502,6 +501,9 @@
             <li><kbd>organization</kbd> - организация/компания пользователя</li>
             <li><kbd>position</kbd> - должность пользователя</li>
             <li><kbd>country</kbd> - страна пользователя</li>
+            <li><kbd>town</kbd> - город пользователя</li>
+            <li><kbd>sex</kbd> - пол пользователя</li>
+            <li><kbd>birth</kbd> - дата рождения пользователя в iso формате</li>
             <li><kbd>bio</kbd> - дополнительное описание пользователя</li>
           </ul>
           <li><code>200 OK</code></li>
@@ -556,7 +558,7 @@
             <li><kbd>name</kbd> - имя пользователя</li>
             <li><kbd>surname</kbd> - фамилия пользователя</li>
             <li><kbd>service_status</kbd> - статус пользователя</li>
-            <li><kbd>account_status</kbd> - статус аккаунта пользователя</li>
+            <li><kbd>status</kbd> - статус аккаунта пользователя</li>
           </ul>
           <li><code>400 - </code>некорректные параметры query string</li>
           <li><code>401 - </code>не залогинен</li>
@@ -581,6 +583,9 @@
             <li><kbd>organization</kbd> - организация/компания пользователя</li>
             <li><kbd>position</kbd> - должность пользователя</li>
             <li><kbd>country</kbd> - страна пользователя</li>
+            <li><kbd>town</kbd> - город пользователя</li>
+            <li><kbd>sex</kbd> - пол пользователя</li>
+            <li><kbd>birth</kbd> - дата рождения пользователя в iso формате</li>
             <li><kbd>bio</kbd> - дополнительное описание пользователя</li>
           </ul>
           <li><code>401 - </code>не залогинен</li>
@@ -623,7 +628,7 @@
       <div class="w-100">
         <h2 class="mb-5">Events</h2>
         <p>Ручки, связанные с мероприятиями.</p>
-        <p>Все ручки данной категории имеют префикс <code>/event</code> (т.е. первая ручка <code>/</code> является <code>/event/[id]</code>.</p>
+        <p>Все ручки данной категории имеют префикс <code>/event</code> (т.е. первая ручка <code>/</code> является <code>/event/</code>).</p>
 
         <div class="text-warning"><kbd>/</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
         <ul class="list-group-flush" style="list-style-type:none;">
@@ -642,7 +647,7 @@
           </ul>
           <li><code>201 CREATED</code></li>
           <ul>
-            <li><kbd>extra</kbd> - id созданного мероприятия</li>
+            <li><kbd>description</kbd> - id созданного мероприятия</li>
           </ul>
           <li><code>400 - </code>некорректные ключи json</li>
           <li><code>401 - </code>не залогинен</li>
@@ -708,6 +713,23 @@
             </ul>
           </ul>
          <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/[id]/delete</kbd><code> - [GET] - </code>LOGIN+RIGHTS REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Удаление мероприятия.</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id мероприяния из url</li>
+          </ul>
+          <li><code>200 OK</code></li>
+          <ul>
+            <li><kbd>description</kbd></li>
+          </ul>
+         <li><code>401 - </code>не залогинен</li>
+         <li><code>403 - </code>нет прав на выполнение</li>
+         <li><code>404 - </code>мероприятие с таким <code>id</code> не найдено</li>
+         <li><code>409 - </code>мероприятие уже имеет удалено</li>
         </ul>
 
         <div class="text-warning"><kbd>/all</kbd><code> - [GET]</code></div>
