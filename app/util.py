@@ -47,7 +47,7 @@ def send_500_email(error):
 
     msg = EmailMessage()
     msg.set_content(message)
-    msg['Subject'] = "Your new password link"
+    msg['Subject'] = "500 server error"
     msg['From'] = cfg.MAIL_LOGIN
     msg['To'] = cfg.SUPER_ADMIN_MAIL
     server.send_message(msg)

@@ -29,7 +29,6 @@ def put_event_by_id(e_id):
         return make_4xx(403, "No rights")
     data = get_json()
     events_logic.update_event(e_id, data)
-    #return make_200('Successfully updated.')
     return make_ok(200, 'Successfully updated')
 
 
@@ -40,7 +39,6 @@ def delete_event_by_id(e_id):
         events_logic.check_participation(current_user.id, e_id) is not 'creator'):
         return make_4xx(403, "No rights")
     events_logic.delete_event(e_id)
-    #return make_200('Successfully deleted.')
     return make_ok(200, 'Successfully deleted')
 
 
@@ -49,8 +47,17 @@ def delete_event_by_id(e_id):
 def create_event():
     data = get_json()
     last_id = events_logic.create_event(current_user.id, data)
-    #return make_201(str(last_id))
     return make_ok(201, str(last_id))
+
+
+@bp.route('/<int:e_id>/manager', methods=['POST'])
+@login_required
+def add_manager_to_event(e_id):
+    data = get_json()
+    if events_logic.check_participation(current_user.id, e_id) is not 'creator':
+        return make_4xx(403, "No rights")
+    action = events_logic.add_manager(e_id, data)
+    return make_ok(200, 'Successfully ' + action + ' manager')
 
 
 @bp.route('/all', methods=['GET'])
@@ -65,7 +72,6 @@ def events():
 def join(e_id):
     data = get_json()
     events_logic.join_event(current_user.id, e_id, data)
-    #return make_200('Successfully joined')
     return make_ok(200, 'Successfully joined')
 
 

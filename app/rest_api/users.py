@@ -22,7 +22,6 @@ def user():
 def update_profile():
     data = get_json()
     users_logic.update_profile(current_user.id, data)
-    #return make_200('Profile info successfully updated.')
     return make_ok(200, 'Profile info successfully updated')
 
 

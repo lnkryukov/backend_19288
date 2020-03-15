@@ -15,9 +15,9 @@ def test_route(i, code_passed, data_passed,
                cookie, get_cookie):
     print(Back.BLUE + '=======================( TEST [' + str(i+1) + '] )=======================' + Style.RESET_ALL)
     print()
+    print('TEST: ' + description)
     print('url: ' + url)
     print('method: ' + method)
-    print('test: ' + description)
     print()
     if method == 'post':
         if cookie:

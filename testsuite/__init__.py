@@ -2,6 +2,7 @@ from colorama import init, Fore, Back, Style
 from .accounts import test_accounts
 from .users import test_users
 from .events import test_events
+from .tasks import test_tasks
 
 
 init()
@@ -31,6 +32,11 @@ def run():
     global_data_passed += data_passed
 
     i, code_passed, data_passed, cookies = test_users(cookies)
+    global_i += i
+    global_code_passed += code_passed
+    global_data_passed += data_passed
+
+    i, code_passed, data_passed, cookies = test_tasks(cookies)
     global_i += i
     global_code_passed += code_passed
     global_data_passed += data_passed

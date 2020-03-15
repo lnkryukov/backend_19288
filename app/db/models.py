@@ -18,6 +18,7 @@ Status = ENUM('unconfirmed', 'active', 'deleted', 'banned',
 Participation_role = ENUM('creator', 'manager', 'presenter', 'viewer',
                            name='participation_role')
 Service_status = ENUM('superadmin', 'admin', 'moderator', 'user', name='service_status')
+Task_status = ENUM('todo', 'inprocess', 'waiting', 'done', 'deleted', name='task_status')
 
 
 class User(Base, UserMixin):
@@ -63,8 +64,8 @@ class Event(Base):
     description = Column(String, nullable=False)
 
     start_date = Column(Date, nullable=False)
-    end_date = Column(Date, nullable=True)
-    start_time = Column(Time, nullable=True)
+    end_date = Column(Date, nullable=False)
+    start_time = Column(Time, nullable=False)
 
     location = Column(String, nullable=False)
     site_link = Column(String, nullable=False)
@@ -83,3 +84,14 @@ class Participation(Base):
     report = Column(TEXT, nullable=True)
     presenter_description = Column(TEXT, nullable=True)
     aprove_report = Column(Boolean, default=False)
+
+
+class ETask(Base):
+    __tablename__ = 'etasks'
+
+    id = Column(Integer, primary_key=True)
+    e_id = Column(Integer, ForeignKey('events.id'), nullable=False)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    deadline = Column(Date, nullable=True)
+    status = Column(Task_status, default='todo', nullable=False)

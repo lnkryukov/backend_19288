@@ -1,6 +1,6 @@
 from .logic.accounts import user_loader
 from .config import cfg
-from .rest_api import accounts, users, events
+from .rest_api import accounts, users, events, tasks
 from .errors import add_error_handlers, on_json_loading_failed
 
 from flask import Flask, Request
@@ -26,6 +26,7 @@ app.config.update(
 app.register_blueprint(accounts.bp)
 app.register_blueprint(users.bp)
 app.register_blueprint(events.bp)
+app.register_blueprint(tasks.bp)
 
 add_error_handlers(app)
 Request.on_json_loading_failed = on_json_loading_failed
