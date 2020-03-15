@@ -60,6 +60,15 @@ def add_manager_to_event(e_id):
     return make_ok(200, 'Successfully ' + action + ' manager')
 
 
+@bp.route('/<int:e_id>/manager/delete', methods=['GET'])
+@login_required
+def delete_manager_from_event(e_id):
+    if events_logic.check_participation(current_user.id, e_id) is not 'creator':
+        return make_4xx(403, "No rights")
+    action = events_logic.delete_manager(e_id)
+    return make_ok(200, 'Successfully delete manager')
+
+
 @bp.route('/all', methods=['GET'])
 def events():
     offset = request.args.get("offset", "")

@@ -134,6 +134,21 @@ def add_manager(e_id, data):
             return 'changed'
 
 
+def delete_manager(e_id):
+    with get_session() as s:
+        event = s.query(Event).get(e_id)
+        if not event or event.status == 'deleted':
+            abort(404, 'No event with this id')
+
+        manager = s.query(Participation).filter(
+                Participation.e_id == e_id,
+                Participation.participation_role == 'manager'
+        ).one_or_none()
+        if not manager:
+            abort(409, 'Event has no manager')
+        s.delete(manager)
+
+
 def update_event(e_id, data):
     with get_session() as s:
         event = s.query(Event).get(e_id)

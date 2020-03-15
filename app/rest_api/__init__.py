@@ -1,5 +1,6 @@
 from flask import jsonify, request, abort
 import logging
+import traceback
 from ..util import send_500_email
 
 
@@ -60,6 +61,7 @@ def method_not_allowed(e):
 
 
 def server_500_error(e):
-    logging.warning('500 - [{}]'.format(e))
-    send_500_email(e)
+    logging.warning('500 - [{}]'.format(e.description))
+    err = traceback.format_exc()
+    send_500_email(e, err)
     return jsonify(error="Server error, we're sorry"), 500

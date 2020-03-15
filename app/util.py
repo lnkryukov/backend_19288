@@ -40,10 +40,10 @@ def send_reset_email(email, new_password):
     server.quit()
 
 
-def send_500_email(error):
+def send_500_email(e, err):
     server = smtplib.SMTP_SSL(cfg.SMTP_HOST, 465)
     server.login(cfg.MAIL_LOGIN, cfg.MAIL_PASSWORD)
-    message = str(error) 
+    message = err
 
     msg = EmailMessage()
     msg.set_content(message)
