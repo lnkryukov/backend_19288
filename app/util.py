@@ -43,7 +43,7 @@ def send_500_email(error):
     msg = Message(
         str(error),
         subject='Congress Events goes KA-BOOOM',
-        recipients = [email],
+        recipients = [cfg.SUPER_ADMIN_MAIL],
     )
 
     logging.info('Sending 500 error message')
