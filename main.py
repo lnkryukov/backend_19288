@@ -29,8 +29,9 @@ for name, logger in logging.root.manager.loggerDict.items():
 
 def main():
 
-    import logging_tree
-    logging_tree.printout()
+    if log_level <= 10:
+        import logging_tree
+        logging_tree.printout()
 
     # urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
     parser = ArgumentParser(description='Backend service of Events project')
