@@ -1,6 +1,6 @@
-from .accounts_logic import user_loader
+from .logic.accounts import user_loader
 from .config import cfg
-from .rest_api import accounts, users, events
+from .rest_api import accounts, users, events, tasks
 from .errors import add_error_handlers, on_json_loading_failed
 
 from flask import Flask, Request
@@ -32,6 +32,7 @@ app.config.update(
 app.register_blueprint(accounts.bp)
 app.register_blueprint(users.bp)
 app.register_blueprint(events.bp)
+app.register_blueprint(tasks.bp)
 
 add_error_handlers(app)
 Request.on_json_loading_failed = on_json_loading_failed
@@ -42,13 +43,6 @@ mail = Mail(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(user_loader)
-
-#logger = logging.getLogger('eventsproj')
-#formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-#console_output_handler = logging.StreamHandler(sys.stderr)
-#console_output_handler.setFormatter(formatter)
-#logger.addHandler(console_output_handler)
-#logger.setLevel(logging.INFO)
 
 logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
                     level=logging.INFO)

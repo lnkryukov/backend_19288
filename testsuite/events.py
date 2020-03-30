@@ -3,17 +3,17 @@ from colorama import init, Fore, Back, Style
 import requests
 import json
 import os
+from .config import cfg
 
 
 def test_events(cookies={}):
-    SUPER_ADMIN_MAIL = os.getenv('SUPER_ADMIN_MAIL')
     tests = [
     {'description': 'CREATE EVENT wrong keys',
                     'url': '/event/',
                     'method': 'post',
                     'data': {"na": "naaaaame", "sm_descriprion": "sm_descriprion"},
                     'valid_code': '<Response [400]>',
-                    'valid_data': {'error': 'Wrong json key(s)!'},
+                    'valid_data': {'error': 'Wrong json key(s)'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -36,10 +36,10 @@ def test_events(cookies={}):
                     'method': 'post',
                     'data': {"name": "naaaaame", "sm_description": "sm_descriprion",
                              "description": "description", "start_date": "2020-02-27",
-                             "start_time": "23:59", "location": "location",
+                             "start_time": "23:59", "end_date": "2021-02-27", "location": "location",
                              "site_link": "site_link", "additional_info": "additional_info"},
                     'valid_code': '<Response [201]>',
-                    'valid_data': {'extra': '1'},
+                    'valid_data': {'description': '1'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -78,10 +78,10 @@ def test_events(cookies={}):
                     'url': '/event/',
                     'method': 'post',
                     'data': {"name": "11", "sm_description": "22", "description": "33",
-                             "start_date": "2222-02-27", "start_time": "23:59",
+                             "start_date": "2222-02-27", "start_time": "23:59", "end_date": "2333-02-27",
                              "location": "44", "site_link": "55", "additional_info": "66"},
                     'valid_code': '<Response [201]>',
-                    'valid_data': {'extra': '2'},
+                    'valid_data': {'description': '2'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -92,7 +92,7 @@ def test_events(cookies={}):
                     'data': {"name": "11", "sm_description": "22", "description": "33",
                              "start_date": "2222-02-27"},
                     'valid_code': '<Response [403]>',
-                    'valid_data': {'error': 'No rights!'},
+                    'valid_data': {'error': 'No rights'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -102,7 +102,7 @@ def test_events(cookies={}):
                     'method': 'put',
                     'data': {"name": "change", "start_date": "3333-02-27"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'Successfully updated.'},
+                    'valid_data': {'description': 'Successfully updated'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -122,7 +122,7 @@ def test_events(cookies={}):
                     'method': 'put',
                     'data': {"na": "changed name", "start_date": "3333-02-27"},
                     'valid_code': '<Response [400]>',
-                    'valid_data': {'error': 'Wrong json key(s)!'},
+                    'valid_data': {'error': 'Wrong json key(s)'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -132,7 +132,7 @@ def test_events(cookies={}):
                     'method': 'put',
                     'data': {"name": "kekekekeke"},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'description': 'Successfully updated.'},
+                    'valid_data': {'description': 'Successfully updated'},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -194,7 +194,7 @@ def test_events(cookies={}):
                     'method': 'post',
                     'data': {"role": "viewer"},
                     'valid_code': '<Response [409]>',
-                    'valid_data': {'error': 'User has already joined this event as [viewer]!'},
+                    'valid_data': {'error': 'User has already joined this event as [viewer]'},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -230,18 +230,73 @@ def test_events(cookies={}):
                     'cookie': 'none',
                     'get_cookie': False
     },
+    {'description': 'DELETE EVENT 1 user not own',
+                    'url': '/event/1/delete',
+                    'method': 'get',
+                    'data': {},
+                    'valid_code': '<Response [403]>',
+                    'valid_data': {'error': 'No rights'},
+                    'need_decision': False,
+                    'cookie': 'user',
+                    'get_cookie': False
+    },
+    {'description': 'CREATE EVENT 3',
+                    'url': '/event/',
+                    'method': 'post',
+                    'data': {"name": "3", "sm_description": "3", "description": "3",
+                             "start_date": "3333-02-27", "start_time": "23:59", "end_date": "4444-02-27",
+                             "location": "3", "site_link": "3", "additional_info": "3"},
+                    'valid_code': '<Response [201]>',
+                    'valid_data': {'description': '3'},
+                    'need_decision': False,
+                    'cookie': 'user',
+                    'get_cookie': False
+    },
+    {'description': 'DELETE EVENT 3',
+                    'url': '/event/3/delete',
+                    'method': 'get',
+                    'data': {},
+                    'valid_code': '<Response [200]>',
+                    'valid_data': {'description': 'Successfully deleted'},
+                    'need_decision': False,
+                    'cookie': 'user',
+                    'get_cookie': False
+    },
+    {'description': 'DELETE EVENT 2',
+                    'url': '/event/2/delete',
+                    'method': 'get',
+                    'data': {},
+                    'valid_code': '<Response [200]>',
+                    'valid_data': {'description': 'Successfully deleted'},
+                    'need_decision': False,
+                    'cookie': 'admin',
+                    'get_cookie': False
+    },
+    {'description': 'JOIN admin 3 presenter',
+                    'url': '/event/3/join',
+                    'method': 'post',
+                    'data': {"role": "presenter", "report": "report",
+                             "presenter_description": "presenter_description"},
+                    'valid_code': '<Response [404]>',
+                    'valid_data': {'error': 'No event with this id'},
+                    'need_decision': False,
+                    'cookie': 'admin',
+                    'get_cookie': False
+    }
     ]
 
     i = 0
     code_passed = 0
     data_passed = 0
 
+    root_url = 'http://' + cfg.HOST + ':' + cfg.PORT
+
     if not hasattr(cookies, 'admin'):
         data = {
-            "email": SUPER_ADMIN_MAIL,
+            "email": cfg.SUPER_ADMIN_MAIL,
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
         cookies['admin'] = answer.cookies
     if not hasattr(cookies, 'user'):
         data = {
@@ -250,12 +305,12 @@ def test_events(cookies={}):
             "surname": "Surname",
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/register', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/register', data=json.dumps(data), headers={'Content-type': 'application/json'})
         data = {
             "email": "mail@mail",
             "password": "1234"
         }
-        answer = requests.post('http://127.0.0.1:45000/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
+        answer = requests.post(root_url + '/login', data=json.dumps(data), headers={'Content-type': 'application/json'})
         cookies['user'] = answer.cookies
     if not hasattr(cookies, 'none'):
         cookies['none'] = ''

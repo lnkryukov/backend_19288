@@ -38,10 +38,10 @@ def send_reset_email(email, new_password):
 
     app.mail.send(msg)
 
-def send_500_email(error):
+def send_500_email(e, error):
 
     msg = Message(
-        str(error),
+        error,
         subject='Congress Events goes KA-BOOOM',
         recipients = [cfg.SUPER_ADMIN_MAIL],
     )

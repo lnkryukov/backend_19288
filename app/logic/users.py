@@ -1,13 +1,12 @@
-from .config import cfg
-from .db import *
-from . import util
+from ..config import cfg
+from ..db import *
+from .. import util
 import logging
-from .exceptions import (NotJsonError, ConfirmationLinkError,
-                         WrongDataError, WrongIdError)
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import desc
 
+from flask import abort
 from datetime import datetime
 import requests
 import os
@@ -18,7 +17,12 @@ def get_user_info(u_id):
     with get_session() as s:
         user = s.query(User).get(u_id)
         if not user:
-            raise WrongIdError('No user with this id')
+            abort(404, 'No user with this id')
+
+        birth = None
+        if user.birth is not None:
+            birth = user.birth.isoformat()
+
         return {
             "email": user.email,
             "name": user.name,
@@ -30,7 +34,8 @@ def get_user_info(u_id):
             "country": user.country,
             "town": user.town,
             "bio": user.bio,
-            "birth": user.birth,
+            "birth": birth,
+            "sex": user.sex,
         }
 
 
@@ -39,7 +44,7 @@ def get_user_events_by_role(u_id, role, offset, size):
     with get_session() as s:
         user = s.query(User).get(u_id)
         if not user:
-            raise WrongIdError('No user with this id')
+            abort(404, 'No user with this id')
 
         events = s.query(Participation, Event).filter(
                 Participation.e_id == Event.id,
@@ -51,12 +56,12 @@ def get_user_events_by_role(u_id, role, offset, size):
             offset = int(offset)
             size = int(size)
             if offset < 0 or size < 1:
-                raise WrongDataError('Offset or size has wrong values!')
+                abort(422, 'Offset or size has wrong values')
             events = events.slice(offset, offset+size)
         elif not offset and not size:
             events = events.all()
         else:
-            raise KeyError('Wrong query string arg.')
+            abort(400, 'Wrong query string arg')
 
         for participant, event in events:
             result.append({
@@ -75,14 +80,18 @@ def update_profile(u_id, data):
                 User.status == 'active',
         ).one_or_none()
 
-        if user:
-            for arg in data.keys():
-                getattr(user, arg)
-                if arg in ['email', 'password', 'id', 'status', 'confirmation_link', 'cookie_id', 'service_status', 'registration_date', 'disable_date']:
-                    raise KeyError('No email or password changing here')
-                setattr(user, arg, data[arg])                
-        else:
-            raise WrongIdError('No user with this id')
+        if not user:
+            abort(404, 'No user with this id')
+        for arg in data.keys():
+            getattr(user, arg)
+            if arg in ['email', 'password', 'id', 'status', 'confirmation_link', 'cookie_id', 'service_status', 'registration_date', 'disable_date']:
+                abort(400, "Can't change this field(s)")
+            if arg is 'birth':
+                birth = data[arg].split('-')
+                birth_date = date(int(birth[0]), int(birth[1]), int(birth[2]))
+                setattr(user, arg, birth_date)
+            else:
+                setattr(user, arg, data[arg])
 
 
 # админка
@@ -95,12 +104,12 @@ def get_users(offset, size):
             offset = int(offset)
             size = int(size)
             if offset < 0 or size < 1:
-                raise WrongDataError('Offset or size has wrong values')
+                abort(422, 'Offset or size has wrong values')
             users = users.slice(offset, offset+size)
         elif not offset and not size:
             users = users.all()
         else:
-            raise KeyError('Wrong query string arg.')
+            abort(400, 'Wrong query string arg')
         for user in users:
             result.append({
                 'id': user.id,
