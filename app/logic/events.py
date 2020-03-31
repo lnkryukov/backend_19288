@@ -312,7 +312,8 @@ def get_report_info(u_id, e_id):
             abort(404, 'No event with this id')
         participation = s.query(Participation).filter(
             Participation.u_id == u_id,
-            Participation.e_id == e_id
+            Participation.e_id == e_id,
+            Participation.participation_role == 'presenter'
         ).one_or_none()
         if not participation:
             abort(424, 'User not joined')
@@ -332,22 +333,25 @@ def get_reports_for_event(e_id):
             abort(404, 'No event with this id')
         participations = s.query(Participation).filter(
             Participation.e_id == e_id,
-            Participation.participation_role == 'presenter' 
+            Participation.participation_role == 'presenter',
+            Participation.aprove_report == True
         ).all()
-        if not participations:
+        if len(participations) == 0 :
             abort(404, 'No participants found')
         if all(
             participation.report_id == None for participation in participations
         ):
             abort(404, 'No reports found')
         
-        return map(
-            lambda p: {
-                'report_id': p.report_id,
-                'report_name': p.report_name,
-                'last_updated': p.last_updated,
-            },
-            participations
+        return list(
+            map(
+                lambda p: {
+                    'report_id': p.report_id,
+                    'report_name': p.report_name,
+                    'last_updated': p.last_updated,
+                },
+                participations
+            )
         )
 
 def get_report_for_event_admin(e_id):
@@ -359,21 +363,23 @@ def get_report_for_event_admin(e_id):
             Participation.e_id == e_id,
             Participation.participation_role == 'presenter' 
         ).all()
-        if not participations:
+        if len(participations) == 0:
             abort(404, 'No participants founde')
         if all(
             participation.report_id == None for participation in participations
         ):
             abort(404, 'No reports found')
         
-        return map(
-            lambda p: {
-                'report_id': p.report_id,
-                'report_name': p.report_name,
-                'last_updated': p.last_updated,
-                'approved': p.aprove_report
-            },
-            participations
+        return list(
+            map(
+                lambda p: {
+                    'report_id': p.report_id,
+                    'report_name': p.report_name,
+                    'last_updated': p.last_updated,
+                    'approved': p.aprove_report
+                },
+                participations
+            )
         )
 
 def remove_report(u_id, e_id):

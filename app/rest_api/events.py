@@ -124,7 +124,7 @@ def get_report_info(e_id):
 
 @bp.route('/<int:e_id>/reports', methods=['GET'])
 def get_reports(e_id):
-    if current_user.service_status is 'user':
+    if not current_user.is_authenticated or current_user.service_status is 'user':
         return jsonify(events_logic.get_reports_for_event(e_id))
     else:
         return jsonify(events_logic.get_report_for_event_admin(e_id))
