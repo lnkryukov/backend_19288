@@ -83,7 +83,7 @@ def join(e_id):
     events_logic.join_event(current_user.id, e_id, data)
     return make_ok(200, 'Successfully joined')
 
-@bp.route('</int:e_id>/report', methods=['POST'])
+@bp.route('/<int:e_id>/report', methods=['POST'])
 @login_required
 def upload_report(e_id):
     
@@ -111,23 +111,23 @@ def get_all_reports():
         return make_4xx(403, "No rights")
     return jsonify(events_logic.get_all_reports())
 
-@bp.route('/<int:e_id/report', methods=['GET'])
+@bp.route('/<int:e_id>/report', methods=['GET'])
 def get_report(e_id):
     path, filename = events_logic.get_report(current_user.id, e_id)
     return send_from_directory(path, filename)
 
-@bp.route('/<int:e_id/report/info', methods=['GET'])
-def get_report(e_id):
+@bp.route('/<int:e_id>/report/info', methods=['GET'])
+def get_report_info(e_id):
     return jsonify(events_logic.get_report_info(current_user.id, e_id))
 
-@bp.route('/<int:e_id/reports', method=['GET'])
+@bp.route('/<int:e_id>/reports', methods=['GET'])
 def get_reports(e_id):
     if current_user.service_status is 'user':
         return jsonify(events_logic.get_reports_for_event(e_id))
     else:
         return jsonify(events_logic.get_report_for_event_admin(e_id))
 
-@bp.route('/<int:e_id/report', methods=['DELETE'])
+@bp.route('/<int:e_id>/report', methods=['DELETE'])
 @login_required
 def remove_report(e_id):
     events_logic.remove_report(current_user.id, e_id)
