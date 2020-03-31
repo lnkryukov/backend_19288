@@ -301,7 +301,9 @@ def get_report(u_id, e_id):
         ).one_or_none()
         if not participation:
             abort(424, 'User not joined')
-        return reports_manager.get(participation.report_id)
+        if participation.report_id is None:
+            abort(404, 'No report found')
+        return (*reports_manager.get(participation.report_id), participation.report_name)
 
 def get_report_info(u_id, e_id):
     with get_session() as s:
@@ -333,7 +335,7 @@ def get_reports_for_event(e_id):
             Participation.participation_role == 'presenter' 
         ).all()
         if not participations:
-            abort(404, 'No participants founde')
+            abort(404, 'No participants found')
         if all(
             participation.report_id == None for participation in participations
         ):

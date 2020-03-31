@@ -58,3 +58,4 @@ reports.ALLOWED_MIME_TYPES = (
                                 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
                                 'application/pdf'
                             )
+reports.MAX_SIZE = cfg.MAX_FILE_SIZE

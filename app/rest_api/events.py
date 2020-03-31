@@ -112,11 +112,13 @@ def get_all_reports():
     return jsonify(events_logic.get_all_reports())
 
 @bp.route('/<int:e_id>/report', methods=['GET'])
+@login_required
 def get_report(e_id):
-    path, filename = events_logic.get_report(current_user.id, e_id)
-    return send_from_directory(path, filename)
+    path, report_id, filename = events_logic.get_report(current_user.id, e_id)
+    return send_from_directory(path, report_id, as_attachment=True, attachment_filename=filename)
 
 @bp.route('/<int:e_id>/report/info', methods=['GET'])
+@login_required
 def get_report_info(e_id):
     return jsonify(events_logic.get_report_info(current_user.id, e_id))
 

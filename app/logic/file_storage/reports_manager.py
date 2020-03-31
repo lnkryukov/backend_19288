@@ -1,7 +1,8 @@
 import logging
 
 from uuid import uuid4
-from os.path import join, stat, exists
+from os.path import join, exists
+from os import stat
 from os import remove
 from shutil import move
 
@@ -14,11 +15,11 @@ _file_set = cfg.FILE_UPLOADS.FILE_SETS['REPORT']
 def save(file):
     file_extension = file.filename.rsplit('.', 1)[1].lower()
 
-    if file_extension not in _file_set['ALLOWED_EXTENSIONS']:
+    if file_extension not in _file_set.ALLOWED_EXTENSIONS:
         raise FileExtensionError
-    if file.mimetype not in _file_set['ALLOWED_MIME_TYPES']:
+    if file.mimetype not in _file_set.ALLOWED_MIME_TYPES:
         raise FileMimeTypeError
-    if file.content_length > _file_set['MAX_SIZE']: # Не будет работать, пока Chrome и Firefox не перестанут ставить Content-Length равным 0 ¯\_(ツ)_/¯
+    if file.content_length > _file_set.MAX_SIZE: # Не будет работать, пока Chrome и Firefox не перестанут ставить Content-Length равным 0 ¯\_(ツ)_/¯
         raise FileSizeLimitError
 
     filename = str(uuid4())
