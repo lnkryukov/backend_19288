@@ -1,6 +1,8 @@
 from ..config import cfg
 from ..db import *
 from .. import util
+from .file_storage import reports_manager
+
 import logging
 
 from sqlalchemy.exc import IntegrityError
@@ -237,11 +239,67 @@ def join_event(u_id, e_id, data):
         participation = Participation(e_id=e_id, u_id=u_id,
                                       participation_role='viewer')
         if data['role'] == 'presenter':
-            participation.participation_role = 'presenter'
-            participation.report = data['report']
-            participation.presenter_description = data['presenter_description']
             role = 'presenter'
+            participation.participation_role = role
+            participation.presenter_description = data['presenter_description']
         s.add(participation)
         logging.info('User [id {}] joined event [id {}] as [{}]'.format(u_id,
                                                                         e_id,
-                                                                        role))            
+                                                                        role))
+
+def upload_report(u_id, e_id, file):
+    with get_session() as s:
+        event = s.query(Event).get(e_id)
+        if not event or event.status == 'deleted':
+            abort(404, 'No event with this id')
+        participation = s.query(Participation).filter(
+            Participation.u_id == u_id,
+            Participation.e_id == e_id
+        ).one_or_none()
+
+        if participation:
+            report_id = participation.report_id
+            filename = file.filename
+            if report_id is not None:
+                reports_manager.remove(report_id)
+            report_id = reports_manager.save(file)
+            participation.report_id = report_id
+            participation.report_name = filename
+            logging.info(
+                'User [id {u_id}] uploaded report file '
+                '[{fname}] for event [id {e_id}].'
+                'Saved [id {r_id}]'.format(
+                    u_id = u_id,
+                    e_id = e_id,
+                    fname = filename,
+                    r_id = report_id
+                )
+            )
+            return report_id
+        else:
+            abort(424, 'User must join event before uploading')
+
+def remove_report(u_id, e_id):
+    with get_session() as s:
+        event = s.query(Event).get(e_id)
+        if not event or event.status == 'deleted':
+            abort(404, 'No event with this id')
+        participation = s.query(Participation).filter(
+            Participation.u_id == u_id,
+            Participation.e_id == e_id
+        ).one_or_none()
+        if participation:
+            report_id = participation.report_id
+            if report_id is None:
+                abort(404, 'No report found')
+            participation.report_id = None
+            participation.report_name = None
+            reports_manager.remove(report_id)
+            logging.info(
+                'User [id {u_id}] deleted report [id {r_id}]'.format(
+                    u_id = u_id,
+                    r_id = report_id
+                )
+            )
+        else:
+            abort(424, "User hasn't joined the event")
