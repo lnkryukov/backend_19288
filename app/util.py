@@ -41,8 +41,8 @@ def send_reset_email(email, new_password):
 def send_500_email(e, error):
 
     msg = Message(
-        error,
-        subject='Congress Events goes KA-BOOOM',
+        body = error,
+        subject = 'Congress Events goes KA-BOOOM',
         recipients = [cfg.SUPER_ADMIN_MAIL],
     )
 
