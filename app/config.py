@@ -11,6 +11,9 @@ def _get_db_connection_string():
         return db_connection_string
     return 'postgresql://{PGUSER}:{PGPASSWORD}@{PGHOST}:{PGPORT}/{PGDATABASE}'.format(**os.environ)
 
+def _get_number(env):
+    return int(os.getenv(env))
+    
 
 cfg.CSRF_ENABLED = False if os.getenv('DISABLE_CSRF') else True
 cfg.SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(24))
@@ -29,3 +32,29 @@ cfg.SMTP_HOST = os.getenv('SMTP_HOST')
 cfg.MAIL_LOGIN = os.getenv('MAIL_LOGIN')
 cfg.MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
 cfg.SITE_ADDR = os.getenv('SITE_ADDR')
+
+
+cfg.MAX_FILE_SIZE = _get_number('MAX_FILE_SIZE') * 1024 * 1024 # Глобальный максимальны размер файла, которы фласк может переварить
+cfg.FILE_UPLOADS = SimpleNamespace()
+cfg.FILE_UPLOADS.PARENT_FOLDER = os.getenv('FILE_UPLOADS_PARENT_FOLDER')
+cfg.FILE_UPLOADS.TEMP_FOLDER = 'tmp'
+cfg.FILE_UPLOADS.FILE_SETS = {
+                                'AVATAR': SimpleNamespace(),
+                                'REPORT': SimpleNamespace()
+                            }
+avatars = cfg.FILE_UPLOADS.FILE_SETS['AVATAR']
+avatars.FOLDER = 'avatars'
+avatars.MAX_SIZE =  8 * 1024 * 1024 # Максимальный размер аватара 8 Мб, спизженно у дискорда,
+avatars.ALLOWED_EXTENSIONS = ('jpg', 'png')
+avatars.ALLOWED_MIME_TYPES = ('image/jpeg', 'image/jpg', 'image/png')
+
+reports = cfg.FILE_UPLOADS.FILE_SETS['REPORT']
+reports.FOLDER = 'reports'
+reports.ALLOWED_EXTENSIONS = ('doc', 'docx', 'ppt', 'pptx', 'pdf')
+reports.ALLOWED_MIME_TYPES = (
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/vnd.ms-powerpoint',
+                                'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                                'application/pdf'
+                            )
