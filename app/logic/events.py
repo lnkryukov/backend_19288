@@ -305,6 +305,15 @@ def get_report(u_id, e_id):
             abort(404, 'No report found')
         return (*reports_manager.get(participation.report_id), participation.report_name)
 
+def get_report_by_id(r_id):
+    with get_session() as s:
+        participation = s.query(Participation).filter(
+            Participation.report_id == r_id,
+        ).one_or_none()
+        if participation.report_id is None:
+            abort(404, 'No report found')
+        return (*reports_manager.get(participation.report_id), participation.report_name)
+
 def get_report_info(u_id, e_id):
     with get_session() as s:
         event = s.query(Event).get(e_id)

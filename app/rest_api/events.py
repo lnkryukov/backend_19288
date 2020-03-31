@@ -111,6 +111,11 @@ def get_all_reports():
         return make_4xx(403, "No rights")
     return jsonify(events_logic.get_all_reports())
 
+@bp.route('/report/<r_id>', methods=['GET'])
+def get_report_by_id(r_id):
+    path, report_id, filename = events_logic.get_report_by_id(r_id)
+    return send_from_directory(path, report_id, as_attachment=True, attachment_filename=filename)
+
 @bp.route('/<int:e_id>/report', methods=['GET'])
 @login_required
 def get_report(e_id):
