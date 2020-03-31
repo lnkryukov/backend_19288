@@ -116,9 +116,16 @@ def get_report(e_id):
     path, filename = events_logic.get_report(current_user.id, e_id)
     return send_from_directory(path, filename)
 
+@bp.route('/<int:e_id/report/info', methods=['GET'])
+def get_report(e_id):
+    return jsonify(events_logic.get_report_info(current_user.id, e_id))
+
 @bp.route('/<int:e_id/reports', method=['GET'])
 def get_reports(e_id):
-    return jsonify(events_logic.get_reports_for_event(e_id))
+    if current_user.service_status is 'user':
+        return jsonify(events_logic.get_reports_for_event(e_id))
+    else:
+        return jsonify(events_logic.get_report_for_event_admin(e_id))
 
 @bp.route('/<int:e_id/report', methods=['DELETE'])
 @login_required

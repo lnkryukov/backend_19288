@@ -33,6 +33,9 @@ def save(file):
     move(tmp_path, new_path)
     return filename
 
+def get(id):
+    return _file_set.FOLDER, id
+
 def remove(filename):
     path = join(_file_set.FOLDER, filename)
     if exists(path):
