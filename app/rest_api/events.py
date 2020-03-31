@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, abort
+from flask import Blueprint, jsonify, request, abort, send_from_directory
 from flask_login import (login_required, login_user, logout_user,
                          login_fresh, current_user)
 
@@ -6,7 +6,7 @@ import bcrypt
 
 from . import *
 from ..logic import events as events_logic
-
+from ..logic.file_storage import file_storage_exceptions
 
 bp = Blueprint('events', __name__, url_prefix='/event')
 
@@ -83,6 +83,48 @@ def join(e_id):
     events_logic.join_event(current_user.id, e_id, data)
     return make_ok(200, 'Successfully joined')
 
+@bp.route('</int:e_id>/report', methods=['POST'])
+@login_required
+def upload_report(e_id):
+    
+    if 'file' not in request.files:
+        return make_4xx(403, "No file found")
+    file = request.files['file']
+    if file.filename == '':
+        return make_4xx(403, "No file found")
+    
+    logging.info('Recieved file with content-length set as {}'.format(file.content_length))
+    
+    try:
+        report_id = events_logic.upload_report(current_user.id, e_id, file)
+    except file_storage_exceptions.FileSizeLimitError as e:
+        return make_4xx(413, e.message)
+    except (file_storage_exceptions.FileExtensionError, file_storage_exceptions.FileMimeTypeError) as e:
+        return make_4xx(415, e.message)
+
+    return make_ok(200, report_id)
+
+@bp.route('/reports', methods=['GET'])
+@login_required
+def get_all_reports():
+    if current_user.service_status is 'user':
+        return make_4xx(403, "No rights")
+    return jsonify(events_logic.get_all_reports())
+
+@bp.route('/<int:e_id/report', methods=['GET'])
+def get_report(e_id):
+    path, filename = events_logic.get_report(current_user.id, e_id)
+    return send_from_directory(path, filename)
+
+@bp.route('/<int:e_id/reports', method=['GET'])
+def get_reports(e_id):
+    return jsonify(events_logic.get_reports_for_event(e_id))
+
+@bp.route('/<int:e_id/report', methods=['DELETE'])
+@login_required
+def remove_report(e_id):
+    events_logic.remove_report(current_user.id, e_id)
+    return make_ok(200, 'Report removed successfully')
 
 @bp.route('/<int:e_id>/presenters', methods=['GET'])
 def presenters(e_id):
