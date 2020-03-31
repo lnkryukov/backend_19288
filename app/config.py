@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 import os
 
+from app import logging_config
 
 cfg = SimpleNamespace()
 
@@ -34,6 +35,10 @@ cfg.MAIL_PORT = os.getenv('MAIL_PORT')
 cfg.MAIL_USERNAME = os.getenv('MAIL_USERNAME')
 cfg.MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
 cfg.MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
+
+cfg.LOG_LEVEL = logging_config.LOG_LEVEL
+cfg.LOGGING = logging_config.LOGGING
+cfg.DISABLE_EXISTING_LOGGERS = logging_config.DISABLE_EXISTING_LOGGERS
 
 cfg.MAX_FILE_SIZE = _get_number('MAX_FILE_SIZE') * 1024 * 1024 # Глобальный максимальны размер файла, которы фласк может переварить
 cfg.FILE_UPLOADS = SimpleNamespace()

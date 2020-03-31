@@ -14,19 +14,10 @@ from os import makedirs
 
 
 import logging
+import logging.config
 import sys
 
-from prettyprinter import pprint
-
-print(cfg.MAX_FILE_SIZE)
-
-pprint(cfg)
-
 for K, V in cfg.FILE_UPLOADS.FILE_SETS.items():
-    print("Key: ")
-    pprint(K)
-    print("Value: ")
-    pprint(V)
     path = join(cfg.FILE_UPLOADS.PARENT_FOLDER, V.FOLDER)
     if not exists(path):
         makedirs(path)
@@ -34,13 +25,9 @@ for K, V in cfg.FILE_UPLOADS.FILE_SETS.items():
 
 tmp_path = join(cfg.FILE_UPLOADS.PARENT_FOLDER, cfg.FILE_UPLOADS.TEMP_FOLDER)
 
-
-
 if not exists(tmp_path):
     makedirs(tmp_path)
 cfg.FILE_UPLOADS.TEMP_FOLDER = tmp_path
-
-pprint(cfg)
 
 app = Flask(__name__)
 app.config.update(
@@ -73,12 +60,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.user_loader(user_loader)
 
-logging.basicConfig(format='[%(asctime)s] [%(levelname)s] %(message)s',
-                    level=logging.INFO)
-
-
 def run():
     monkey.patch_all(ssl=False)
-    http_server = WSGIServer((cfg.HOST, cfg.PORT), app)
+    logger = logging.getLogger('gevent') if cfg.DISABLE_EXISTING_LOGGERS is False else None
+    http_server = WSGIServer(
+        (cfg.HOST, cfg.PORT),
+        app,
+        log = logger, # Gevent игнорирует конфигурацию логгеров, поэтому ему отедльно нужно сказать, чтобы перестал это делать
+        error_log = logger
+    )
     logging.info('Started server')
     http_server.serve_forever()
