@@ -82,9 +82,20 @@ def self_delete():
 
 
 @bp.route('/status', methods=['GET'])
-@login_required
 def user_status():
-    return jsonify(service_status=current_user.service_status)
+    is_auth = current_user.is_authenticated
+
+    status = dict(is_logged_in=is_auth)
+    if is_auth:
+        status['info'] = {
+            'id': current_user.id,
+            'email': current_user.email,
+            'name': current_user.name,
+            'surname': current_user.surname,
+            'service_status': current_user.service_status
+        }
+
+    return jsonify(status)
 
 
 @bp.route('/user/<int:u_id>/ban', methods=['GET'])

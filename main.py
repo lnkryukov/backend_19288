@@ -23,6 +23,7 @@ def main():
         db.create_tables(pw.decode('utf-8'))
 
     logging.info('Starting restful api backend server')
+    logging.info('IP: ' + cfg.HOST + '  PORT: ' + str(cfg.PORT))
     app.run()
 
 

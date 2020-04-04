@@ -206,7 +206,8 @@ def get_presenters(e_id):
         users = s.query(User, Participation).filter(
                 User.id == Participation.u_id,
                 Participation.e_id == e_id,
-                Participation.participation_role == 'presenter' 
+                Participation.participation_role == 'presenter',
+                Participation.report_status == 'approved'
         ).all()
 
         for user, participant in users:
@@ -214,7 +215,8 @@ def get_presenters(e_id):
                 'name': user.name,
                 'surname': user.surname,
                 'report': participant.report,
-                'presenter_description': participant.presenter_description
+                'presenter_description': participant.presenter_description,
+                'report_description': participant.report_description
             })
 
     return result
@@ -240,6 +242,8 @@ def join_event(u_id, e_id, data):
             participation.participation_role = 'presenter'
             participation.report = data['report']
             participation.presenter_description = data['presenter_description']
+            participation.report_description = data['report_description']
+            participation.report_status = 'unseen'
             role = 'presenter'
         s.add(participation)
         logging.info('User [id {}] joined event [id {}] as [{}]'.format(u_id,
