@@ -52,7 +52,7 @@ def test_accounts():
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'service_status': 'superadmin'},
+                    'valid_data': {'info': {'email': 'python_send@mail.ru', 'id': 1, 'name': 'Super', 'service_status': 'superadmin', 'surname': 'Admin'}, 'is_logged_in': True},
                     'need_decision': False,
                     'cookie': 'admin',
                     'get_cookie': False
@@ -328,7 +328,7 @@ def test_accounts():
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'service_status': 'admin'},
+                    'valid_data': {'info': {'email': 'mail@mail', 'id': 3, 'name': 'Name', 'service_status': 'admin', 'surname': 'Surname'}, 'is_logged_in': True},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
@@ -358,7 +358,7 @@ def test_accounts():
                     'method': 'get',
                     'data': {},
                     'valid_code': '<Response [200]>',
-                    'valid_data': {'service_status': 'user'},
+                    'valid_data': {'info': {'email': 'mail@mail', 'id': 3, 'name': 'Name', 'service_status': 'user', 'surname': 'Surname'}, 'is_logged_in': True},
                     'need_decision': False,
                     'cookie': 'user',
                     'get_cookie': False
