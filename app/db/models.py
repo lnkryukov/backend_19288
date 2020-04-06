@@ -19,6 +19,7 @@ Participation_role = ENUM('creator', 'manager', 'presenter', 'viewer',
                            name='participation_role')
 Service_status = ENUM('superadmin', 'admin', 'moderator', 'user', name='service_status')
 Task_status = ENUM('todo', 'inprocess', 'waiting', 'done', 'deleted', name='task_status')
+Report_status = ENUM('unseen', 'approved', 'declined', name='report_status')
 
 class User(Base, UserMixin):
     __tablename__ = 'users'
@@ -88,7 +89,9 @@ class Participation(Base):
     report_id = Column(TEXT, nullable=True, unique=True)
     last_updated = Column(DateTime, nullable=True, onupdate=datetime.now)
     presenter_description = Column(TEXT, nullable=True)
-    aprove_report = Column(Boolean, default=False)
+    report = Column(TEXT, nullable=True)
+    report_description = Column(TEXT, nullable=True)
+    report_status = Column(Report_status, nullable=True)
 
 
 class ETask(Base):

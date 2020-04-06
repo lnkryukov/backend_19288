@@ -44,9 +44,11 @@ def main():
     
     if args.create_tables:
         pw = bcrypt.hashpw(str(cfg.SUPER_ADMIN_PASSWORD).encode('utf-8'), bcrypt.gensalt())
+        cfg.SUPER_ADMIN_PASSWORD = ""
         db.create_tables(pw.decode('utf-8'))
 
     logging.info('Starting restful api backend server')
+    logging.info('IP: ' + cfg.HOST + '  PORT: ' + str(cfg.PORT))
     app.run()
 
 
