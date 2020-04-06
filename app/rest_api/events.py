@@ -6,7 +6,6 @@ import bcrypt
 
 from . import *
 from ..logic import events as events_logic
-from ..logic.file_storage import file_storage_exceptions
 
 bp = Blueprint('events', __name__, url_prefix='/event')
 
@@ -82,63 +81,6 @@ def join(e_id):
     data = get_json()
     events_logic.join_event(current_user.id, e_id, data)
     return make_ok(200, 'Successfully joined')
-
-@bp.route('/<int:e_id>/report', methods=['POST'])
-@login_required
-def upload_report(e_id):
-    
-    if 'file' not in request.files:
-        return make_4xx(403, "No file found")
-    file = request.files['file']
-    if file.filename == '':
-        return make_4xx(403, "No file found")
-    
-    logging.info('Recieved file with content-length set as {}'.format(file.content_length))
-    
-    try:
-        report_id = events_logic.upload_report(current_user.id, e_id, file)
-    except file_storage_exceptions.FileSizeLimitError as e:
-        return make_4xx(413, e.message)
-    except (file_storage_exceptions.FileExtensionError, file_storage_exceptions.FileMimeTypeError) as e:
-        return make_4xx(415, e.message)
-
-    return make_ok(200, report_id)
-
-@bp.route('/reports', methods=['GET'])
-@login_required
-def get_all_reports():
-    if current_user.service_status is 'user':
-        return make_4xx(403, "No rights")
-    return jsonify(events_logic.get_all_reports())
-
-@bp.route('/report/<r_id>', methods=['GET'])
-def get_report_by_id(r_id):
-    path, report_id, filename = events_logic.get_report_by_id(r_id)
-    return send_from_directory(path, report_id, as_attachment=True, attachment_filename=filename)
-
-@bp.route('/<int:e_id>/report', methods=['GET'])
-@login_required
-def get_report(e_id):
-    path, report_id, filename = events_logic.get_report(current_user.id, e_id)
-    return send_from_directory(path, report_id, as_attachment=True, attachment_filename=filename)
-
-@bp.route('/<int:e_id>/report/info', methods=['GET'])
-@login_required
-def get_report_info(e_id):
-    return jsonify(events_logic.get_report_info(current_user.id, e_id))
-
-@bp.route('/<int:e_id>/reports', methods=['GET'])
-def get_reports(e_id):
-    if not current_user.is_authenticated or current_user.service_status is 'user':
-        return jsonify(events_logic.get_reports_for_event(e_id))
-    else:
-        return jsonify(events_logic.get_report_for_event_admin(e_id))
-
-@bp.route('/<int:e_id>/report', methods=['DELETE'])
-@login_required
-def remove_report(e_id):
-    events_logic.remove_report(current_user.id, e_id)
-    return make_ok(200, 'Report removed successfully')
 
 @bp.route('/<int:e_id>/presenters', methods=['GET'])
 def presenters(e_id):
