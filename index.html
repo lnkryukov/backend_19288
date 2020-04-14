@@ -905,6 +905,76 @@
           <li><code>424 - </code> пользователь не присоеденился к мероприятию</li>
         </ul>
 
+        <div class="text-warning"><kbd>/[id]/report/info</kbd><code> - [GET]</code> LOGIN REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Получить информацию о докладе текущего пользователя на заданное мероприятие</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id мероприятия</li>
+          </ul>
+          <li><code>200 OK - JSON</code></li>
+          <ul>
+            <li><kbd>report_id</kbd> - id доклада</li>
+            <li><kbd>report_name</kbd> - имя файла с докладом</li>
+            <li><kbd>last_updated</kbd> - дата последнего изменения</li>
+            <li><kbd>status</kbd> - статус доклада</li>
+          </ul>
+          <li><code>404 - </code> мероприятие с заданным id не найден или пользователь не загружал доклад</li>
+          <li><code>424 - </code> пользователь не присоеденился к мероприятию</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/[id]/report/all</kbd><code> - [GET]</code></div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Получить информацию о всех докладах на заданном мероприятии, возвращает толкьо одобренные доклады</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id мероприятия</li>
+          </ul>
+          <li><code>200 OK - JSON</code></li>
+          <ul>
+            <li>Список</li>
+            <li><kbd>report_id</kbd> - id доклада</li>
+            <li><kbd>report_name</kbd> - имя файла с докладом</li>
+            <li><kbd>last_updated</kbd> - дата последнего изменения</li>
+          </ul>
+          <li><code>404 - </code> мероприятие с заданным id не найден или пользователь не загружал доклад</li>
+          <li><code>424 - </code> пользователь не присоеденился к мероприятию</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/[id]/report/all</kbd><code> - [GET]</code> LOGIN REQUIRED + RIGHTS REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Получить информацию о всех докладах на заданном мероприятии, возвращает все доклады, доступна только админам</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id мероприятия</li>
+          </ul>
+          <li><code>200 OK - JSON</code></li>
+          <ul>
+            <li>Список</li>
+            <li><kbd>report_id</kbd> - id доклада</li>
+            <li><kbd>report_name</kbd> - имя файла с докладом</li>
+            <li><kbd>last_updated</kbd> - дата последнего изменения</li>
+            <li><kbd>status</kbd> - статус доклада</li>
+          </ul>
+          <li><code>404 - </code> мероприятие с заданным id не найден или пользователь не загружал доклад</li>
+          <li><code>424 - </code> пользователь не присоеденился к мероприятию</li>
+        </ul>
+
+        <div class="text-warning"><kbd>/[id]/report</kbd><code> - [DELETT]</code> LOGIN REQUIRED</div>
+        <ul class="list-group-flush" style="list-style-type:none;">
+          <li>Удалить доклад текущего пользователя для конкретного мероприятия</li>
+          <li><code>Принимает</code></li>
+          <ul>
+            <li><kbd>[id]</kbd> - id мероприятия</li>
+          </ul>
+          <li><code>200 OK</code></li>
+          <ul>
+            <li><kbd>description</kbd></li>
+          </ul>
+          <li><code>404 - </code> мероприятие с заданным id не найден или пользователь не загружал доклад</li>
+          <li><code>424 - </code> пользователь не присоеденился к мероприятию</li>
+        </ul>
+
         <!-- <div class="text-warning"><kbd>/change_password</kbd><code> - [POST] - </code>LOGIN REQUIRED</div>
         <ul class="list-group-flush" style="list-style-type:none;">
           <li>Смена пароля.</li>
