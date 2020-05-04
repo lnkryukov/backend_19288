@@ -1,9 +1,9 @@
-peline {
-    agent { docker { image 'python:3.5.1' } }
+pipeline {
+    agent { docker { image 'python:3' } }
     stages {
         stage('build') {
             steps {
-                sh 'python --version'
+                sh 'pip -r requirements.txt'
             }
         }
     }
